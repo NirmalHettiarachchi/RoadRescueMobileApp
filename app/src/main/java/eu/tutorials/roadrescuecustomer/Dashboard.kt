@@ -1,6 +1,7 @@
 package eu.tutorials.roadrescuecustomer
 
 import android.graphics.drawable.shapes.Shape
+import android.widget.GridView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,13 +34,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -168,19 +167,87 @@ fun CommonIssuesBox() {
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {},
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "Request Service",
-                    style = textStyle3
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // First row, first button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        onClick = {},
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Mechanical",
+                            style = textStyle3
+                        )
+                    }
+                    // First row, second button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        onClick = {},
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Electrical & Battery",
+                            style = textStyle3
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Second row, first button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        onClick = {},
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Tire & Wheel",
+                            style = textStyle3
+                        )
+                    }
+
+                    // Second row, second button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        onClick = {},
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Fuel & Ignition",
+                            style = textStyle3
+                        )
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
