@@ -14,16 +14,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -61,6 +67,7 @@ val cardModifier = Modifier
     .fillMaxWidth()
     .padding(16.dp)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard() {
     Column(
@@ -73,18 +80,91 @@ fun Dashboard() {
                     end = Offset(0f, Float.POSITIVE_INFINITY)
                 )
             ),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        //Welcome text
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Welcome Nirmal Hettiarachchi",
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            style = textStyle1
-        )
+        Column {
+            CenterAlignedTopAppBar(
+                title = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.logo),
+                        modifier = Modifier.size(100.dp),
+                        tint = Color.Unspecified,
+                        contentDescription = "Toolbar icon"
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp),
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF253555)
+                ),
+            )
+            //Welcome text
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Welcome Nirmal Hettiarachchi",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle1
+            )
 
-        RequestServiceBox()
-        CommonIssuesBox()
-        HelpBox()
+            RequestServiceBox()
+            CommonIssuesBox()
+            HelpBox()
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
+                .background(color = Color(0xFF253555))
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.book_fill),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(45.dp),
+                tint = Color.Unspecified, contentDescription = null
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.compass_fill),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(45.dp),
+                tint = Color.Unspecified, contentDescription = null
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.home),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(45.dp),
+                tint = Color.Unspecified, contentDescription = null
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.chat_fill),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(45.dp),
+                tint = Color.Unspecified, contentDescription = null
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.user_fill),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(40.dp),
+                tint = Color.Unspecified, contentDescription = null
+            )
+
+
+        }
     }
 }
 
@@ -128,7 +208,9 @@ fun RequestServiceBox() {
                     Icon(
                         painter = painterResource(id = R.drawable.send_fill),
                         contentDescription = null,
-                        modifier = Modifier.padding(top = 5.dp).size(30.dp),
+                        modifier = Modifier
+                            .padding(top = 5.dp)
+                            .size(30.dp),
                         tint = Color.Unspecified // Tint color of the icon
                     )
                     Text(
@@ -164,7 +246,7 @@ fun CommonIssuesBox() {
             Spacer(modifier = Modifier.height(16.dp))
             Column(
                 modifier = Modifier
-                    .padding(vertical = 16.dp, horizontal = 24.dp)
+                    .padding(vertical = 8.dp, horizontal = 24.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -251,6 +333,13 @@ fun CommonIssuesBox() {
                             style = textStyle3.copy(textAlign = TextAlign.Center)
                         )
                     }
+                }
+                Button(onClick = {}, modifier = Modifier.fillMaxWidth().padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+                    Text(
+                        text = "Other",
+                        color = Color(0xFF253555),
+                        style = textStyle3.copy(textAlign = TextAlign.Center)
+                    )
                 }
             }
         }
