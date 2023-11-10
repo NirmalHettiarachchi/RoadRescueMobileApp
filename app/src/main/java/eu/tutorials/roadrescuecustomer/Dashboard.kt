@@ -1,13 +1,10 @@
 package eu.tutorials.roadrescuecustomer
 
-import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,13 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,9 +28,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -67,13 +60,10 @@ val textStyle3 = TextStyle(
 val cardModifier = Modifier
     .fillMaxWidth()
     .padding(16.dp)
-    .background(color = Color(0xFFB6C7E3), shape = RoundedCornerShape(percent = 10))
-    .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(percent = 10))
 
 @Composable
 fun Dashboard() {
-
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -102,6 +92,8 @@ fun Dashboard() {
 fun RequestServiceBox() {
     Card(
         modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
@@ -134,9 +126,10 @@ fun RequestServiceBox() {
                     horizontalArrangement = Arrangement.spacedBy(4.dp) // Adjust spacing between icon and text
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowForward,
+                        painter = painterResource(id = R.drawable.send_fill),
                         contentDescription = null,
-                        tint = Color.White // Tint color of the icon
+                        modifier = Modifier.padding(top = 5.dp).size(30.dp),
+                        tint = Color.Unspecified // Tint color of the icon
                     )
                     Text(
                         text = "Request Service",
@@ -153,6 +146,7 @@ fun RequestServiceBox() {
 fun CommonIssuesBox() {
     Card(
         modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White), shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
@@ -168,19 +162,97 @@ fun CommonIssuesBox() {
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {},
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 16.dp, horizontal = 24.dp)
             ) {
-                Text(
-                    text = "Request Service",
-                    style = textStyle3
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // First row, first button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClick = {},
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Mechanical",
+                            style = textStyle3.copy(textAlign = TextAlign.Center)
+                        )
+                    }
+                    // First row, second button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClick = {},
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Electrical & Battery",
+                            style = textStyle3.copy(textAlign = TextAlign.Center)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Second row, first button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClick = {},
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Tire & Wheel",
+                            style = textStyle3.copy(textAlign = TextAlign.Center)
+                        )
+                    }
+
+                    // Second row, second button
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClick = {},
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Fuel & Ignition",
+                            style = textStyle3.copy(textAlign = TextAlign.Center)
+                        )
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -189,6 +261,8 @@ fun CommonIssuesBox() {
 fun HelpBox() {
     Card(
         modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
@@ -211,12 +285,13 @@ fun HelpBox() {
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
+
                 IconButton(onClick = {}) {
                     Icon(
-                        imageVector = Icons.Default.PlayArrow,
+                        painter = painterResource(id = R.drawable.arrow_drop_right),
                         contentDescription = null,
-                        tint = Color(0xFF253555),
-                        modifier = Modifier.size(24.dp)
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(30.dp)
                     )
                 }
             }
