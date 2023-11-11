@@ -1,6 +1,7 @@
 package eu.tutorials.roadrescuecustomer
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -66,6 +68,7 @@ fun Dashboard() {
 @Composable
 fun RequestServiceBox() {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
+    var showCostDetailWindoew by remember { mutableStateOf(false) }
 
     Card(
         modifier = cardModifier,
@@ -122,7 +125,9 @@ fun RequestServiceBox() {
 
     //RequestServiceWindow
     if(showRequestServiceWindow) {
-        AlertDialog(onDismissRequest = { },
+        AlertDialog(
+            onDismissRequest = { },
+            tonalElevation = 100.dp,
             confirmButton = {
                 Column (
                 modifier = Modifier
@@ -155,6 +160,32 @@ fun RequestServiceBox() {
                     DropDown("Issue")
                     DropDown("Vehicle Type")
                     DropDown("Fuel Type")
+
+                    Button(
+                        onClick = { showCostDetailWindoew = true },
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Cost LKR 0.00",
+                                style = textStyle2,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = "Info",
+                                tint = Color(0xFF253555)
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
@@ -194,6 +225,26 @@ fun RequestServiceBox() {
                 }
             }
         )
+    }
+
+    if(showCostDetailWindoew) {
+        AlertDialog(
+            onDismissRequest = { showCostDetailWindoew = false },
+            modifier = Modifier.border(2.dp, Color.White, shape = RoundedCornerShape(20)),
+            tonalElevation = 300.dp,
+            confirmButton = {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF253555)
+                )
+            }
+        })
     }
 }
 
