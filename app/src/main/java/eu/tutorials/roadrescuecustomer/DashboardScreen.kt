@@ -1,8 +1,6 @@
 package eu.tutorials.roadrescuecustomer
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -149,6 +150,12 @@ fun RequestServiceBox() {
                         style = textStyle2
                     )
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    DropDown("Issue")
+                    DropDown("Vehicle Type")
+                    DropDown("Fuel Type")
+
+                    Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = "",
                         onValueChange = {},
@@ -189,6 +196,44 @@ fun RequestServiceBox() {
     }
 }
 
+@Composable
+fun DropDown(dropDownText: String) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Box {
+        Button(
+            onClick = { isExpanded = true },
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = dropDownText,
+                    color = Color(0xFF253555)
+                )
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = "Arrow Down",
+                    tint = Color(0xFF253555)
+                )
+            }
+        }
+        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text("Tire Punch") },
+                onClick = {
+                    isExpanded = false
+                }
+            )
+        }
+    }
+}
 
 @Composable
 fun CommonIssuesBox() {
