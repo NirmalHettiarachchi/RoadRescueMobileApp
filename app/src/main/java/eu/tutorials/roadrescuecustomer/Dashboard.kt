@@ -2,6 +2,7 @@ package eu.tutorials.roadrescuecustomer
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -65,7 +66,7 @@ val textStyle3 = TextStyle(
 
 val cardModifier = Modifier
     .fillMaxWidth()
-    .padding(16.dp)
+    .padding(horizontal = 16.dp, vertical = 8.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,30 +84,7 @@ fun Dashboard() {
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
-            CenterAlignedTopAppBar(
-                title = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.logo),
-                        modifier = Modifier.size(100.dp),
-                        tint = Color.Unspecified,
-                        contentDescription = "Toolbar icon"
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            tint = Color.White,
-                            modifier = Modifier.size(30.dp),
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF253555)
-                ),
-            )
+            Header()
             //Welcome text
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -119,52 +97,7 @@ fun Dashboard() {
             CommonIssuesBox()
             HelpBox()
         }
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
-                .background(color = Color(0xFF253555))
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.book_fill),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(45.dp),
-                tint = Color.Unspecified, contentDescription = null
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.compass_fill),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(45.dp),
-                tint = Color.Unspecified, contentDescription = null
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.home),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(45.dp),
-                tint = Color.Unspecified, contentDescription = null
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.chat_fill),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(45.dp),
-                tint = Color.Unspecified, contentDescription = null
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.user_fill),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(40.dp),
-                tint = Color.Unspecified, contentDescription = null
-            )
-
-
-        }
+        Footer()
     }
 }
 
@@ -334,7 +267,10 @@ fun CommonIssuesBox() {
                         )
                     }
                 }
-                Button(onClick = {}, modifier = Modifier.fillMaxWidth().padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+                Button(onClick = {},
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
                     Text(
                         text = "Other",
                         color = Color(0xFF253555),
@@ -386,5 +322,88 @@ fun HelpBox() {
             }
             Spacer(modifier = Modifier.height(6.dp))
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Header() {
+    CenterAlignedTopAppBar(
+        title = {
+            Icon(
+                painter = painterResource(id = R.drawable.logo),
+                modifier = Modifier.size(100.dp),
+                tint = Color.Unspecified,
+                contentDescription = "Toolbar icon"
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    tint = Color.White,
+                    modifier = Modifier.size(30.dp),
+                    contentDescription = "Localized description"
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Color(0xFF253555)
+        ),
+    )
+}
+@Composable
+fun Footer() {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
+            .background(color = Color(0xFF253555))
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.book_fill),
+            modifier = Modifier
+                .padding(16.dp)
+                .size(45.dp)
+                .clickable{},
+            tint = Color.Unspecified, contentDescription = null
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.compass_fill),
+            modifier = Modifier
+                .padding(16.dp)
+                .size(45.dp)
+                .clickable{},
+            tint = Color.Unspecified, contentDescription = null
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.home),
+            modifier = Modifier
+                .padding(16.dp)
+                .size(45.dp)
+                .clickable{},
+            tint = Color.Unspecified, contentDescription = null
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.chat_fill),
+            modifier = Modifier
+                .padding(16.dp)
+                .size(45.dp)
+                .clickable{},
+            tint = Color.Unspecified, contentDescription = null
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.user_fill),
+            modifier = Modifier
+                .padding(8.dp)
+                .size(40.dp)
+                .clickable{},
+            tint = Color.Unspecified, contentDescription = null
+        )
+
+
     }
 }
