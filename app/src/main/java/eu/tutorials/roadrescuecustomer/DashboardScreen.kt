@@ -1,7 +1,10 @@
 package eu.tutorials.roadrescuecustomer
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -19,6 +22,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun Dashboard() {
@@ -112,6 +118,7 @@ fun RequestServiceBox() {
         }
     }
 
+    //RequestServiceWindow
     if(showRequestServiceWindow) {
         AlertDialog(onDismissRequest = { },
             confirmButton = {
@@ -142,9 +149,18 @@ fun RequestServiceBox() {
                         style = textStyle2
                     )
                     Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = {},
+                        modifier = Modifier
+                            .height(100.dp), // Adjust the height as needed
+                        placeholder = {
+                            Text("Write a Description (Optional) ... ", fontSize = 12.sp)
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = {
-                            },
+                        onClick = {},
                         border = BorderStroke(width = 2.dp, color = Color.White),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
