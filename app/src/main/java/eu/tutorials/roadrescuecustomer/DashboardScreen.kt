@@ -12,13 +12,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +57,8 @@ fun Dashboard() {
 
 @Composable
 fun RequestServiceBox() {
+    var showRequestServiceWindow by remember { mutableStateOf(false) }
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -77,14 +85,14 @@ fun RequestServiceBox() {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {},
+                onClick = { showRequestServiceWindow = true },
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp) // Adjust spacing between icon and text
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.send_fill),
@@ -92,7 +100,7 @@ fun RequestServiceBox() {
                         modifier = Modifier
                             .padding(top = 5.dp)
                             .size(30.dp),
-                        tint = Color.Unspecified // Tint color of the icon
+                        tint = Color.Unspecified
                     )
                     Text(
                         text = "Request Service",
@@ -103,7 +111,68 @@ fun RequestServiceBox() {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
+    if(showRequestServiceWindow) {
+        AlertDialog(onDismissRequest = { },
+            confirmButton = {
+                Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        IconButton(onClick = { showRequestServiceWindow = false }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close_round_fill),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(24.dp),
+                                tint = Color.Unspecified
+                            )
+                        }
+                    }
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = "Tell us more about your issue...",
+                        style = textStyle2
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            },
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.send_fill),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(top = 5.dp)
+                                    .size(30.dp),
+                                tint = Color.Unspecified
+                            )
+                            Text(
+                                text = "Request Service",
+                                style = textStyle3
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
 }
+
 
 @Composable
 fun CommonIssuesBox() {
@@ -111,7 +180,7 @@ fun CommonIssuesBox() {
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White), shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)) // Apply shadow to the outer Box
     ) {
         Column(
             modifier = Modifier
@@ -229,7 +298,3 @@ fun CommonIssuesBox() {
         }
     }
 }
-
-
-
-
