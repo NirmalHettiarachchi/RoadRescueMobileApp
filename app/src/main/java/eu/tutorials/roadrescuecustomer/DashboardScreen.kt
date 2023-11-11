@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -224,9 +225,13 @@ fun DropDown(dropDownText: String) {
                 )
             }
         }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        DropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+            modifier = Modifier.width(270.dp)
+        ) {
             DropdownMenuItem(
-                text = { Text("Tire Punch") },
+                text = { Text(text = "Tire Punch", color = Color(0xFF253555))},
                 onClick = {
                     isExpanded = false
                 }
