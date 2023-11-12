@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -165,9 +166,9 @@ fun RequestServiceBox() {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    issue = dropDown("Issue")
-                    vehicleType = dropDown("Vehicle Type")
-                    fuelType = dropDown("Fuel Type")
+                    issue = dropDown("Issue", listOf("Tire Punch", "Engine Fault"))
+                    vehicleType = dropDown("Vehicle Type", listOf("Car", "Van", "Lorry", "Bicycle"))
+                    fuelType = dropDown("Fuel Type", listOf("Petrol", "Diesel", "Hybrid", "Electric"))
 
                     Button(
                         onClick = { showCostDetailWindoew = true },
@@ -269,7 +270,7 @@ fun RequestServiceBox() {
 }
 
 @Composable
-fun dropDown(dropDownText: String): String {
+fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
     var isExpanded by remember { mutableStateOf(false) }
     var selectedValue by remember { mutableStateOf(dropDownText) }
 
@@ -300,15 +301,21 @@ fun dropDown(dropDownText: String): String {
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = Modifier.width(270.dp)
+            modifier = Modifier.width(270.dp).background(Color.White),
         ) {
-            DropdownMenuItem(
-                text = { Text(text = "Tire Punch", color = Color(0xFF253555))},
-                onClick = {
-                    isExpanded = false
-                    selectedValue = "Tire Punch"
+            dropDownListItems.forEachIndexed { index, dropDownListItem ->
+                DropdownMenuItem(
+                    text = {Text(text = dropDownListItem, color = Color(0xFF253555))},
+                    modifier = Modifier.fillMaxWidth().background(Color.White),
+                    onClick = {
+                        isExpanded = false
+                        selectedValue = dropDownListItem
+                    }
+                )
+                if (index < dropDownListItems.size - 1) {
+                    Divider()
                 }
-            )
+            }
         }
     }
     return selectedValue
