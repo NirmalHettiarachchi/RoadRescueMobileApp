@@ -6,7 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,10 +23,26 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    DashboardScreen()
+                    MyApp()
                 }
             }
         }
     }
 }
 
+@Composable
+fun MyApp() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "dashboardscreen") {
+        composable("dashboardscreen") {
+            DashboardScreen {
+                navController.navigate("profilescreen")
+            }
+        }
+        composable("profilescreen") {
+            ProfileScreen {
+                navController.navigate("dashboardscreen")
+            }
+        }
+    }
+}

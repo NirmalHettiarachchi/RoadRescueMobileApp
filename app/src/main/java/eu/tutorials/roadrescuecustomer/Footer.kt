@@ -18,7 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Footer() {
+fun Footer(
+    navigationToDashboardScreen: () -> Unit,
+    navigationToProfileScreen: () -> Unit
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -48,7 +51,7 @@ fun Footer() {
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable{},
+                .clickable{ navigationToDashboardScreen() },
             tint = Color.Unspecified, contentDescription = null
         )
         Icon(
@@ -64,7 +67,7 @@ fun Footer() {
             modifier = Modifier
                 .padding(8.dp)
                 .size(40.dp)
-                .clickable{},
+                .clickable{ navigationToProfileScreen() },
             tint = Color.Unspecified, contentDescription = null
         )
 

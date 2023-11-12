@@ -47,7 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    navigationToProfileScreen: () -> Unit) {
     Column(
         backgroundModifier,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -65,7 +66,7 @@ fun DashboardScreen() {
             CommonIssuesBox()
             HelpBox()
         }
-        Footer()
+        Footer({}, navigationToProfileScreen)
     }
 }
 
