@@ -1,6 +1,7 @@
 package eu.tutorials.roadrescuecustomer
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -36,8 +38,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,6 +73,11 @@ fun Dashboard() {
 fun RequestServiceBox() {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
     var showCostDetailWindoew by remember { mutableStateOf(false) }
+
+    var issue by remember { mutableStateOf("") }
+    var vehicleType by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     Card(
         modifier = cardModifier,
@@ -157,9 +166,9 @@ fun RequestServiceBox() {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    DropDown("Issue")
-                    DropDown("Vehicle Type")
-                    DropDown("Fuel Type")
+                    issue = dropDown("Issue", listOf("Tire Punch", "Engine Fault"))
+                    vehicleType = dropDown("Vehicle Type", listOf("Car", "Van", "Lorry", "Bicycle"))
+                    fuelType = dropDown("Fuel Type", listOf("Petrol", "Diesel", "Hybrid", "Electric"))
 
                     Button(
                         onClick = { showCostDetailWindoew = true },
@@ -188,15 +197,27 @@ fun RequestServiceBox() {
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = description,
+                        onValueChange = { description = it },
                         modifier = Modifier
-                            .height(100.dp), // Adjust the height as needed
+                            .height(100.dp)
+                            .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                            .shadow(2.dp, shape = RoundedCornerShape(20))
+                            .background(Color.White),
                         placeholder = {
-                            Text("Write a Description (Optional) ... ", fontSize = 12.sp)
-                        }
+                            Text(
+                                text = "Write a Description (Optional) ... ",
+                                fontSize = 12.sp,
+                                color = Color(0xFF253555)
+                            )
+                        },
+                        textStyle = TextStyle(
+                            color = Color(0xFF253555)
+                        )
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {},
@@ -249,8 +270,9 @@ fun RequestServiceBox() {
 }
 
 @Composable
-fun DropDown(dropDownText: String) {
+fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
     var isExpanded by remember { mutableStateOf(false) }
+    var selectedValue by remember { mutableStateOf(dropDownText) }
 
     Box {
         Button(
@@ -266,7 +288,7 @@ fun DropDown(dropDownText: String) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = dropDownText,
+                    text = selectedValue,
                     color = Color(0xFF253555)
                 )
                 Icon(
@@ -279,16 +301,24 @@ fun DropDown(dropDownText: String) {
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = Modifier.width(270.dp)
+            modifier = Modifier.width(270.dp).background(Color.White),
         ) {
-            DropdownMenuItem(
-                text = { Text(text = "Tire Punch", color = Color(0xFF253555))},
-                onClick = {
-                    isExpanded = false
+            dropDownListItems.forEachIndexed { index, dropDownListItem ->
+                DropdownMenuItem(
+                    text = {Text(text = dropDownListItem, color = Color(0xFF253555))},
+                    modifier = Modifier.fillMaxWidth().background(Color.White),
+                    onClick = {
+                        isExpanded = false
+                        selectedValue = dropDownListItem
+                    }
+                )
+                if (index < dropDownListItems.size - 1) {
+                    Divider()
                 }
-            )
+            }
         }
     }
+    return selectedValue
 }
 
 @Composable
