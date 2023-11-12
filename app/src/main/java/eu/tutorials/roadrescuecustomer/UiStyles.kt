@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
+
 val textStyle1 = TextStyle(
     fontWeight = FontWeight.ExtraBold,
     fontSize = 20.sp,
