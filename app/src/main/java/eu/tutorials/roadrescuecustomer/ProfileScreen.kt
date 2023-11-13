@@ -25,6 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -51,12 +55,15 @@ fun ProfileScreen(
             ProfileBox()
             HelpBox()
         }
-        Footer(navigationToDashboardScreen, {})
+        Footer(navigationToDashboardScreen) {}
     }
 }
 
 @Composable
 fun ProfileBox() {
+    var showPhoneNumDetailWindow by remember {mutableStateOf(false)}
+    var showNumOfReqServiceWindow by remember {mutableStateOf(false)}
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -80,13 +87,13 @@ fun ProfileBox() {
             Spacer(modifier = Modifier.height(8.dp))
             ProfileField("Name", "Nirmal Hettiarachchi")
             ProfileField("Email", "nirmalhettiarachchi5@gmail.com")
-            ProfileFieldButton("Phone Number", "+94 768879830")
-            ProfileFieldButton("Number of Service Requests","2" )
+            ProfileFieldButton("Phone Number", "+94 768879830", onClickButton = {showPhoneNumDetailWindow = true} )
+            ProfileFieldButton("Number of Service Requests","2", onClickButton = {showNumOfReqServiceWindow = true})
 
             //Edit button
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {  },
+                onClick = { },
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
@@ -97,6 +104,16 @@ fun ProfileBox() {
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+    if(showPhoneNumDetailWindow) {
+        MoreInfoWindow(message = "You can change the registered phone number by accessing the settings...") {
+            showPhoneNumDetailWindow = false
+        }
+    }
+    if(showNumOfReqServiceWindow) {
+        MoreInfoWindow(message = "This number shows only the completed service requests that have been accepted by a service provider and completed.") {
+            showNumOfReqServiceWindow = false
         }
     }
 }
@@ -133,7 +150,7 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
 }
 
 @Composable
-fun ProfileFieldButton(labelName: String, value: String) {
+fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Unit) {
     Box(
         modifier = Modifier
         .fillMaxWidth(),
@@ -146,7 +163,7 @@ fun ProfileFieldButton(labelName: String, value: String) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Button(
-                onClick = { },
+                onClick = { onClickButton() },
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 modifier = Modifier

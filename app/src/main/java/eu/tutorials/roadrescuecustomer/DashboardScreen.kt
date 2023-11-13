@@ -263,31 +263,12 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
         }
     )
     if(showCostDetailWindow) {
-        CostDetailWindow ( onDismiss = {showCostDetailWindow = false} )
+        MoreInfoWindow (
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+            onDismiss = {showCostDetailWindow = false}
+        )
     }
 }
-
-@Composable
-fun CostDetailWindow(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        modifier = Modifier.border(2.dp, Color.White, shape = RoundedCornerShape(20)),
-        tonalElevation = 300.dp,
-        confirmButton = {
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF253555)
-                )
-            }
-        })
-}
-
 @Composable
 fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
     var isExpanded by remember { mutableStateOf(false) }
