@@ -134,7 +134,7 @@ fun RequestServiceBox() {
 }
 
 @Composable
-fun RequestServiceWindow(onDismiss: () -> Unit) {
+fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
     var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
@@ -174,9 +174,17 @@ fun RequestServiceWindow(onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                issue = dropDown("Issue", listOf("Tire Punch", "Engine Fault"))
-                vehicleType = dropDown("Vehicle Type", listOf("Car", "Van", "Lorry", "Bicycle"))
-                fuelType = dropDown("Fuel Type", listOf("Petrol", "Diesel", "Hybrid", "Electric"))
+                val issueList =  listOf("Fuel Issues", "Engine Overheating", "Flat Tire", "Dead Battery", "Other")
+                val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
+                val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
+
+                issue = if(issueValue == null) {
+                    dropDown("Issue", issueList)
+                } else {
+                    dropDown(dropDownText = issueValue, dropDownListItems = issueList)
+                }
+                vehicleType = dropDown("Vehicle Type", vehicleTypeList)
+                fuelType = dropDown("Fuel Type", fuelTypeList)
 
                 Button(
                     onClick = { showCostDetailWindow = true },
@@ -338,6 +346,9 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
 
 @Composable
 fun CommonIssuesBox() {
+    var showRequestServiceWindow by remember { mutableStateOf(false) }
+    var selectedIssue by remember { mutableStateOf("") }
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White), shape = RoundedCornerShape(20.dp),
@@ -369,19 +380,26 @@ fun CommonIssuesBox() {
                 ) {
                     // First row, first button
                     CommonIssueButton(
-                        issueCategory = "Mechanical",
+                        issueCategory = "Fuel Issues",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Fuel Issues"}
                     )
                     // First row, second button
                     CommonIssueButton(
-                        issueCategory = "Electrical & Battery",
+                        issueCategory = "Engine Overheating",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Engine Overheating"
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.height(2.dp))
@@ -394,23 +412,33 @@ fun CommonIssuesBox() {
                 ) {
                     // Second row, first button
                     CommonIssueButton(
-                        issueCategory = "Tire & Wheel",
+                        issueCategory = "Flat Tire",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Flat Tire"
+                        }
                     )
 
                     // Second row, second button
                     CommonIssueButton(
-                        issueCategory = "Fuel & Ignition",
+                        issueCategory = "Dead Battery",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Dead Battery"
+                        }
                     )
                 }
-                Button(onClick = {},
+                Button(onClick = {
+                    showRequestServiceWindow = true
+                    selectedIssue = "Other" },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
@@ -423,13 +451,16 @@ fun CommonIssuesBox() {
             }
         }
     }
+    if(showRequestServiceWindow) {
+        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, selectedIssue)
+    }
 }
 
 @Composable
-fun CommonIssueButton(issueCategory: String, modifier: Modifier) {
+fun CommonIssueButton(issueCategory: String, modifier: Modifier, onClickButton: () -> Unit) {
     Button(
         modifier = modifier,
-        onClick = {},
+        onClick = { onClickButton() },
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(width = 2.dp, color = Color.White),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
