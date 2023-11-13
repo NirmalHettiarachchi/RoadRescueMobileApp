@@ -25,6 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -51,12 +55,22 @@ fun ProfileScreen(
             ProfileBox()
             HelpBox()
         }
-        Footer(navigationToDashboardScreen, {})
+        Footer(navigationToDashboardScreen) {}
     }
 }
 
 @Composable
 fun ProfileBox() {
+    var isEditing by remember { mutableStateOf(false) }
+
+    var showPhoneNumDetailWindow by remember {mutableStateOf(false)}
+    var showNumOfReqServiceWindow by remember {mutableStateOf(false)}
+
+    val name by remember { mutableStateOf("Nirmal Hettiarachchi") }
+    val email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
+    val phoneNumber by remember { mutableStateOf("+94 768879830") }
+    val numOfServiceReqs by remember { mutableStateOf("2") }
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -78,31 +92,76 @@ fun ProfileBox() {
                 tint = Color.Unspecified, contentDescription = null
             )
             Spacer(modifier = Modifier.height(8.dp))
-            ProfileField("Name", "Nirmal Hettiarachchi")
-            ProfileField("Email", "nirmalhettiarachchi5@gmail.com")
-            ProfileFieldButton("Phone Number", "+94 768879830")
-            ProfileFieldButton("Number of Service Requests","2" )
+            ProfileField("Name", name, isEditing)
+            ProfileField("Email", email, isEditing)
+            ProfileFieldButton("Phone Number", phoneNumber, onClickButton = {showPhoneNumDetailWindow = true} )
+            ProfileFieldButton("Number of Service Requests",numOfServiceReqs, onClickButton = {showNumOfReqServiceWindow = true})
 
-            //Edit button
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {  },
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-            ) {
-                Text(
-                    text = "Edit Profile",
-                    style = textStyle3
-                )
+            if(!isEditing) {
+                //Edit button
+                Button(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = { isEditing = true },
+                    border = BorderStroke(width = 2.dp, color = Color.White),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                ) {
+                    Text(
+                        text = "Edit Profile",
+                        style = textStyle3
+                    )
+                }
+            } else {
+                //Save and Cancel Button
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Button(
+                        onClick = { isEditing = false },
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Save",
+                            style = textStyle3
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            isEditing = false },
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            style = textStyle3
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+    if(showPhoneNumDetailWindow) {
+        MoreInfoWindow(message = "You can change the registered phone number by accessing the settings...") {
+            showPhoneNumDetailWindow = false
+        }
+    }
+    if(showNumOfReqServiceWindow) {
+        MoreInfoWindow(message = "This number shows only the completed service requests that have been accepted by a service provider and completed.") {
+            showNumOfReqServiceWindow = false
         }
     }
 }
 
 @Composable
 fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
+    var fieldValue by remember { mutableStateOf(value) }
+
     Box(
         modifier = Modifier
         .fillMaxWidth(),
@@ -116,8 +175,8 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = value,
-                onValueChange = { },
+                value = fieldValue,
+                onValueChange = { fieldValue = it },
                 modifier = Modifier
                     .height(intrinsicSize = IntrinsicSize.Min)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(30))
@@ -133,7 +192,7 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
 }
 
 @Composable
-fun ProfileFieldButton(labelName: String, value: String) {
+fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Unit) {
     Box(
         modifier = Modifier
         .fillMaxWidth(),
@@ -146,7 +205,7 @@ fun ProfileFieldButton(labelName: String, value: String) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Button(
-                onClick = { },
+                onClick = { onClickButton() },
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 modifier = Modifier

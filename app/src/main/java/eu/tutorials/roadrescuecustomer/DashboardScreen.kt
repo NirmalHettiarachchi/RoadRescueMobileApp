@@ -73,12 +73,6 @@ fun DashboardScreen(
 @Composable
 fun RequestServiceBox() {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
-    var showCostDetailWindoew by remember { mutableStateOf(false) }
-
-    var issue by remember { mutableStateOf("") }
-    var vehicleType by remember { mutableStateOf("") }
-    var fuelType by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
 
     Card(
         modifier = cardModifier,
@@ -133,143 +127,148 @@ fun RequestServiceBox() {
         }
     }
 
-    //RequestServiceWindow
+    //Request service window
     if(showRequestServiceWindow) {
-        AlertDialog(
-            onDismissRequest = { },
-            tonalElevation = 100.dp,
-            confirmButton = {
-                Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        IconButton(onClick = { showRequestServiceWindow = false }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.close_round_fill),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(24.dp),
-                                tint = Color.Unspecified
-                            )
-                        }
-                    }
-                    Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = "Tell us more about your issue...",
-                        style = textStyle2
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    issue = dropDown("Issue", listOf("Tire Punch", "Engine Fault"))
-                    vehicleType = dropDown("Vehicle Type", listOf("Car", "Van", "Lorry", "Bicycle"))
-                    fuelType = dropDown("Fuel Type", listOf("Petrol", "Diesel", "Hybrid", "Electric"))
-
-                    Button(
-                        onClick = { showCostDetailWindoew = true },
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Cost LKR 0.00",
-                                style = textStyle2,
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                Icons.Default.Info,
-                                contentDescription = "Info",
-                                tint = Color(0xFF253555)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        modifier = Modifier
-                            .height(100.dp)
-                            .border(2.dp, Color.White, shape = RoundedCornerShape(20))
-                            .shadow(2.dp, shape = RoundedCornerShape(20))
-                            .background(Color.White),
-                        placeholder = {
-                            Text(
-                                text = "Write a Description (Optional) ... ",
-                                fontSize = 12.sp,
-                                color = Color(0xFF253555)
-                            )
-                        },
-                        textStyle = TextStyle(
-                            color = Color(0xFF253555)
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {},
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.send_fill),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 5.dp)
-                                    .size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text(
-                                text = "Request Service",
-                                style = textStyle3
-                            )
-                        }
-                    }
-                }
-            }
-        )
+        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false})
     }
+}
 
-    if(showCostDetailWindoew) {
-        AlertDialog(
-            onDismissRequest = { showCostDetailWindoew = false },
-            modifier = Modifier.border(2.dp, Color.White, shape = RoundedCornerShape(20)),
-            tonalElevation = 300.dp,
-            confirmButton = {
+@Composable
+fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
+    var issue by remember { mutableStateOf("") }
+    var vehicleType by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+
+    var showCostDetailWindow by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = { },
+        tonalElevation = 100.dp,
+        confirmButton = {
             Column (
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            ){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close_round_fill),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp),
+                            tint = Color.Unspecified
+                        )
+                    }
+                }
                 Text(
-                    text = "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF253555)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Tell us more about your issue...",
+                    style = textStyle2
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val issueList =  listOf("Fuel Issues", "Engine Overheating", "Flat Tire", "Dead Battery", "Other")
+                val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
+                val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
+
+                issue = if(issueValue == null) {
+                    dropDown("Issue", issueList)
+                } else {
+                    dropDown(dropDownText = issueValue, dropDownListItems = issueList)
+                }
+                vehicleType = dropDown("Vehicle Type", vehicleTypeList)
+                fuelType = dropDown("Fuel Type", fuelTypeList)
+
+                Button(
+                    onClick = { showCostDetailWindow = true },
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    border = BorderStroke(width = 2.dp, color = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Cost LKR 0.00",
+                            style = textStyle2,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Info",
+                            tint = Color(0xFF253555)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    modifier = Modifier
+                        .height(100.dp)
+                        .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                        .shadow(2.dp, shape = RoundedCornerShape(20))
+                        .background(Color.White),
+                    placeholder = {
+                        Text(
+                            text = "Write a Description (Optional) ... ",
+                            fontSize = 12.sp,
+                            color = Color(0xFF253555)
+                        )
+                    },
+                    textStyle = TextStyle(
+                        color = Color(0xFF253555)
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {},
+                    border = BorderStroke(width = 2.dp, color = Color.White),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.send_fill),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                                .size(30.dp),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = "Request Service",
+                            style = textStyle3
+                        )
+                    }
+                }
             }
-        })
+        }
+    )
+    if(showCostDetailWindow) {
+        MoreInfoWindow (
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+            onDismiss = {showCostDetailWindow = false}
+        )
     }
 }
-
 @Composable
 fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
     var isExpanded by remember { mutableStateOf(false) }
@@ -302,12 +301,16 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = Modifier.width(270.dp).background(Color.White),
+            modifier = Modifier
+                .width(270.dp)
+                .background(Color.White),
         ) {
             dropDownListItems.forEachIndexed { index, dropDownListItem ->
                 DropdownMenuItem(
                     text = {Text(text = dropDownListItem, color = Color(0xFF253555))},
-                    modifier = Modifier.fillMaxWidth().background(Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
                     onClick = {
                         isExpanded = false
                         selectedValue = dropDownListItem
@@ -324,6 +327,9 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
 
 @Composable
 fun CommonIssuesBox() {
+    var showRequestServiceWindow by remember { mutableStateOf(false) }
+    var selectedIssue by remember { mutableStateOf("") }
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White), shape = RoundedCornerShape(20.dp),
@@ -354,39 +360,28 @@ fun CommonIssuesBox() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // First row, first button
-                    Button(
+                    CommonIssueButton(
+                        issueCategory = "Fuel Issues",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
-                        onClick = {},
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        shape = RoundedCornerShape(20.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Mechanical",
-                            style = textStyle3.copy(textAlign = TextAlign.Center)
-                        )
-                    }
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Fuel Issues"}
+                    )
                     // First row, second button
-                    Button(
+                    CommonIssueButton(
+                        issueCategory = "Engine Overheating",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
-                        onClick = {},
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Electrical & Battery",
-                            style = textStyle3.copy(textAlign = TextAlign.Center)
-                        )
-                    }
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Engine Overheating"
+                        }
+                    )
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(
@@ -397,42 +392,34 @@ fun CommonIssuesBox() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Second row, first button
-                    Button(
+                    CommonIssueButton(
+                        issueCategory = "Flat Tire",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
-                        onClick = {},
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Tire & Wheel",
-                            style = textStyle3.copy(textAlign = TextAlign.Center)
-                        )
-                    }
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Flat Tire"
+                        }
+                    )
 
                     // Second row, second button
-                    Button(
+                    CommonIssueButton(
+                        issueCategory = "Dead Battery",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
-                        onClick = {},
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Fuel & Ignition",
-                            style = textStyle3.copy(textAlign = TextAlign.Center)
-                        )
-                    }
+                        onClickButton = {
+                            showRequestServiceWindow = true
+                            selectedIssue = "Dead Battery"
+                        }
+                    )
                 }
-                Button(onClick = {},
+                Button(onClick = {
+                    showRequestServiceWindow = true
+                    selectedIssue = "Other" },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
@@ -444,5 +431,25 @@ fun CommonIssuesBox() {
                 }
             }
         }
+    }
+    if(showRequestServiceWindow) {
+        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, selectedIssue)
+    }
+}
+
+@Composable
+fun CommonIssueButton(issueCategory: String, modifier: Modifier, onClickButton: () -> Unit) {
+    Button(
+        modifier = modifier,
+        onClick = { onClickButton() },
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(width = 2.dp, color = Color.White),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+    ) {
+        Text(
+            text = issueCategory,
+            style = textStyle3.copy(textAlign = TextAlign.Center)
+        )
     }
 }
