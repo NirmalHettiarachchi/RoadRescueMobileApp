@@ -61,8 +61,15 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileBox() {
+    var isEditing by remember { mutableStateOf(false) }
+
     var showPhoneNumDetailWindow by remember {mutableStateOf(false)}
     var showNumOfReqServiceWindow by remember {mutableStateOf(false)}
+
+    val name by remember { mutableStateOf("Nirmal Hettiarachchi") }
+    val email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
+    val phoneNumber by remember { mutableStateOf("+94 768879830") }
+    val numOfServiceReqs by remember { mutableStateOf("2") }
 
     Card(
         modifier = cardModifier,
@@ -85,23 +92,56 @@ fun ProfileBox() {
                 tint = Color.Unspecified, contentDescription = null
             )
             Spacer(modifier = Modifier.height(8.dp))
-            ProfileField("Name", "Nirmal Hettiarachchi")
-            ProfileField("Email", "nirmalhettiarachchi5@gmail.com")
-            ProfileFieldButton("Phone Number", "+94 768879830", onClickButton = {showPhoneNumDetailWindow = true} )
-            ProfileFieldButton("Number of Service Requests","2", onClickButton = {showNumOfReqServiceWindow = true})
+            ProfileField("Name", name, isEditing)
+            ProfileField("Email", email, isEditing)
+            ProfileFieldButton("Phone Number", phoneNumber, onClickButton = {showPhoneNumDetailWindow = true} )
+            ProfileFieldButton("Number of Service Requests",numOfServiceReqs, onClickButton = {showNumOfReqServiceWindow = true})
 
-            //Edit button
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { },
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-            ) {
-                Text(
-                    text = "Edit Profile",
-                    style = textStyle3
-                )
+            if(!isEditing) {
+                //Edit button
+                Button(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = { isEditing = true },
+                    border = BorderStroke(width = 2.dp, color = Color.White),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                ) {
+                    Text(
+                        text = "Edit Profile",
+                        style = textStyle3
+                    )
+                }
+            } else {
+                //Save and Cancel Button
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Button(
+                        onClick = { isEditing = false },
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Save",
+                            style = textStyle3
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            isEditing = false },
+                        border = BorderStroke(width = 2.dp, color = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            style = textStyle3
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -120,6 +160,8 @@ fun ProfileBox() {
 
 @Composable
 fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
+    var fieldValue by remember { mutableStateOf(value) }
+
     Box(
         modifier = Modifier
         .fillMaxWidth(),
@@ -133,8 +175,8 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = value,
-                onValueChange = { },
+                value = fieldValue,
+                onValueChange = { fieldValue = it },
                 modifier = Modifier
                     .height(intrinsicSize = IntrinsicSize.Min)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(30))
