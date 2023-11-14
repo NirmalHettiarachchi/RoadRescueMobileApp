@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,59 +46,34 @@ fun SidebarContent(menuClicked:()->Unit){
                         },
                     contentDescription = "Localized description"
                 )
+                Divider()
                 Spacer(modifier = Modifier
                     .background(Color.White)
                     .height(2.dp))
             }
-            Button(
-                onClick = {
-
-                },
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                Text(
-                    text = "Help",
-                    color = Color(0xFF253555),
-                    style = textStyle3.copy(textAlign = TextAlign.Center)
-                )
-            }
-            Button(
-                onClick = {
-
-                },
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
-                Text(
-                    text = "Settings",
-                    color = Color(0xFF253555),
-                    style = textStyle3.copy(textAlign = TextAlign.Center)
-                )
-            }
+            SidebarButton(buttonName = "Help", verticalPadding = 8)
+            SidebarButton(buttonName = "Settings", verticalPadding = 8)
         }
-        Button(
-            onClick = {
-
-            },
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        ) {
-            Text(
-                text = "Log Out",
-                color = Color(0xFF253555),
-                style = textStyle3.copy(textAlign = TextAlign.Center)
-            )
-        }
+        SidebarButton(buttonName = "Log Out", verticalPadding = 16)
     }
 }
 
+@Composable
+fun SidebarButton(buttonName: String, verticalPadding: Int) {
+    Button(
+        onClick = {
+
+        },
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = verticalPadding.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+    ) {
+        Text(
+            text = buttonName,
+            color = Color(0xFF253555),
+            style = textStyle3.copy(textAlign = TextAlign.Center)
+        )
+    }
+}
