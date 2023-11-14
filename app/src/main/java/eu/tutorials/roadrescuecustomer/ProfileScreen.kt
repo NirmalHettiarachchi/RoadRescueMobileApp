@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,61 +16,98 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
     navigationToDashboardScreen: () -> Unit
 ) {
-    Column(
-        backgroundModifier,
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column {
-            Header()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Customer Profile",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle1
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent {
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                }
             )
-            ProfileBox()
-            HelpBox()
         }
-        Footer(navigationToDashboardScreen) {}
+    ) {
+        Scaffold {
+            Column(
+                backgroundModifier.padding(it),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(
+                    backgroundModifier,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column {
+                        Header {
+                            scope.launch {drawerState.open()}
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Customer Profile",
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            style = textStyle1
+                        )
+                        ProfileBox()
+                        HelpBox()
+                    }
+                    Footer(navigationToDashboardScreen) {}
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun ProfileBox() {
+    val context = LocalContext.current
+
     var isEditing by remember { mutableStateOf(false) }
 
     var showPhoneNumDetailWindow by remember {mutableStateOf(false)}
     var showNumOfReqServiceWindow by remember {mutableStateOf(false)}
 
-    val name by remember { mutableStateOf("Nirmal Hettiarachchi") }
-    val email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
+    var isCancelClicked by remember { mutableStateOf(false) }
+
+    var name by remember { mutableStateOf("Nirmal Hettiarachchi") }
+    var email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
     val phoneNumber by remember { mutableStateOf("+94 768879830") }
-    val numOfServiceReqs by remember { mutableStateOf("2") }
+    val numOfServiceReq by remember { mutableStateOf("2") }
 
     Card(
         modifier = cardModifier,
@@ -92,54 +130,48 @@ fun ProfileBox() {
                 tint = Color.Unspecified, contentDescription = null
             )
             Spacer(modifier = Modifier.height(8.dp))
-            ProfileField("Name", name, isEditing)
-            ProfileField("Email", email, isEditing)
-            ProfileFieldButton("Phone Number", phoneNumber, onClickButton = {showPhoneNumDetailWindow = true} )
-            ProfileFieldButton("Number of Service Requests",numOfServiceReqs, onClickButton = {showNumOfReqServiceWindow = true})
+
+            if(isCancelClicked) {
+                name = profileField("Name", name, isEditing)
+                email = profileField("Email", email, isEditing)
+            } else {
+                profileField("Name", name, isEditing)
+                profileField("Email", email, isEditing)
+            }
+
+            ProfileFieldButton(
+                labelName = "Phone Number",
+                value = phoneNumber,
+                onClickButton = {showPhoneNumDetailWindow = true}
+            )
+            ProfileFieldButton(
+                labelName = "Number of Service Requests",
+                value = numOfServiceReq,
+                onClickButton = {showNumOfReqServiceWindow = true}
+            )
 
             if(!isEditing) {
                 //Edit button
-                Button(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    onClick = { isEditing = true },
-                    border = BorderStroke(width = 2.dp, color = Color.White),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                ) {
-                    Text(
-                        text = "Edit Profile",
-                        style = textStyle3
-                    )
+                ProfileScreenButton(btnName = "Edit Profile", Modifier.align(Alignment.CenterHorizontally)) {
+                    isCancelClicked = false
+                    isEditing = true
                 }
             } else {
-                //Save and Cancel Button
                 Row (
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ){
-                    Button(
-                        onClick = { isEditing = false },
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Save",
-                            style = textStyle3
-                        )
+                    //Save Button
+                    ProfileScreenButton("Save", Modifier) {
+                        isEditing = false
+                        isCancelClicked = false
+                        Toast.makeText(context, "Changes saved successfully!", Toast.LENGTH_SHORT).show()
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = {
-                            isEditing = false },
-                        border = BorderStroke(width = 2.dp, color = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                    ) {
-                        Text(
-                            text = "Cancel",
-                            style = textStyle3
-                        )
+                    //Cancel Button
+                    ProfileScreenButton("Cancel", Modifier) {
+                        isEditing = false
+                        isCancelClicked = true
                     }
                 }
             }
@@ -159,12 +191,12 @@ fun ProfileBox() {
 }
 
 @Composable
-fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
+fun profileField(labelName: String, value: String, isEditing: Boolean = false):String {
     var fieldValue by remember { mutableStateOf(value) }
 
     Box(
         modifier = Modifier
-        .fillMaxWidth(),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Column {
@@ -178,6 +210,7 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
                 value = fieldValue,
                 onValueChange = { fieldValue = it },
                 modifier = Modifier
+                    .padding(horizontal = 36.dp)
                     .height(intrinsicSize = IntrinsicSize.Min)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(30))
                     .shadow(6.dp, shape = RoundedCornerShape(30))
@@ -189,13 +222,14 @@ fun ProfileField(labelName: String, value: String, isEditing: Boolean = false) {
         }
     }
     Spacer(modifier = Modifier.height(8.dp))
+    return fieldValue
 }
 
 @Composable
 fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Unit) {
     Box(
         modifier = Modifier
-        .fillMaxWidth(),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Column {
@@ -209,27 +243,49 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 modifier = Modifier
-                    .width(250.dp)
-                    .padding(8.dp),
+                    .fillMaxWidth()
+                    .padding(horizontal = 38.dp, vertical = 8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = value,
+                        modifier = Modifier.weight(0.8f),
+                        maxLines = 1,
                         style = textStyle2,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
-                        Icons.Default.Info,
+                        painter = painterResource(id = R.drawable.question_fill),
+                        modifier = Modifier
+                            .weight(0.2f)
+                            .size(30.dp),
                         contentDescription = "Info",
-                        tint = Color(0xFF253555)
+                        tint = Color.Unspecified
                     )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+}
+
+@Composable
+fun ProfileScreenButton(btnName: String, modifier: Modifier, onClickButton: () -> Unit) {
+    Button(
+        onClick = { onClickButton() },
+        modifier = modifier,
+        border = BorderStroke(width = 2.dp, color = Color.White),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+    ) {
+        Text(
+            text = btnName,
+            style = textStyle3
+        )
     }
 }

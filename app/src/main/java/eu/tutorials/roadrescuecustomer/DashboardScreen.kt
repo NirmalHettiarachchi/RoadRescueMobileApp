@@ -18,23 +18,28 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,28 +50,52 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
-    navigationToProfileScreen: () -> Unit) {
-    Column(
-        backgroundModifier,
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column {
-            Header()
-            //Welcome text
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Welcome Nirmal Hettiarachchi",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle1
-            )
-            RequestServiceBox()
-            CommonIssuesBox()
-            HelpBox()
+    navigationToProfileScreen: () -> Unit
+) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+                        ModalDrawerSheet(
+                            content = {
+                                SidebarContent {
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                }
+                            }
+                        )
+                    }
+                ) {
+        Scaffold {
+            Column(
+                backgroundModifier.padding(it),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
+                    Header {
+                        scope.launch {drawerState.open()}
+                    }
+                    //Welcome text
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Welcome Nirmal Hettiarachchi",
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = textStyle1
+                    )
+                    RequestServiceBox()
+                    CommonIssuesBox()
+                    HelpBox()
+                }
+                Footer({}, navigationToProfileScreen)
+            }
         }
-        Footer({}, navigationToProfileScreen)
     }
 }
 
@@ -144,7 +173,15 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
 
     AlertDialog(
         onDismissRequest = { },
-        tonalElevation = 100.dp,
+        tonalElevation = 16.dp,
+        modifier = Modifier
+            .padding(8.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = Color(0xFFB6C7E3)
+            ),
+        containerColor = Color(0xFFB6C7E3),
         confirmButton = {
             Column (
                 modifier = Modifier
@@ -205,9 +242,10 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
-                            Icons.Default.Info,
+                            painter = painterResource(id = R.drawable.question_fill),
                             contentDescription = "Info",
-                            tint = Color(0xFF253555)
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(30.dp),
                         )
                     }
                 }

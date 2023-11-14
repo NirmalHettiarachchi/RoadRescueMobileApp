@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header() {
+fun Header(menuClicked: () -> Unit) {
+
     CenterAlignedTopAppBar(
         title = {
             Icon(
@@ -28,7 +29,9 @@ fun Header() {
             )
         },
         navigationIcon = {
-            IconButton(onClick = { }) {
+            IconButton(onClick = {
+                menuClicked()
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     tint = Color.White,
