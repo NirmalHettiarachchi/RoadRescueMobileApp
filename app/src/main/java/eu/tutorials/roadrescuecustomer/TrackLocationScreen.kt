@@ -27,7 +27,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
-    navigationToProfileScreen: () -> Unit
+    navigationToProfileScreen: () -> Unit,
+    currentStateViewModel: CurrentStateViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -62,7 +63,11 @@ fun TrackLocationScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    NoPendingActivityBox()
+                    if(!currentStateViewModel.isServiceRequested.value) {
+                        NoPendingActivityBox()
+                    } else {
+                        //Todo
+                    }
                     HelpBox()
                 }
                 Footer(navigationToDashboardScreen, navigationToProfileScreen) {}

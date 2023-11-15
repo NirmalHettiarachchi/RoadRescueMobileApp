@@ -55,7 +55,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     navigationToProfileScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit
+    navigationToTrackLocationScreen: () -> Unit,
+    currentStateViewModel: CurrentStateViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -90,8 +91,8 @@ fun DashboardScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    RequestServiceBox()
-                    CommonIssuesBox()
+                    RequestServiceBox(currentStateViewModel)
+                    CommonIssuesBox(currentStateViewModel)
                     HelpBox()
                 }
                 Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen)
@@ -101,7 +102,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun RequestServiceBox() {
+fun RequestServiceBox(currentStateViewModel: CurrentStateViewModel) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
 
     Card(
@@ -159,12 +160,12 @@ fun RequestServiceBox() {
 
     //Request service window
     if(showRequestServiceWindow) {
-        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false})
+        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, currentStateViewModel = currentStateViewModel)
     }
 }
 
 @Composable
-fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
+fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null, currentStateViewModel: CurrentStateViewModel) {
     var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
@@ -276,7 +277,7 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = {},
+                    onClick = { currentStateViewModel.setCurrentState(true) },
                     border = BorderStroke(width = 2.dp, color = Color.White),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
@@ -366,7 +367,7 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
 }
 
 @Composable
-fun CommonIssuesBox() {
+fun CommonIssuesBox(currentStateViewModel: CurrentStateViewModel) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
     var selectedIssue by remember { mutableStateOf("") }
 
@@ -473,7 +474,7 @@ fun CommonIssuesBox() {
         }
     }
     if(showRequestServiceWindow) {
-        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, selectedIssue)
+        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, selectedIssue, currentStateViewModel = currentStateViewModel)
     }
 }
 
