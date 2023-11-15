@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun App(currentStateViewModel: CurrentStateViewModel) {
+fun App(currentStateViewModel: CurrentStateViewModel, serviceRequestViewModel: ServiceRequestViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "dashboardscreen") {
@@ -14,7 +14,8 @@ fun App(currentStateViewModel: CurrentStateViewModel) {
             DashboardScreen (
                 {navController.navigate("profilescreen")},
                 {navController.navigate("tracklocationscreen")},
-                currentStateViewModel = currentStateViewModel
+                currentStateViewModel = currentStateViewModel,
+                serviceRequestViewModel = serviceRequestViewModel
             )
         }
         composable("profilescreen") {

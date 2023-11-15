@@ -15,13 +15,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val currentStateViewModel: CurrentStateViewModel = viewModel()
+            val serviceRequestViewModel: ServiceRequestViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    App(currentStateViewModel)
+                    App(currentStateViewModel, serviceRequestViewModel)
                 }
             }
         }
