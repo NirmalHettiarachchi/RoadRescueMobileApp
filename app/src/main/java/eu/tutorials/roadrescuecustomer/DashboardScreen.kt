@@ -54,7 +54,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
-    navigationToProfileScreen: () -> Unit
+    navigationToProfileScreen: () -> Unit,
+    navigationToTrackLocationScreen: () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -93,7 +94,7 @@ fun DashboardScreen(
                     CommonIssuesBox()
                     HelpBox()
                 }
-                Footer({}, navigationToProfileScreen)
+                Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen)
             }
         }
     }

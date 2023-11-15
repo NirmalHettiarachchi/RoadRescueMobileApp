@@ -35,14 +35,22 @@ fun MyApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "dashboardscreen") {
         composable("dashboardscreen") {
-            DashboardScreen {
-                navController.navigate("profilescreen")
-            }
+            DashboardScreen (
+                {navController.navigate("profilescreen")},
+                {navController.navigate("tracklocationscreen")}
+            )
         }
         composable("profilescreen") {
-            ProfileScreen {
-                navController.navigate("dashboardscreen")
-            }
+            ProfileScreen (
+                {navController.navigate("dashboardscreen")},
+                {navController.navigate("tracklocationscreen")}
+            )
+        }
+        composable("tracklocationscreen") {
+            TrackLocationScreen (
+                {navController.navigate("dashboardscreen")},
+                {navController.navigate("profilescreen")}
+            )
         }
     }
 }
