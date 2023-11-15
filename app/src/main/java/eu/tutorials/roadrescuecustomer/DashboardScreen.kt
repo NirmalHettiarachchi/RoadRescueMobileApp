@@ -91,14 +91,23 @@ fun DashboardScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    RequestServiceBox(currentStateViewModel)
-                    CommonIssuesBox(currentStateViewModel)
+                    if(!currentStateViewModel.isServiceRequested.value) {
+                        NoPendingActivityDashboard(currentStateViewModel = currentStateViewModel)
+                    } else {
+                        //todo
+                    }
                     HelpBox()
                 }
                 Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen)
             }
         }
     }
+}
+
+@Composable
+fun NoPendingActivityDashboard(currentStateViewModel: CurrentStateViewModel) {
+    RequestServiceBox(currentStateViewModel)
+    CommonIssuesBox(currentStateViewModel)
 }
 
 @Composable

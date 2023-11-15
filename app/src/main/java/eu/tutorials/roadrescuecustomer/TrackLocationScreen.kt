@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -56,7 +58,6 @@ fun TrackLocationScreen(
                     Header {
                         scope.launch {drawerState.open()}
                     }
-                    //Welcome text
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Track Location",
@@ -64,9 +65,9 @@ fun TrackLocationScreen(
                         style = textStyle1
                     )
                     if(!currentStateViewModel.isServiceRequested.value) {
-                        NoPendingActivityBox()
+                        NoPendingActivityTrackLocationScreen()
                     } else {
-                        //Todo
+                        PendingActivityBox()
                     }
                     HelpBox()
                 }
@@ -77,7 +78,7 @@ fun TrackLocationScreen(
 }
 
 @Composable
-fun NoPendingActivityBox(){
+fun NoPendingActivityTrackLocationScreen(){
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -97,6 +98,56 @@ fun NoPendingActivityBox(){
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(128.dp))
+        }
+    }
+}
+
+@Composable
+fun PendingActivityBox() {
+    //todo
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "A technician from Tech Garage is ",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Text(
+                text = "on the way to your location . . .",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "ETA: 14 Minutes",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                border = BorderStroke(width = 2.dp, color = Color.White),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+            ) {
+                Text(
+                    text = "Contact Technician",
+                    style = textStyle3
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
