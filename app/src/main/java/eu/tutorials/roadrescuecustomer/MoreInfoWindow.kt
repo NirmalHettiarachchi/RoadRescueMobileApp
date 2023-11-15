@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 fun MoreInfoWindow(message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
+        shape = RoundedCornerShape(20),
         modifier = Modifier.border(2.dp, Color.White, shape = RoundedCornerShape(20)),
         tonalElevation = 300.dp,
         confirmButton = {

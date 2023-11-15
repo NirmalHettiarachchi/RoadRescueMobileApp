@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -196,6 +197,7 @@ fun profileField(labelName: String, value: String, isEditing: Boolean = false):S
 
     Box(
         modifier = Modifier
+            .padding(horizontal = 12.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
@@ -225,10 +227,12 @@ fun profileField(labelName: String, value: String, isEditing: Boolean = false):S
     return fieldValue
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Unit) {
     Box(
         modifier = Modifier
+            .padding(horizontal = 12.dp)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
@@ -238,23 +242,24 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
                 style = textStyle2,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Button(
+            Card(
                 onClick = { onClickButton() },
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
+                shape = RoundedCornerShape(30.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 38.dp, vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+                    .padding(horizontal = 38.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFC6D4DE))
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                    , modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
                 ) {
                     Text(
                         text = value,
-                        modifier = Modifier.weight(0.8f),
+                        modifier = Modifier.padding(start = 8.dp).weight(1f),
                         maxLines = 1,
                         style = textStyle2,
                     )
@@ -262,7 +267,6 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
                     Icon(
                         painter = painterResource(id = R.drawable.question_fill),
                         modifier = Modifier
-                            .weight(0.2f)
                             .size(30.dp),
                         contentDescription = "Info",
                         tint = Color.Unspecified

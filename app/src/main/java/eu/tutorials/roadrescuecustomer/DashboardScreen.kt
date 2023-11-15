@@ -229,6 +229,7 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
                     border = BorderStroke(width = 2.dp, color = Color.White),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(58.dp)
                         .padding(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
                 ) {
