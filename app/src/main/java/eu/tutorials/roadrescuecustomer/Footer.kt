@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Footer(
     navigationToDashboardScreen: () -> Unit,
-    navigationToProfileScreen: () -> Unit
+    navigationToProfileScreen: () -> Unit,
+    navigationToTrackLocationScreen: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -43,7 +44,7 @@ fun Footer(
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable{},
+                .clickable{ navigationToTrackLocationScreen() },
             tint = Color.Unspecified, contentDescription = null
         )
         Icon(

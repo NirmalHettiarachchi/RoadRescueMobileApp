@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -17,8 +18,15 @@ import androidx.compose.ui.unit.dp
 fun MoreInfoWindow(message: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        modifier = Modifier.border(2.dp, Color.White, shape = RoundedCornerShape(20)),
-        tonalElevation = 300.dp,
+        shape = RoundedCornerShape(20),
+        modifier = Modifier
+            .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+            .shadow(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(16.dp)
+        ),
+        tonalElevation = 16.dp,
+        containerColor = Color(0xFFC6D4DE),
         confirmButton = {
             Column (
                 modifier = Modifier

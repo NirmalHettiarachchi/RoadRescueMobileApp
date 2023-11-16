@@ -54,7 +54,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
-    navigationToProfileScreen: () -> Unit
+    navigationToProfileScreen: () -> Unit,
+    navigationToTrackLocationScreen: () -> Unit,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -89,18 +92,154 @@ fun DashboardScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    RequestServiceBox()
-                    CommonIssuesBox()
+                    if(!currentStateViewModel.isServiceRequested.value) {
+                        NoPendingActivityDashboard(
+                            currentStateViewModel = currentStateViewModel,
+                            serviceRequestViewModel = serviceRequestViewModel
+                            )
+                    } else {
+                        PendingActivityDashboard(
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            currentStateViewModel = currentStateViewModel
+                        )
+                    }
                     HelpBox()
                 }
-                Footer({}, navigationToProfileScreen)
+                Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen)
             }
         }
     }
 }
 
 @Composable
-fun RequestServiceBox() {
+fun NoPendingActivityDashboard(
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel) {
+    RequestServiceBox(currentStateViewModel, serviceRequestViewModel)
+    CommonIssuesBox(currentStateViewModel, serviceRequestViewModel)
+}
+
+@Composable
+fun PendingActivityDashboard(
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
+) {
+    var showCostDetailWindow by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Requesting Service . . . ",
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DashboardFieldButton(
+                fieldName = "Issue",
+                fieldValue = serviceRequestViewModel.issue.value,
+                modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .width(250.dp)
+            )
+            DashboardFieldButton(
+                fieldName = "Vehicle Type",
+                fieldValue = serviceRequestViewModel.vehicleType.value,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .width(250.dp)
+            )
+            DashboardFieldButton(
+                fieldName = "Fuel Type",
+                fieldValue = serviceRequestViewModel.fuelType.value,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .width(250.dp)
+            )
+
+            Button(
+                onClick = { },
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                border = BorderStroke(width = 2.dp, color = Color.White),
+                modifier = Modifier
+                    .height(58.dp)
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .width(250.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
+                        style = textStyle2,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.question_fill),
+                        contentDescription = "Info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = serviceRequestViewModel.description.value,
+                onValueChange = { },
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(250.dp)
+                    .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                    .shadow(2.dp, shape = RoundedCornerShape(20))
+                    .background(Color.White)
+                    .align(Alignment.CenterHorizontally),
+                enabled = false,
+                placeholder = {
+                    Text(
+                        text = "No description provided!",
+                        fontSize = 12.sp,
+                        color = Color(0xFF253555)
+                    )
+                },
+                textStyle = TextStyle(
+                    color = Color(0xFF253555)
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            //Cancel btn
+            CommonButton(btnName = "Cancel Request", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                currentStateViewModel.setCurrentState(false)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+    if(showCostDetailWindow) {
+        MoreInfoWindow (
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+            onDismiss = {showCostDetailWindow = false}
+        )
+    }
+}
+
+@Composable
+fun RequestServiceBox(
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
 
     Card(
@@ -127,43 +266,30 @@ fun RequestServiceBox() {
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { showRequestServiceWindow = true },
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.send_fill),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(top = 5.dp)
-                            .size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text(
-                        text = "Request Service",
-                        style = textStyle3
-                    )
-                }
+
+            RequestServiceButton(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                showRequestServiceWindow = true
             }
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 
     //Request service window
     if(showRequestServiceWindow) {
-        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false})
+        RequestServiceWindow(
+            onDismiss = {showRequestServiceWindow = false},
+            currentStateViewModel = currentStateViewModel,
+            serviceRequestViewModel = serviceRequestViewModel)
     }
 }
 
 @Composable
-fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
+fun RequestServiceWindow(
+    onDismiss: () -> Unit,
+    issueValue: String? = null,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel) {
     var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
@@ -229,6 +355,7 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
                     border = BorderStroke(width = 2.dp, color = Color.White),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(58.dp)
                         .padding(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
                 ) {
@@ -237,7 +364,7 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Cost LKR 0.00",
+                            text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
                             style = textStyle2,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -273,29 +400,15 @@ fun RequestServiceWindow(onDismiss: () -> Unit, issueValue: String? = null) {
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = {},
-                    border = BorderStroke(width = 2.dp, color = Color.White),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.send_fill),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(top = 5.dp)
-                                .size(30.dp),
-                            tint = Color.Unspecified
-                        )
-                        Text(
-                            text = "Request Service",
-                            style = textStyle3
-                        )
-                    }
+
+                RequestServiceButton(modifier = Modifier) {
+                    currentStateViewModel.setCurrentState(true)
+                    serviceRequestViewModel.setServiceRequest(
+                        issue,
+                        vehicleType,
+                        fuelType,
+                        0.00,
+                        description)
                 }
             }
         }
@@ -364,7 +477,9 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
 }
 
 @Composable
-fun CommonIssuesBox() {
+fun CommonIssuesBox(
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
     var selectedIssue by remember { mutableStateOf("") }
 
@@ -471,7 +586,12 @@ fun CommonIssuesBox() {
         }
     }
     if(showRequestServiceWindow) {
-        RequestServiceWindow(onDismiss = {showRequestServiceWindow = false}, selectedIssue)
+        RequestServiceWindow(
+            onDismiss = {showRequestServiceWindow = false},
+            issueValue = selectedIssue,
+            currentStateViewModel = currentStateViewModel,
+            serviceRequestViewModel = serviceRequestViewModel
+        )
     }
 }
 
@@ -490,4 +610,49 @@ fun CommonIssueButton(issueCategory: String, modifier: Modifier, onClickButton: 
             style = textStyle3.copy(textAlign = TextAlign.Center)
         )
     }
+}
+
+@Composable
+fun RequestServiceButton(modifier: Modifier, onClickButton: () -> Unit) {
+    Button(
+        modifier = modifier,
+        onClick = { onClickButton() },
+        border = BorderStroke(width = 2.dp, color = Color.White),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.send_fill),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(top = 5.dp)
+                    .size(30.dp),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = "Request Service",
+                style = textStyle3
+            )
+        }
+    }
+}
+
+@Composable
+fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifier) {
+    Button(
+        onClick = {  },
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+    ) {
+        Text(
+            text = "$fieldName: $fieldValue",
+            color = Color(0xFF253555)
+        )
+    }
+    Spacer(modifier = Modifier.height(16.dp))
 }
