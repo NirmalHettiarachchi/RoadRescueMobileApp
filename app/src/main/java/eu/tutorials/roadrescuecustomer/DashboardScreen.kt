@@ -290,6 +290,7 @@ fun RequestServiceWindow(
     issueValue: String? = null,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel) {
+
     var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
@@ -656,3 +657,4 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     }
     Spacer(modifier = Modifier.height(16.dp))
 }
+

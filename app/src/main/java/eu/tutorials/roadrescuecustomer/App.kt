@@ -1,13 +1,21 @@
 package eu.tutorials.roadrescuecustomer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun App(currentStateViewModel: CurrentStateViewModel, serviceRequestViewModel: ServiceRequestViewModel) {
+fun App(
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationViewModel: LocationViewModel
+) {
     val navController = rememberNavController()
+
+    val context = LocalContext.current
+    val locationUtils = LocationUtils(context)
 
     NavHost(navController = navController, startDestination = "dashboardscreen") {
         composable("dashboardscreen") {
@@ -28,7 +36,10 @@ fun App(currentStateViewModel: CurrentStateViewModel, serviceRequestViewModel: S
             TrackLocationScreen (
                 {navController.navigate("dashboardscreen")},
                 {navController.navigate("profilescreen")},
-                currentStateViewModel
+                currentStateViewModel,
+                locationUtils,
+                locationViewModel,
+                context
             )
         }
     }

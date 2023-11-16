@@ -1,5 +1,10 @@
 package eu.tutorials.roadrescuecustomer
 
+import android.Manifest
+import android.content.Context
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,13 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.launch
 
 @Composable
 fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
-    currentStateViewModel: CurrentStateViewModel
+    currentStateViewModel: CurrentStateViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -67,7 +76,11 @@ fun TrackLocationScreen(
                     if(!currentStateViewModel.isServiceRequested.value) {
                         NoPendingActivityTrackLocationScreen()
                     } else {
-                        PendingActivityBox()
+                        PendingActivityTrackLocationScreen(
+                            locationUtils,
+                            locationViewModel,
+                            context
+                        )
                     }
                     HelpBox()
                 }
@@ -103,7 +116,11 @@ fun NoPendingActivityTrackLocationScreen(){
 }
 
 @Composable
-fun PendingActivityBox() {
+fun PendingActivityTrackLocationScreen(
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
     //todo
     Card(
         modifier = cardModifier,
@@ -135,6 +152,13 @@ fun PendingActivityBox() {
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
+            //displayLocation
+            LocationDisplay(
+                locationUtils = locationUtils,
+                locationViewModel = locationViewModel,
+                context = context
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = { },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -149,5 +173,65 @@ fun PendingActivityBox() {
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+fun LocationDisplay(
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
+    val location = locationViewModel.location.value
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                //Have access to location
+                locationUtils.requestLocationUpdates(locationViewModel = locationViewModel)
+            } else {
+                val rationalRequired = ActivityCompat
+                    .shouldShowRequestPermissionRationale(
+                        context as MainActivity,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) || ActivityCompat
+                    .shouldShowRequestPermissionRationale(
+                        context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+
+                if(rationalRequired) {
+                    Toast.makeText(
+                        context,
+                        "Location permission is required for this feature to work.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Location permission is required. Please enable it from the system settings.",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    )
+    if(location != null) {
+        Text("Location: ${location.latitude} ${location.longitude}")
+    } else {
+        Text(text = "Location not available")
+    }
+
+    if(locationUtils.hasLocationPermission(context)) {
+        locationUtils.requestLocationUpdates(locationViewModel)
+    } else {
+        requestPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 }
