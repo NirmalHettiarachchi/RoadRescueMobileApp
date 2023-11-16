@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -154,7 +152,7 @@ fun ProfileBox() {
 
             if(!isEditing) {
                 //Edit button
-                ProfileScreenButton(btnName = "Edit Profile", Modifier.align(Alignment.CenterHorizontally)) {
+                CommonButton(btnName = "Edit Profile", Modifier.align(Alignment.CenterHorizontally)) {
                     isCancelClicked = false
                     isEditing = true
                 }
@@ -164,14 +162,14 @@ fun ProfileBox() {
                     horizontalArrangement = Arrangement.Center
                 ){
                     //Save Button
-                    ProfileScreenButton("Save", Modifier) {
+                    CommonButton("Save", Modifier) {
                         isEditing = false
                         isCancelClicked = false
                         Toast.makeText(context, "Changes saved successfully!", Toast.LENGTH_SHORT).show()
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     //Cancel Button
-                    ProfileScreenButton("Cancel", Modifier) {
+                    CommonButton("Cancel", Modifier) {
                         isEditing = false
                         isCancelClicked = true
                     }
@@ -279,18 +277,3 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
     }
 }
 
-@Composable
-fun ProfileScreenButton(btnName: String, modifier: Modifier, onClickButton: () -> Unit) {
-    Button(
-        onClick = { onClickButton() },
-        modifier = modifier,
-        border = BorderStroke(width = 2.dp, color = Color.White),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
-    ) {
-        Text(
-            text = btnName,
-            style = textStyle3
-        )
-    }
-}
