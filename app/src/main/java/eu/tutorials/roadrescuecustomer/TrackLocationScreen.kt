@@ -6,12 +6,16 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,9 +31,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import com.google.maps.android.compose.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -156,7 +167,12 @@ fun PendingActivityTrackLocationScreen(
             LocationDisplay(
                 locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
-                context = context
+                context = context,
+                modifier = Modifier
+                    .border(width = 2.dp, color = Color.White)
+                    .size(320.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .shadow(elevation = 8.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -180,7 +196,8 @@ fun PendingActivityTrackLocationScreen(
 fun LocationDisplay(
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context
+    context: Context,
+    modifier: Modifier
 ) {
     val location = locationViewModel.location.value
 
@@ -219,9 +236,28 @@ fun LocationDisplay(
         }
     )
     if(location != null) {
-        Text("Location: ${location.latitude} ${location.longitude}")
+//        Text("Location: ${location.latitude} ${location.longitude}")
+        val curLocation = LatLng(location.latitude, location.longitude)
+
+        val cameraPosition = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(curLocation, 15f)
+        }
+        Box(
+            modifier = modifier
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(), // Ensure the map fills the entire Box
+                cameraPositionState = cameraPosition
+            ) {
+                Marker(
+                    state = MarkerState(position = curLocation),
+                    title = "Your Location"
+                )
+            }
+        }
+
     } else {
-        Text(text = "Location not available")
+//        Text(text = "Location not available")
     }
 
     if(locationUtils.hasLocationPermission(context)) {
