@@ -23,7 +23,10 @@ fun App(
                 {navController.navigate("profilescreen")},
                 {navController.navigate("tracklocationscreen")},
                 currentStateViewModel = currentStateViewModel,
-                serviceRequestViewModel = serviceRequestViewModel
+                serviceRequestViewModel = serviceRequestViewModel,
+                locationUtils = locationUtils,
+                locationViewModel = locationViewModel,
+                context = context
             )
         }
         composable("profilescreen") {
@@ -37,9 +40,7 @@ fun App(
                 {navController.navigate("dashboardscreen")},
                 {navController.navigate("profilescreen")},
                 currentStateViewModel,
-                locationUtils,
-                locationViewModel,
-                context
+                locationViewModel
             )
         }
     }

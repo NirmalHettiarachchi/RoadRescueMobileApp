@@ -1,10 +1,5 @@
 package eu.tutorials.roadrescuecustomer
 
-import android.Manifest
-import android.content.Context
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import com.google.maps.android.compose.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -48,9 +43,7 @@ fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
-    locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -88,9 +81,7 @@ fun TrackLocationScreen(
                         NoPendingActivityTrackLocationScreen()
                     } else {
                         PendingActivityTrackLocationScreen(
-                            locationUtils,
                             locationViewModel,
-                            context
                         )
                     }
                     HelpBox()
@@ -128,9 +119,7 @@ fun NoPendingActivityTrackLocationScreen(){
 
 @Composable
 fun PendingActivityTrackLocationScreen(
-    locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context
 ) {
     //todo
     Card(
@@ -165,9 +154,7 @@ fun PendingActivityTrackLocationScreen(
             Spacer(modifier = Modifier.height(16.dp))
             //displayLocation
             LocationDisplay(
-                locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
-                context = context,
                 modifier = Modifier
                     .border(width = 2.dp, color = Color.White)
                     .size(320.dp)
@@ -194,47 +181,11 @@ fun PendingActivityTrackLocationScreen(
 
 @Composable
 fun LocationDisplay(
-    locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context,
     modifier: Modifier
 ) {
     val location = locationViewModel.location.value
 
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
-            if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-                //Have access to location
-                locationUtils.requestLocationUpdates(locationViewModel = locationViewModel)
-            } else {
-                val rationalRequired = ActivityCompat
-                    .shouldShowRequestPermissionRationale(
-                        context as MainActivity,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) || ActivityCompat
-                    .shouldShowRequestPermissionRationale(
-                        context,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-
-                if(rationalRequired) {
-                    Toast.makeText(
-                        context,
-                        "Location permission is required for this feature to work.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Location permission is required. Please enable it from the system settings.",
-                        Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }
-    )
     if(location != null) {
 //        Text("Location: ${location.latitude} ${location.longitude}")
         val curLocation = LatLng(location.latitude, location.longitude)
@@ -257,17 +208,6 @@ fun LocationDisplay(
         }
 
     } else {
-//        Text(text = "Location not available")
-    }
-
-    if(locationUtils.hasLocationPermission(context)) {
-        locationUtils.requestLocationUpdates(locationViewModel)
-    } else {
-        requestPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
+        //Todo
     }
 }

@@ -11,4 +11,8 @@ class LocationViewModel: ViewModel() {
     fun updateLocation(newLocation: LocationData) {
         _location.value = newLocation
     }
+
+    fun resetLocation() {
+        _location.value = null
+    }
 }
