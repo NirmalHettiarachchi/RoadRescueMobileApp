@@ -41,12 +41,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
     navigationToDashboardScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit
+    navigationToTrackLocationScreen: () -> Unit,
+    profileViewModel: ProfileViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -84,7 +86,7 @@ fun ProfileScreen(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             style = textStyle1
                         )
-                        ProfileBox()
+                        ProfileBox(profileViewModel)
                         HelpBox()
                     }
                     Footer(navigationToDashboardScreen, {}, navigationToTrackLocationScreen)
@@ -95,7 +97,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileBox() {
+fun ProfileBox(profileViewModel: ProfileViewModel) {
     val context = LocalContext.current
 
     var isEditing by remember { mutableStateOf(false) }
@@ -105,10 +107,10 @@ fun ProfileBox() {
 
     var isCancelClicked by remember { mutableStateOf(false) }
 
-    var name by remember { mutableStateOf("Nirmal Hettiarachchi") }
-    var email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
-    val phoneNumber by remember { mutableStateOf("+94 768879830") }
-    val numOfServiceReq by remember { mutableStateOf("2") }
+//    var name by remember { mutableStateOf("Nirmal Hettiarachchi") }
+//    var email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
+//    val phoneNumber by remember { mutableStateOf("+94 768879830") }
+//    val numOfServiceReq by remember { mutableStateOf("2") }
 
     Card(
         modifier = cardModifier,
@@ -133,21 +135,21 @@ fun ProfileBox() {
             Spacer(modifier = Modifier.height(8.dp))
 
             if(isCancelClicked) {
-                name = profileField("Name", name, isEditing)
-                email = profileField("Email", email, isEditing)
+                profileViewModel.name.value = profileField("Name", profileViewModel.name.value, isEditing)
+                profileViewModel.email.value = profileField("Email", profileViewModel.email.value, isEditing)
             } else {
-                profileField("Name", name, isEditing)
-                profileField("Email", email, isEditing)
+                profileField("Name", profileViewModel.name.value, isEditing)
+                profileField("Email", profileViewModel.email.value, isEditing)
             }
 
             ProfileFieldButton(
                 labelName = "Phone Number",
-                value = phoneNumber,
+                value = profileViewModel.phoneNumber.value,
                 onClickButton = {showPhoneNumDetailWindow = true}
             )
             ProfileFieldButton(
                 labelName = "Number of Service Requests",
-                value = numOfServiceReq,
+                value = profileViewModel.numOfServiceRequests.value.toString(),
                 onClickButton = {showNumOfReqServiceWindow = true}
             )
 
@@ -192,7 +194,7 @@ fun ProfileBox() {
 }
 
 @Composable
-fun profileField(labelName: String, value: String, isEditing: Boolean = false):String {
+fun profileField(labelName: String, value: String?, isEditing: Boolean = false):String {
     var fieldValue by remember { mutableStateOf(value) }
 
     Box(
@@ -209,7 +211,7 @@ fun profileField(labelName: String, value: String, isEditing: Boolean = false):S
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = fieldValue,
+                value = fieldValue ?: "",
                 onValueChange = { fieldValue = it },
                 modifier = Modifier
                     .padding(horizontal = 36.dp)
@@ -224,7 +226,7 @@ fun profileField(labelName: String, value: String, isEditing: Boolean = false):S
         }
     }
     Spacer(modifier = Modifier.height(8.dp))
-    return fieldValue
+    return fieldValue?:""
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

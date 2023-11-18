@@ -8,13 +8,15 @@ import androidx.navigation.compose.rememberNavController
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
 fun App(
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    profileViewModel: ProfileViewModel
 ) {
     val navController = rememberNavController()
 
@@ -36,7 +38,8 @@ fun App(
         composable("profilescreen") {
             ProfileScreen (
                 {navController.navigate("dashboardscreen")},
-                {navController.navigate("tracklocationscreen")}
+                {navController.navigate("tracklocationscreen")},
+                profileViewModel = profileViewModel
             )
         }
         composable("tracklocationscreen") {

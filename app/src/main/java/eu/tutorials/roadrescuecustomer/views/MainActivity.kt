@@ -11,8 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
-import eu.tutorials.roadrescuecustomer.views.App
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
             val currentStateViewModel: CurrentStateViewModel = viewModel()
             val serviceRequestViewModel: ServiceRequestViewModel = viewModel()
             val locationViewModel: LocationViewModel = viewModel()
+            val profileViewModel: ProfileViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -30,7 +31,8 @@ class MainActivity : ComponentActivity() {
                     App(
                         currentStateViewModel,
                         serviceRequestViewModel,
-                        locationViewModel
+                        locationViewModel,
+                        profileViewModel
                     )
                 }
             }
