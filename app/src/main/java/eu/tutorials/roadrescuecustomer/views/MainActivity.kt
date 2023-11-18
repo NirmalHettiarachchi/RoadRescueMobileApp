@@ -16,13 +16,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             val currentStateViewModel: CurrentStateViewModel = viewModel()
             val serviceRequestViewModel: ServiceRequestViewModel = viewModel()
+            val locationViewModel: LocationViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    App(currentStateViewModel, serviceRequestViewModel)
+                    App(
+                        currentStateViewModel,
+                        serviceRequestViewModel,
+                        locationViewModel
+                    )
                 }
             }
         }

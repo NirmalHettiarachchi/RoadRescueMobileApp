@@ -1,12 +1,16 @@
 package eu.tutorials.roadrescuecustomer
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,15 +26,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.maps.android.compose.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
 @Composable
 fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
-    currentStateViewModel: CurrentStateViewModel
+    currentStateViewModel: CurrentStateViewModel,
+    locationViewModel: LocationViewModel,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -67,7 +79,9 @@ fun TrackLocationScreen(
                     if(!currentStateViewModel.isServiceRequested.value) {
                         NoPendingActivityTrackLocationScreen()
                     } else {
-                        PendingActivityBox()
+                        PendingActivityTrackLocationScreen(
+                            locationViewModel,
+                        )
                     }
                     HelpBox()
                 }
@@ -103,8 +117,9 @@ fun NoPendingActivityTrackLocationScreen(){
 }
 
 @Composable
-fun PendingActivityBox() {
-    //todo
+fun PendingActivityTrackLocationScreen(
+    locationViewModel: LocationViewModel,
+) {
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -135,6 +150,16 @@ fun PendingActivityBox() {
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
+            //displayLocation
+            LocationDisplay(
+                locationViewModel = locationViewModel,
+                modifier = Modifier
+                    .border(width = 2.dp, color = Color.White)
+                    .size(320.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .shadow(elevation = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = { },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -149,5 +174,38 @@ fun PendingActivityBox() {
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+fun LocationDisplay(
+    locationViewModel: LocationViewModel,
+    modifier: Modifier
+) {
+    val location = locationViewModel.location.value
+
+    if(location != null) {
+//        Text("Location: ${location.latitude} ${location.longitude}")
+        val curLocation = LatLng(location.latitude, location.longitude)
+
+        val cameraPosition = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(curLocation, 15f)
+        }
+        Box(
+            modifier = modifier
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(), // Ensure the map fills the entire Box
+                cameraPositionState = cameraPosition
+            ) {
+                Marker(
+                    state = MarkerState(position = curLocation),
+                    title = "Your Location"
+                )
+            }
+        }
+
+    } else {
+        //
     }
 }

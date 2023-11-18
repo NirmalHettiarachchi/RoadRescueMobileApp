@@ -1,5 +1,10 @@
 package eu.tutorials.roadrescuecustomer
 
+import android.Manifest
+import android.content.Context
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,6 +55,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,7 +63,10 @@ fun DashboardScreen(
     navigationToProfileScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -95,7 +104,10 @@ fun DashboardScreen(
                     if(!currentStateViewModel.isServiceRequested.value) {
                         NoPendingActivityDashboard(
                             currentStateViewModel = currentStateViewModel,
-                            serviceRequestViewModel = serviceRequestViewModel
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            locationUtils = locationUtils,
+                            locationViewModel = locationViewModel,
+                            context = context
                             )
                     } else {
                         PendingActivityDashboard(
@@ -114,15 +126,19 @@ fun DashboardScreen(
 @Composable
 fun NoPendingActivityDashboard(
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel) {
-    RequestServiceBox(currentStateViewModel, serviceRequestViewModel)
-    CommonIssuesBox(currentStateViewModel, serviceRequestViewModel)
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
+    RequestServiceBox(currentStateViewModel, serviceRequestViewModel, locationUtils, locationViewModel, context)
+    CommonIssuesBox(currentStateViewModel, serviceRequestViewModel, locationUtils, locationViewModel, context)
 }
 
 @Composable
 fun PendingActivityDashboard(
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel
+    serviceRequestViewModel: ServiceRequestViewModel,
 ) {
     var showCostDetailWindow by remember { mutableStateOf(false) }
 
@@ -150,8 +166,8 @@ fun PendingActivityDashboard(
                 fieldName = "Issue",
                 fieldValue = serviceRequestViewModel.issue.value,
                 modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .width(250.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .width(250.dp)
             )
             DashboardFieldButton(
                 fieldName = "Vehicle Type",
@@ -239,7 +255,11 @@ fun PendingActivityDashboard(
 @Composable
 fun RequestServiceBox(
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel) {
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
 
     Card(
@@ -280,7 +300,11 @@ fun RequestServiceBox(
         RequestServiceWindow(
             onDismiss = {showRequestServiceWindow = false},
             currentStateViewModel = currentStateViewModel,
-            serviceRequestViewModel = serviceRequestViewModel)
+            serviceRequestViewModel = serviceRequestViewModel,
+            locationUtils = locationUtils,
+            locationViewModel = locationViewModel,
+            context = context
+        )
     }
 }
 
@@ -289,13 +313,33 @@ fun RequestServiceWindow(
     onDismiss: () -> Unit,
     issueValue: String? = null,
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel) {
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
+
     var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
     var showCostDetailWindow by remember { mutableStateOf(false) }
+    var showLoadingLocationWindow by remember { mutableStateOf(false) }
+
+    showLoadingLocationWindow =
+        locationViewModel.location.value == null
+    
+    if(showLoadingLocationWindow) {
+        MoreInfoWindow(message = "Getting the current location . . . ") {}
+    }
+    
+    //Get the current location
+    TrackLocation(
+        locationUtils = locationUtils,
+        locationViewModel = locationViewModel,
+        context = context
+    )
 
     AlertDialog(
         onDismissRequest = { },
@@ -320,7 +364,10 @@ fun RequestServiceWindow(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.Top
                 ) {
-                    IconButton(onClick = { onDismiss() }) {
+                    IconButton(onClick = {
+                        onDismiss()
+                        locationViewModel.resetLocation()
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.close_round_fill),
                             contentDescription = null,
@@ -402,13 +449,22 @@ fun RequestServiceWindow(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 RequestServiceButton(modifier = Modifier) {
-                    currentStateViewModel.setCurrentState(true)
-                    serviceRequestViewModel.setServiceRequest(
-                        issue,
-                        vehicleType,
-                        fuelType,
-                        0.00,
-                        description)
+                    if(issue != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
+                        currentStateViewModel.setCurrentState(true)
+                        serviceRequestViewModel.setServiceRequest(
+                            issue,
+                            vehicleType,
+                            fuelType,
+                            0.00,
+                            description
+                        )
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Invalid request! Please fill all the required fields to continue . . . ",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -420,6 +476,60 @@ fun RequestServiceWindow(
         )
     }
 }
+
+@Composable
+fun TrackLocation(
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                //Have access to location
+                locationUtils.requestLocationUpdates(locationViewModel = locationViewModel)
+            } else {
+                val rationalRequired = ActivityCompat
+                    .shouldShowRequestPermissionRationale(
+                        context as MainActivity,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) || ActivityCompat
+                    .shouldShowRequestPermissionRationale(
+                        context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+
+                if(rationalRequired) {
+                    Toast.makeText(
+                        context,
+                        "Location permission is required for this feature to work.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Location permission is required. Please enable it from the system settings.",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    )
+
+    if(locationUtils.hasLocationPermission(context)) {
+        locationUtils.requestLocationUpdates(locationViewModel)
+    } else {
+        requestPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+}
+
 @Composable
 fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
     var isExpanded by remember { mutableStateOf(false) }
@@ -479,7 +589,11 @@ fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
 @Composable
 fun CommonIssuesBox(
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel) {
+    serviceRequestViewModel: ServiceRequestViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context
+) {
     var showRequestServiceWindow by remember { mutableStateOf(false) }
     var selectedIssue by remember { mutableStateOf("") }
 
@@ -590,7 +704,10 @@ fun CommonIssuesBox(
             onDismiss = {showRequestServiceWindow = false},
             issueValue = selectedIssue,
             currentStateViewModel = currentStateViewModel,
-            serviceRequestViewModel = serviceRequestViewModel
+            serviceRequestViewModel = serviceRequestViewModel,
+            locationUtils =locationUtils,
+            locationViewModel = locationViewModel,
+            context = context
         )
     }
 }
@@ -656,3 +773,4 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     }
     Spacer(modifier = Modifier.height(16.dp))
 }
+
