@@ -1,4 +1,4 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.models
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 
 class LocationUtils(context: Context){
 

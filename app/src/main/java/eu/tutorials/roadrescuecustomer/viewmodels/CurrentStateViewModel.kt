@@ -1,8 +1,9 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.viewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import eu.tutorials.roadrescuecustomer.models.CurrentStateRepository
 
 class CurrentStateViewModel : ViewModel() {
     private val _repository: CurrentStateRepository = CurrentStateRepository()
