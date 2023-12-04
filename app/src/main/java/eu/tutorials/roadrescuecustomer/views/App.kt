@@ -32,7 +32,8 @@ fun App(
                 serviceRequestViewModel = serviceRequestViewModel,
                 locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
-                context = context
+                context = context,
+                profileViewModel = profileViewModel
             )
         }
         composable("profilescreen") {
