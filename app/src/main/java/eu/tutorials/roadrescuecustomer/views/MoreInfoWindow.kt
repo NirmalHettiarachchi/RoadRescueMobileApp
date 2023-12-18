@@ -26,7 +26,7 @@ fun MoreInfoWindow(message: String, onDismiss: () -> Unit) {
             shape = RoundedCornerShape(16.dp)
         ),
         tonalElevation = 16.dp,
-        containerColor = Color(0xFFC6D4DE),
+        containerColor = Color(0xFFDCE4EC),
         confirmButton = {
             Column (
                 modifier = Modifier
