@@ -24,6 +24,8 @@ fun VehicleDetailsWindow(onDismiss: () -> Unit) {
 
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
+    var vehicleMake by remember { mutableStateOf("") }
+    var vehicleModel by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -33,9 +35,9 @@ fun VehicleDetailsWindow(onDismiss: () -> Unit) {
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(16.dp),
-                ambientColor = Color(0xFFB6C7E3)
+                ambientColor = Color(0xFFDCE4EC)
             ),
-        containerColor = Color(0xFFB6C7E3),
+        containerColor = Color(0xFFDCE4EC),
         confirmButton = {
             Column (
                 modifier = Modifier
@@ -51,9 +53,13 @@ fun VehicleDetailsWindow(onDismiss: () -> Unit) {
 
                 val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
                 val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
+                val vehicleMakeList = listOf("Toyota", "Honda", "BMW", "Audi")
+                val vehicleModelList = listOf("Axio", "Premio", "Allion", "Vezel", "Graze")
 
                 vehicleType = dropDown("Vehicle Type", vehicleTypeList)
                 fuelType = dropDown("Fuel Type", fuelTypeList)
+                vehicleMake = dropDown("Vehicle Make", vehicleMakeList)
+                vehicleModel = dropDown("Vehicle Model",  vehicleModelList)
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
