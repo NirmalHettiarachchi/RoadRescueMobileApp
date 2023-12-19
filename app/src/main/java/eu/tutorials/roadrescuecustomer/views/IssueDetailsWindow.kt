@@ -21,11 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
-fun IssueDetailsWindow(onDismiss: () -> Unit) {
+fun IssueDetailsWindow(
+    serviceRequestViewModel: ServiceRequestViewModel,
+    onDismiss: () -> Unit) {
 
-    var issue by remember { mutableStateOf("") }
+    var checkEngineIndicator by remember { mutableStateOf(false) }
+    var batteryIndicator by remember { mutableStateOf(false) }
+    var coolantTemperatureIndicator by remember { mutableStateOf(false) }
+    var transmissionIndicator by remember { mutableStateOf(false) }
+    var oilPressureWarningIndicator by remember { mutableStateOf(false) }
+    var brakeSystemIndicator by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -39,11 +47,11 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
             ),
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     text = "Fill the issue details here...",
@@ -51,8 +59,14 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val issueList =  listOf("Fuel Issues", "Engine Overheating", "Flat Tire", "Dead Battery", "Other")
-                issue = dropDown("Issue", issueList)
+                val issueList = listOf(
+                    "Fuel Issues",
+                    "Engine Overheating",
+                    "Flat Tire",
+                    "Dead Battery",
+                    "Other"
+                )
+                serviceRequestViewModel.issue.value = dropDown("Issue", issueList)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -64,18 +78,9 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                var checkEngineIndicator by remember { mutableStateOf(false) }
-                var batteryIndicator by remember { mutableStateOf(false) }
-                var coolantTemperatureIndicator by remember { mutableStateOf(false) }
-                var transmissionIndicator by remember { mutableStateOf(false) }
-                var oilPressureWarningIndicator by remember { mutableStateOf(false) }
-                var brakeSystemIndicator by remember { mutableStateOf(false) }
-
-
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     checkEngineIndicator = toggle(initialState = checkEngineIndicator)
@@ -89,7 +94,6 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     batteryIndicator = toggle(initialState = batteryIndicator)
@@ -103,7 +107,6 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     coolantTemperatureIndicator = toggle(initialState = coolantTemperatureIndicator)
@@ -118,7 +121,6 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     transmissionIndicator = toggle(initialState = transmissionIndicator)
@@ -132,7 +134,6 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     oilPressureWarningIndicator = toggle(initialState = oilPressureWarningIndicator)
@@ -146,7 +147,6 @@ fun IssueDetailsWindow(onDismiss: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .width(220.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     brakeSystemIndicator = toggle(initialState = brakeSystemIndicator)

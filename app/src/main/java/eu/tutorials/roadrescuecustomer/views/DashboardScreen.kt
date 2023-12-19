@@ -273,8 +273,6 @@ fun RequestServiceBox(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var showRequestServiceWindow by remember { mutableStateOf(false) }
-
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -307,223 +305,17 @@ fun RequestServiceBox(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-
-//    //Request service window
-//    if(showRequestServiceWindow) {
-//        RequestServiceWindow(
-//            onDismiss = {showRequestServiceWindow = false},
-//            currentStateViewModel = currentStateViewModel,
-//            serviceRequestViewModel = serviceRequestViewModel,
-//            locationUtils = locationUtils,
-//            locationViewModel = locationViewModel,
-//            context = context
-//        )
-//    }
 }
-
-//@Composable
-//fun RequestServiceWindow(
-//    onDismiss: () -> Unit,
-//    issueValue: String? = null,
-//    currentStateViewModel: CurrentStateViewModel,
-//    serviceRequestViewModel: ServiceRequestViewModel,
-//    locationUtils: LocationUtils,
-//    locationViewModel: LocationViewModel,
-//    context: Context
-//) {
-//
-//    var issue by remember { mutableStateOf("") }
-//    var vehicleType by remember { mutableStateOf("") }
-//    var fuelType by remember { mutableStateOf("") }
-//    var description by remember { mutableStateOf("") }
-//
-//    var showCostDetailWindow by remember { mutableStateOf(false) }
-//    var showLoadingLocationWindow by remember { mutableStateOf(false) }
-//    var showVehicleDetailsWindow by remember { mutableStateOf(false) }
-//    var showIssueDetailsWindow by remember { mutableStateOf(false) }
-//
-//    showLoadingLocationWindow =
-//        locationViewModel.location.value == null
-//
-//    if(showLoadingLocationWindow) {
-//        MoreInfoWindow(message = "Getting the current location . . . ") {}
-//    }
-//
-//    //Get the current location
-//    TrackLocation(
-//        locationUtils = locationUtils,
-//        locationViewModel = locationViewModel,
-//        context = context
-//    )
-//
-//    AlertDialog(
-//        onDismissRequest = { },
-//        tonalElevation = 16.dp,
-//        modifier = Modifier
-//            .padding(8.dp)
-//            .shadow(
-//                elevation = 8.dp,
-//                shape = RoundedCornerShape(16.dp),
-//                ambientColor = Color(0xFFB6C7E3)
-//            ),
-//        containerColor = Color(0xFFB6C7E3),
-//        confirmButton = {
-//            Column (
-//                modifier = Modifier
-//                    .fillMaxWidth(),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ){
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.End,
-//                    verticalAlignment = Alignment.Top
-//                ) {
-//                    IconButton(onClick = {
-//                        onDismiss()
-//                        locationViewModel.resetLocation()
-//                    }) {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.close_round_fill),
-//                            contentDescription = null,
-//                            modifier = Modifier
-//                                .size(24.dp),
-//                            tint = Color.Unspecified
-//                        )
-//                    }
-//                }
-//                Text(
-//                    modifier = Modifier.align(Alignment.CenterHorizontally),
-//                    text = "Tell us more about your issue...",
-//                    style = textStyle2
-//                )
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-////                val issueList =  listOf("Fuel Issues", "Engine Overheating", "Flat Tire", "Dead Battery", "Other")
-////                val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
-////                val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
-//
-////                issue = if(issueValue == null) {
-////                    dropDown("Issue", issueList)
-////                } else {
-////                    dropDown(dropDownText = issueValue, dropDownListItems = issueList)
-////                }
-////                vehicleType = dropDown("Vehicle Type", vehicleTypeList)
-////                fuelType = dropDown("Fuel Type", fuelTypeList)
-//
-//                FillDetailsButton(detailButtonName = "Issue Details") {
-//                    showIssueDetailsWindow = true
-//                }
-//                FillDetailsButton(detailButtonName = "Vehicle Details") {
-//                    showVehicleDetailsWindow = true
-//                }
-//
-//                Button(
-//                    onClick = { showCostDetailWindow = true },
-//                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-//                    border = BorderStroke(width = 2.dp, color = Color.White),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(58.dp)
-//                        .padding(8.dp),
-//                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
-//                ) {
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Text(
-//                            text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
-//                            style = textStyle2,
-//                        )
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.question_fill),
-//                            contentDescription = "Info",
-//                            tint = Color.Unspecified,
-//                            modifier = Modifier.size(30.dp),
-//                        )
-//                    }
-//                }
-//
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                OutlinedTextField(
-//                    value = description,
-//                    onValueChange = { description = it },
-//                    modifier = Modifier
-//                        .height(100.dp)
-//                        .border(2.dp, Color.White, shape = RoundedCornerShape(20))
-//                        .shadow(2.dp, shape = RoundedCornerShape(20))
-//                        .background(Color.White),
-//                    placeholder = {
-//                        Text(
-//                            text = "Write a Description (Optional) ... ",
-//                            fontSize = 12.sp,
-//                            color = Color(0xFF253555)
-//                        )
-//                    },
-//                    textStyle = TextStyle(
-//                        color = Color(0xFF253555)
-//                    )
-//                )
-//
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                RequestServiceButton(modifier = Modifier) {
-//                    if(issue != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
-//                        currentStateViewModel.setCurrentState(true,
-//                            isReqServiceWindowOpened = false
-//                        )
-//                        serviceRequestViewModel.setServiceRequest(
-//                            issue,
-//                            vehicleType,
-//                            fuelType,
-//                            0.00,
-//                            description
-//                        )
-//                    } else {
-//                        Toast.makeText(
-//                            context,
-//                            "Invalid request! Please fill all the required fields to continue . . . ",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
-//                }
-//            }
-//        }
-//    )
-//    if(showCostDetailWindow) {
-//        MoreInfoWindow (
-//            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
-//            onDismiss = {showCostDetailWindow = false}
-//        )
-//    }
-//
-//    if(showVehicleDetailsWindow) {
-//        VehicleDetailsWindow {
-//            showVehicleDetailsWindow = false
-//        }
-//    }
-//
-//    if(showIssueDetailsWindow) {
-//        IssueDetailsWindow {
-//            showIssueDetailsWindow = false
-//        }
-//    }
-//}
 
 @Composable
 fun RequestServiceScreen(
     onDismiss: () -> Unit,
-    issueValue: String? = null,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -585,7 +377,10 @@ fun RequestServiceScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            FillDetailsButton(detailButtonName = "Issue Details") {
+            FillDetailsButton(detailButtonName = "Issue Details" +
+                    if (serviceRequestViewModel.issue.value.isEmpty()) ""
+                    else ": ${serviceRequestViewModel.issue.value}"
+            ) {
                 showIssueDetailsWindow = true
             }
             FillDetailsButton(detailButtonName = "Vehicle Details") {
@@ -597,7 +392,6 @@ fun RequestServiceScreen(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 modifier = Modifier
-//                    .fillMaxWidth()
                     .width(285.dp)
                     .height(58.dp)
                     .padding(8.dp),
@@ -646,12 +440,12 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             RequestServiceButton(modifier = Modifier) {
-                if(issue != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
+                if(serviceRequestViewModel.issue.value != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
                     currentStateViewModel.setCurrentState(true,
                         isReqServiceWindowOpened = false
                     )
                     serviceRequestViewModel.setServiceRequest(
-                        issue,
+                        serviceRequestViewModel.issue.value,
                         vehicleType,
                         fuelType,
                         0.00,
@@ -683,7 +477,7 @@ fun RequestServiceScreen(
     }
 
     if(showIssueDetailsWindow) {
-        IssueDetailsWindow {
+        IssueDetailsWindow (serviceRequestViewModel) {
             showIssueDetailsWindow = false
         }
     }
@@ -750,8 +544,6 @@ fun CommonIssuesBox(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var showRequestServiceWindow by remember { mutableStateOf(false) }
-    var selectedIssue by remember { mutableStateOf("") }
 
     Card(
         modifier = cardModifier,
@@ -790,8 +582,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Fuel Issues"}
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Fuel Issues"}
                     )
                     // First row, second button
                     CommonIssueButton(
@@ -801,8 +593,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Engine Overheating"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Engine Overheating"
                         }
                     )
                 }
@@ -822,8 +614,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Flat Tire"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Flat Tire"
                         }
                     )
 
@@ -835,14 +627,14 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Dead Battery"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Dead Battery"
                         }
                     )
                 }
                 Button(onClick = {
-                    showRequestServiceWindow = true
-                    selectedIssue = "Other" },
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value = "Other" },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
@@ -854,17 +646,6 @@ fun CommonIssuesBox(
                 }
             }
         }
-    }
-    if(showRequestServiceWindow) {
-        RequestServiceScreen(
-            onDismiss = {showRequestServiceWindow = false},
-            issueValue = selectedIssue,
-            currentStateViewModel = currentStateViewModel,
-            serviceRequestViewModel = serviceRequestViewModel,
-            locationUtils =locationUtils,
-            locationViewModel = locationViewModel,
-            context = context
-        )
     }
 }
 
