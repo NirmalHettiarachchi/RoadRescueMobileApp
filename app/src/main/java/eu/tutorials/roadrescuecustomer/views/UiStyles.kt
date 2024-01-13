@@ -1,4 +1,4 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize

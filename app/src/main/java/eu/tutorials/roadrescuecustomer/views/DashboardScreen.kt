@@ -1,4 +1,4 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.views
 
 import android.Manifest
 import android.content.Context
@@ -9,7 +9,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -22,16 +21,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -56,6 +51,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavHostController
+import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.models.LocationUtils
+import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,7 +69,10 @@ fun DashboardScreen(
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context
+    context: Context,
+    profileViewModel: ProfileViewModel,
+    navController: NavHostController,
+    context1: MainActivity
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -76,11 +82,11 @@ fun DashboardScreen(
         drawerContent = {
                         ModalDrawerSheet(
                             content = {
-                                SidebarContent {
+                                SidebarContent({
                                     scope.launch {
                                         drawerState.close()
                                     }
-                                }
+                                }, navController, context)
                             }
                         )
                     }
@@ -97,18 +103,29 @@ fun DashboardScreen(
                     //Welcome text
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome Nirmal Hettiarachchi",
+                        text = "Welcome ${AppPreferences(context).getStringPreference("NAME","")}",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
                     if(!currentStateViewModel.isServiceRequested.value) {
-                        NoPendingActivityDashboard(
-                            currentStateViewModel = currentStateViewModel,
-                            serviceRequestViewModel = serviceRequestViewModel,
-                            locationUtils = locationUtils,
-                            locationViewModel = locationViewModel,
-                            context = context
+                        if(currentStateViewModel.isReqServiceWindowOpened.value) {
+                            RequestServiceScreen(
+                                onDismiss = { currentStateViewModel.isReqServiceWindowOpened.value = false },
+                                currentStateViewModel = currentStateViewModel,
+                                serviceRequestViewModel = serviceRequestViewModel,
+                                locationUtils = locationUtils,
+                                locationViewModel = locationViewModel,
+                                context = context
                             )
+                        } else {
+                            NoPendingActivityDashboard(
+                                currentStateViewModel = currentStateViewModel,
+                                serviceRequestViewModel = serviceRequestViewModel,
+                                locationUtils = locationUtils,
+                                locationViewModel = locationViewModel,
+                                context = context
+                            )
+                        }
                     } else {
                         PendingActivityDashboard(
                             serviceRequestViewModel = serviceRequestViewModel,
@@ -239,7 +256,7 @@ fun PendingActivityDashboard(
             Spacer(modifier = Modifier.height(16.dp))
             //Cancel btn
             CommonButton(btnName = "Cancel Request", modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                currentStateViewModel.setCurrentState(false)
+                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -260,8 +277,6 @@ fun RequestServiceBox(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var showRequestServiceWindow by remember { mutableStateOf(false) }
-
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -288,52 +303,39 @@ fun RequestServiceBox(
             Spacer(modifier = Modifier.height(16.dp))
 
             RequestServiceButton(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                showRequestServiceWindow = true
+                currentStateViewModel.isReqServiceWindowOpened.value = true
             }
 
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-
-    //Request service window
-    if(showRequestServiceWindow) {
-        RequestServiceWindow(
-            onDismiss = {showRequestServiceWindow = false},
-            currentStateViewModel = currentStateViewModel,
-            serviceRequestViewModel = serviceRequestViewModel,
-            locationUtils = locationUtils,
-            locationViewModel = locationViewModel,
-            context = context
-        )
-    }
 }
 
 @Composable
-fun RequestServiceWindow(
+fun RequestServiceScreen(
     onDismiss: () -> Unit,
-    issueValue: String? = null,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-
-    var issue by remember { mutableStateOf("") }
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
     var showCostDetailWindow by remember { mutableStateOf(false) }
     var showLoadingLocationWindow by remember { mutableStateOf(false) }
+    var showVehicleDetailsWindow by remember { mutableStateOf(false) }
+    var showIssueDetailsWindow by remember { mutableStateOf(false) }
 
     showLoadingLocationWindow =
         locationViewModel.location.value == null
-    
+
     if(showLoadingLocationWindow) {
         MoreInfoWindow(message = "Getting the current location . . . ") {}
     }
-    
+
     //Get the current location
     TrackLocation(
         locationUtils = locationUtils,
@@ -341,139 +343,147 @@ fun RequestServiceWindow(
         context = context
     )
 
-    AlertDialog(
-        onDismissRequest = { },
-        tonalElevation = 16.dp,
-        modifier = Modifier
-            .padding(8.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color(0xFFB6C7E3)
-            ),
-        containerColor = Color(0xFFB6C7E3),
-        confirmButton = {
-            Column (
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
+        Column (
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    IconButton(onClick = {
-                        onDismiss()
-                        locationViewModel.resetLocation()
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.close_round_fill),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    }
-                }
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Tell us more about your issue...",
-                    style = textStyle2
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val issueList =  listOf("Fuel Issues", "Engine Overheating", "Flat Tire", "Dead Battery", "Other")
-                val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
-                val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
-
-                issue = if(issueValue == null) {
-                    dropDown("Issue", issueList)
-                } else {
-                    dropDown(dropDownText = issueValue, dropDownListItems = issueList)
-                }
-                vehicleType = dropDown("Vehicle Type", vehicleTypeList)
-                fuelType = dropDown("Fuel Type", fuelTypeList)
-
-                Button(
-                    onClick = { showCostDetailWindow = true },
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    border = BorderStroke(width = 2.dp, color = Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(58.dp)
-                        .padding(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
-                            style = textStyle2,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.question_fill),
-                            contentDescription = "Info",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(30.dp),
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    modifier = Modifier
-                        .height(100.dp)
-                        .border(2.dp, Color.White, shape = RoundedCornerShape(20))
-                        .shadow(2.dp, shape = RoundedCornerShape(20))
-                        .background(Color.White),
-                    placeholder = {
-                        Text(
-                            text = "Write a Description (Optional) ... ",
-                            fontSize = 12.sp,
-                            color = Color(0xFF253555)
-                        )
-                    },
-                    textStyle = TextStyle(
-                        color = Color(0xFF253555)
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top
+            ) {
+                IconButton(onClick = {
+                    onDismiss()
+                    locationViewModel.resetLocation()
+                }) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp),
+                        tint = Color.Unspecified
                     )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                RequestServiceButton(modifier = Modifier) {
-                    if(issue != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
-                        currentStateViewModel.setCurrentState(true)
-                        serviceRequestViewModel.setServiceRequest(
-                            issue,
-                            vehicleType,
-                            fuelType,
-                            0.00,
-                            description
-                        )
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Invalid request! Please fill all the required fields to continue . . . ",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
                 }
             }
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Tell us more about your issue...",
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FillDetailsButton(detailButtonName = "Issue Details" +
+                    if (serviceRequestViewModel.issue.value.isEmpty()) ""
+                    else ": ${serviceRequestViewModel.issue.value}"
+            ) {
+                showIssueDetailsWindow = true
+            }
+            FillDetailsButton(detailButtonName = "Vehicle Details") {
+                showVehicleDetailsWindow = true
+            }
+
+            Button(
+                onClick = { showCostDetailWindow = true },
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                border = BorderStroke(width = 2.dp, color = Color.White),
+                modifier = Modifier
+                    .width(285.dp)
+                    .height(58.dp)
+                    .padding(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
+                        style = textStyle2,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.question_fill),
+                        contentDescription = "Info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                modifier = Modifier
+                    .height(100.dp)
+                    .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                    .shadow(2.dp, shape = RoundedCornerShape(20))
+                    .background(Color.White),
+                placeholder = {
+                    Text(
+                        text = "Write a Description (Optional) ... ",
+                        fontSize = 12.sp,
+                        color = Color(0xFF253555)
+                    )
+                },
+                textStyle = TextStyle(
+                    color = Color(0xFF253555)
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            RequestServiceButton(modifier = Modifier) {
+                if(serviceRequestViewModel.issue.value != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
+                    currentStateViewModel.setCurrentState(true,
+                        isReqServiceWindowOpened = false
+                    )
+                    serviceRequestViewModel.setServiceRequest(
+                        serviceRequestViewModel.issue.value,
+                        vehicleType,
+                        fuelType,
+                        0.00,
+                        description
+                    )
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Invalid request! Please fill all the required fields to continue . . . ",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
-    )
+    }
     if(showCostDetailWindow) {
         MoreInfoWindow (
             "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
             onDismiss = {showCostDetailWindow = false}
         )
+    }
+
+    if(showVehicleDetailsWindow) {
+        VehicleDetailsWindow {
+            showVehicleDetailsWindow = false
+        }
+    }
+
+    if(showIssueDetailsWindow) {
+        IssueDetailsWindow (serviceRequestViewModel) {
+            showIssueDetailsWindow = false
+        }
     }
 }
 
@@ -531,62 +541,6 @@ fun TrackLocation(
 }
 
 @Composable
-fun dropDown(dropDownText: String, dropDownListItems: List<String>): String {
-    var isExpanded by remember { mutableStateOf(false) }
-    var selectedValue by remember { mutableStateOf(dropDownText) }
-
-    Box {
-        Button(
-            onClick = { isExpanded = true },
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = selectedValue,
-                    color = Color(0xFF253555)
-                )
-                Icon(
-                    Icons.Default.ArrowDropDown,
-                    contentDescription = "Arrow Down",
-                    tint = Color(0xFF253555)
-                )
-            }
-        }
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            modifier = Modifier
-                .width(270.dp)
-                .background(Color.White),
-        ) {
-            dropDownListItems.forEachIndexed { index, dropDownListItem ->
-                DropdownMenuItem(
-                    text = {Text(text = dropDownListItem, color = Color(0xFF253555))},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White),
-                    onClick = {
-                        isExpanded = false
-                        selectedValue = dropDownListItem
-                    }
-                )
-                if (index < dropDownListItems.size - 1) {
-                    Divider()
-                }
-            }
-        }
-    }
-    return selectedValue
-}
-
-@Composable
 fun CommonIssuesBox(
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
@@ -594,8 +548,6 @@ fun CommonIssuesBox(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var showRequestServiceWindow by remember { mutableStateOf(false) }
-    var selectedIssue by remember { mutableStateOf("") }
 
     Card(
         modifier = cardModifier,
@@ -634,8 +586,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Fuel Issues"}
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Fuel Issues"}
                     )
                     // First row, second button
                     CommonIssueButton(
@@ -645,8 +597,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Engine Overheating"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Engine Overheating"
                         }
                     )
                 }
@@ -666,8 +618,8 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Flat Tire"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Flat Tire"
                         }
                     )
 
@@ -679,14 +631,14 @@ fun CommonIssuesBox(
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
-                            showRequestServiceWindow = true
-                            selectedIssue = "Dead Battery"
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Dead Battery"
                         }
                     )
                 }
                 Button(onClick = {
-                    showRequestServiceWindow = true
-                    selectedIssue = "Other" },
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value = "Other" },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
@@ -698,17 +650,6 @@ fun CommonIssuesBox(
                 }
             }
         }
-    }
-    if(showRequestServiceWindow) {
-        RequestServiceWindow(
-            onDismiss = {showRequestServiceWindow = false},
-            issueValue = selectedIssue,
-            currentStateViewModel = currentStateViewModel,
-            serviceRequestViewModel = serviceRequestViewModel,
-            locationUtils =locationUtils,
-            locationViewModel = locationViewModel,
-            context = context
-        )
     }
 }
 
@@ -774,3 +715,16 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     Spacer(modifier = Modifier.height(16.dp))
 }
 
+@Composable
+fun FillDetailsButton(detailButtonName: String, onClickButton: () -> Unit) {
+    Button(onClick = { onClickButton() },
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
+            .width(285.dp)
+            .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+        Text(
+            text = detailButtonName,
+            color = Color(0xFF253555),
+            style = textStyle3.copy(textAlign = TextAlign.Center)
+        )
+    }
+}

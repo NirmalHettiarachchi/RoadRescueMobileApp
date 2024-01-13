@@ -1,4 +1,4 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import eu.tutorials.roadrescuecustomer.R
 
 @Composable
 fun HelpBox() {
@@ -64,4 +66,9 @@ fun HelpBox() {
             Spacer(modifier = Modifier.height(6.dp))
         }
     }
+}
+@Preview
+@Composable
+fun HelpBoxPreview(){
+    HelpBox()
 }

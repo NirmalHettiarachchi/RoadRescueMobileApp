@@ -1,4 +1,4 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,7 @@ fun MoreInfoWindow(message: String, onDismiss: () -> Unit) {
             shape = RoundedCornerShape(16.dp)
         ),
         tonalElevation = 16.dp,
-        containerColor = Color(0xFFC6D4DE),
+        containerColor = Color(0xFFDCE4EC),
         confirmButton = {
             Column (
                 modifier = Modifier

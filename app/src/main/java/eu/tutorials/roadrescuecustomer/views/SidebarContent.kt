@@ -1,5 +1,6 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.views
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import eu.tutorials.roadrescuecustomer.AppPreferences
 
 @Composable
-fun SidebarContent(menuClicked:()->Unit){
+fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,context: Context){
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -51,18 +54,23 @@ fun SidebarContent(menuClicked:()->Unit){
                     .background(Color.White)
                     .height(2.dp))
             }
-            SidebarButton(buttonName = "Help", verticalPadding = 8)
-            SidebarButton(buttonName = "Settings", verticalPadding = 8)
+            SidebarButton(buttonName = "Help", verticalPadding = 8,{})
+            SidebarButton(buttonName = "Settings", verticalPadding = 8,{})
         }
-        SidebarButton(buttonName = "Log Out", verticalPadding = 16)
+        SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
+            AppPreferences(context).clearAllPreferences()
+            navHostController.navigate("loginscreen") {
+                popUpTo("loginscreen") { inclusive = true }
+            }
+        }
     }
 }
 
 @Composable
-fun SidebarButton(buttonName: String, verticalPadding: Int) {
+fun SidebarButton(buttonName: String, verticalPadding: Int,onClick:()->Unit) {
     Button(
         onClick = {
-
+            onClick()
         },
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
         modifier = Modifier

@@ -1,9 +1,10 @@
-package eu.tutorials.roadrescuecustomer
+package eu.tutorials.roadrescuecustomer.viewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 
 class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
