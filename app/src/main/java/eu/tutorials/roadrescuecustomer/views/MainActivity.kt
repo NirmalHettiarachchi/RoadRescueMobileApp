@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.FirebaseApp
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
                         currentStateViewModel,
                         serviceRequestViewModel,
                         locationViewModel,
-                        profileViewModel
+                        profileViewModel,this
                     )
                 }
             }

@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.google.maps.android.compose.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -45,6 +46,7 @@ fun TrackLocationScreen(
     navigationToProfileScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
     locationViewModel: LocationViewModel,
+    navHostController: NavHostController, context: MainActivity
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -54,11 +56,11 @@ fun TrackLocationScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent {
+                    SidebarContent({
                         scope.launch {
                             drawerState.close()
                         }
-                    }
+                    }, navHostController, context)
                 }
             )
         }
@@ -70,7 +72,7 @@ fun TrackLocationScreen(
             ) {
                 Column {
                     Header {
-                        scope.launch {drawerState.open()}
+                        scope.launch { drawerState.open() }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -78,7 +80,7 @@ fun TrackLocationScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    if(!currentStateViewModel.isServiceRequested.value) {
+                    if (!currentStateViewModel.isServiceRequested.value) {
                         NoPendingActivityTrackLocationScreen()
                     } else {
                         PendingActivityTrackLocationScreen(
@@ -94,7 +96,7 @@ fun TrackLocationScreen(
 }
 
 @Composable
-fun NoPendingActivityTrackLocationScreen(){
+fun NoPendingActivityTrackLocationScreen() {
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -186,7 +188,7 @@ fun LocationDisplay(
 ) {
     val location = locationViewModel.location.value
 
-    if(location != null) {
+    if (location != null) {
 //        Text("Location: ${location.latitude} ${location.longitude}")
         val curLocation = LatLng(location.latitude, location.longitude)
 

@@ -51,6 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavHostController
+import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
@@ -68,7 +70,9 @@ fun DashboardScreen(
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     context: Context,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    navController: NavHostController,
+    context1: MainActivity
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -78,11 +82,11 @@ fun DashboardScreen(
         drawerContent = {
                         ModalDrawerSheet(
                             content = {
-                                SidebarContent {
+                                SidebarContent({
                                     scope.launch {
                                         drawerState.close()
                                     }
-                                }
+                                }, navController, context)
                             }
                         )
                     }
@@ -99,7 +103,7 @@ fun DashboardScreen(
                     //Welcome text
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome ${profileViewModel.name.value}",
+                        text = "Welcome ${AppPreferences(context).getStringPreference("NAME","")}",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )

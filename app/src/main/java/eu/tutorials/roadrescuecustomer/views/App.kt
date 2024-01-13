@@ -1,10 +1,10 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
@@ -16,39 +16,53 @@ fun App(
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     locationViewModel: LocationViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    context: MainActivity
 ) {
     val navController = rememberNavController()
 
-    val context = LocalContext.current
     val locationUtils = LocationUtils(context)
 
-    NavHost(navController = navController, startDestination = "dashboardscreen") {
+    NavHost(
+        navController = navController,
+        startDestination = if (AppPreferences(context).getStringPreference(
+                "NAME",
+                ""
+            ).isNotEmpty()
+        ) "dashboardscreen"
+        else "loginscreen"
+    ) {
         composable("dashboardscreen") {
-            DashboardScreen (
-                {navController.navigate("profilescreen")},
-                {navController.navigate("tracklocationscreen")},
+            DashboardScreen(
+                { navController.navigate("profilescreen") },
+                { navController.navigate("tracklocationscreen") },
                 currentStateViewModel = currentStateViewModel,
                 serviceRequestViewModel = serviceRequestViewModel,
                 locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
                 context = context,
-                profileViewModel = profileViewModel
+                profileViewModel = profileViewModel, navController, context
             )
         }
+        composable("loginscreen") {
+            LoginScreen(navController, context)
+        }
+        composable("signupscreen") {
+            SingupScreen(navController, context)
+        }
         composable("profilescreen") {
-            ProfileScreen (
-                {navController.navigate("dashboardscreen")},
-                {navController.navigate("tracklocationscreen")},
-                profileViewModel = profileViewModel
+            ProfileScreen(
+                { navController.navigate("dashboardscreen") },
+                { navController.navigate("tracklocationscreen") },
+                profileViewModel = profileViewModel, navController, context
             )
         }
         composable("tracklocationscreen") {
-            TrackLocationScreen (
-                {navController.navigate("dashboardscreen")},
-                {navController.navigate("profilescreen")},
+            TrackLocationScreen(
+                { navController.navigate("dashboardscreen") },
+                { navController.navigate("profilescreen") },
                 currentStateViewModel,
-                locationViewModel
+                locationViewModel, navController, context
             )
         }
     }

@@ -40,15 +40,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
+import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.api.RetrofitInstance
+import eu.tutorials.roadrescuecustomer.models.LoginResponse
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun ProfileScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    navController: NavHostController,
+    context: MainActivity
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -58,11 +71,11 @@ fun ProfileScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent {
+                    SidebarContent({
                         scope.launch {
                             drawerState.close()
                         }
-                    }
+                    }, navController, context)
                 }
             )
         }
@@ -78,7 +91,7 @@ fun ProfileScreen(
                 ) {
                     Column {
                         Header {
-                            scope.launch {drawerState.open()}
+                            scope.launch { drawerState.open() }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
@@ -101,17 +114,10 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
     val context = LocalContext.current
 
     var isEditing by remember { mutableStateOf(false) }
-
-    var showPhoneNumDetailWindow by remember {mutableStateOf(false)}
-    var showNumOfReqServiceWindow by remember {mutableStateOf(false)}
-
-    var isCancelClicked by remember { mutableStateOf(false) }
-
-//    var name by remember { mutableStateOf("Nirmal Hettiarachchi") }
-//    var email by remember { mutableStateOf("nirmalhettiarachchi5@gmail.com") }
-//    val phoneNumber by remember { mutableStateOf("+94 768879830") }
-//    val numOfServiceReq by remember { mutableStateOf("2") }
-
+    var newName by remember { mutableStateOf("") }
+    var newEmail by remember { mutableStateOf("") }
+    var showPhoneNumDetailWindow by remember { mutableStateOf(false) }
+    var showNumOfReqServiceWindow by remember { mutableStateOf(false) }
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -133,60 +139,66 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
                 tint = Color.Unspecified, contentDescription = null
             )
             Spacer(modifier = Modifier.height(8.dp))
-
-            if(isCancelClicked) {
-                profileViewModel.name.value = profileField("Name", profileViewModel.name.value, isEditing)
-                profileViewModel.email.value = profileField("Email", profileViewModel.email.value, isEditing)
-            } else {
-                profileField("Name", profileViewModel.name.value, isEditing)
-                profileField("Email", profileViewModel.email.value, isEditing)
-            }
+            newName =
+                profileField(
+                    "Name",
+                    AppPreferences(context).getStringPreference("NAME", ""),
+                    isEditing
+                )
+            newEmail =
+                profileField(
+                    "Email",
+                    AppPreferences(context).getStringPreference("EMAIL", ""),
+                    isEditing
+                )
 
             ProfileFieldButton(
                 labelName = "Phone Number",
-                value = profileViewModel.phoneNumber.value,
-                onClickButton = {showPhoneNumDetailWindow = true}
+                value = AppPreferences(context).getStringPreference("PHONE", ""),
+                onClickButton = { showPhoneNumDetailWindow = true }
             )
             ProfileFieldButton(
                 labelName = "Number of Service Requests",
                 value = profileViewModel.numOfServiceRequests.value.toString(),
-                onClickButton = {showNumOfReqServiceWindow = true}
+                onClickButton = { showNumOfReqServiceWindow = true }
             )
 
-            if(!isEditing) {
+            if (!isEditing) {
                 //Edit button
-                CommonButton(btnName = "Edit Profile", Modifier.align(Alignment.CenterHorizontally)) {
-                    isCancelClicked = false
+                CommonButton(
+                    btnName = "Edit Profile",
+                    Modifier.align(Alignment.CenterHorizontally)
+                ) {
                     isEditing = true
                 }
             } else {
-                Row (
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
-                ){
+                ) {
                     //Save Button
                     CommonButton("Save", Modifier) {
-                        isEditing = false
-                        isCancelClicked = false
-                        Toast.makeText(context, "Changes saved successfully!", Toast.LENGTH_SHORT).show()
+                        if (newName.isNotEmpty() && newEmail.isNotEmpty()) {
+                            profileViewModel.updateProfile(newName,newEmail,context)
+                            isEditing = false
+                        }
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     //Cancel Button
                     CommonButton("Cancel", Modifier) {
                         isEditing = false
-                        isCancelClicked = true
                     }
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
-    if(showPhoneNumDetailWindow) {
+    if (showPhoneNumDetailWindow) {
         MoreInfoWindow(message = "You can change the registered phone number by accessing the settings...") {
             showPhoneNumDetailWindow = false
         }
     }
-    if(showNumOfReqServiceWindow) {
+    if (showNumOfReqServiceWindow) {
         MoreInfoWindow(message = "This number shows only the completed service requests that have been accepted by a service provider and completed.") {
             showNumOfReqServiceWindow = false
         }
@@ -194,7 +206,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
 }
 
 @Composable
-fun profileField(labelName: String, value: String?, isEditing: Boolean = false):String {
+fun profileField(labelName: String, value: String?, isEditing: Boolean = false): String {
     var fieldValue by remember { mutableStateOf(value) }
 
     Box(
@@ -226,7 +238,7 @@ fun profileField(labelName: String, value: String?, isEditing: Boolean = false):
         }
     }
     Spacer(modifier = Modifier.height(8.dp))
-    return fieldValue?:""
+    return fieldValue ?: ""
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,12 +268,14 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                    , modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
                 ) {
                     Text(
                         text = value,
-                        modifier = Modifier.padding(start = 8.dp).weight(1f),
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .weight(1f),
                         maxLines = 1,
                         style = textStyle2,
                     )
