@@ -12,6 +12,8 @@ class ServiceRequestViewModel : ViewModel() {
     private val _issue = mutableStateOf(_repository.getServiceRequest().issue)
     private val _vehicleType = mutableStateOf(_repository.getServiceRequest().vehicleType)
     private val _fuelType = mutableStateOf(_repository.getServiceRequest().fuelType)
+    private val _vehicleMake = mutableStateOf(_repository.getServiceRequest().vehicleMake)
+    private val _vehicleModel = mutableStateOf(_repository.getServiceRequest().vehicleModel)
     private val _approximatedCost = mutableDoubleStateOf(_repository.getServiceRequest().approximatedCost)
     private val _description = mutableStateOf(_repository.getServiceRequest().description)
 
@@ -21,11 +23,13 @@ class ServiceRequestViewModel : ViewModel() {
     val approximatedCost: MutableState<Double> = _approximatedCost
     val description: MutableState<String> = _description
 
-    fun setServiceRequest(issue: String, vehicleType: String, fuelType: String, approximatedCost: Double, description: String) {
-        _repository.setServiceRequest(issue, vehicleType, fuelType, approximatedCost, description)
+    fun setServiceRequest(issue: String, vehicleType: String, fuelType: String, vehicleMake: String, vehicleModel: String, approximatedCost: Double, description: String) {
+        _repository.setServiceRequest(issue, vehicleType, fuelType, vehicleMake, vehicleModel, approximatedCost, description)
         _issue.value = _repository.getServiceRequest().issue
         _vehicleType.value = _repository.getServiceRequest().vehicleType
         _fuelType.value = _repository.getServiceRequest().fuelType
+        _vehicleMake.value = _repository.getServiceRequest().vehicleMake
+        _vehicleModel.value = _repository.getServiceRequest().vehicleModel
         _approximatedCost.doubleValue = _repository.getServiceRequest().approximatedCost
         _description.value = _repository.getServiceRequest().description
     }
