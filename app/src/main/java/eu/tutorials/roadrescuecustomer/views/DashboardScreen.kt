@@ -187,14 +187,14 @@ fun PendingActivityDashboard(
                     .width(250.dp)
             )
             DashboardFieldButton(
-                fieldName = "Vehicle Type",
+                fieldName = "Vehicle",
                 fieldValue = serviceRequestViewModel.vehicleType.value,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(250.dp)
             )
             DashboardFieldButton(
-                fieldName = "Fuel Type",
+                fieldName = "Request ID",
                 fieldValue = serviceRequestViewModel.fuelType.value,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
