@@ -566,7 +566,7 @@ fun CommonIssuesBox(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Column(
                 modifier = Modifier
                     .padding(vertical = 8.dp, horizontal = 24.dp)
@@ -574,11 +574,56 @@ fun CommonIssuesBox(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(80.dp)
                         .height(IntrinsicSize.Max),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // First row, first button
+                    CommonIssueButton(
+                        issueCategory = "Mechanical Issues",
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClickButton = {
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Mechanical Issues"}
+                    )
+                    // First row, second button
+                    CommonIssueButton(
+                        issueCategory = "Electrical Issues",
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClickButton = {
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Electrical Issues"
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Second row, first button
+                    CommonIssueButton(
+                        issueCategory = "Engine Problems",
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        onClickButton = {
+                            currentStateViewModel.isReqServiceWindowOpened.value = true
+                            serviceRequestViewModel.issue.value = "Engine Problems"
+                        }
+                    )
+
+                    // Second row, second button
                     CommonIssueButton(
                         issueCategory = "Fuel Issues",
                         modifier = Modifier
@@ -587,18 +632,7 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Fuel Issues"}
-                    )
-                    // First row, second button
-                    CommonIssueButton(
-                        issueCategory = "Engine Overheating",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Engine Overheating"
+                            serviceRequestViewModel.issue.value = "Fuel Issues"
                         }
                     )
                 }
@@ -606,33 +640,33 @@ fun CommonIssuesBox(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(80.dp)
                         .height(IntrinsicSize.Max),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Second row, first button
+                    // Third row, first button
                     CommonIssueButton(
-                        issueCategory = "Flat Tire",
+                        issueCategory = "Exhaust Issues",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Flat Tire"
+                            serviceRequestViewModel.issue.value = "Exhaust Issues"
                         }
                     )
 
-                    // Second row, second button
+                    // Third row, second button
                     CommonIssueButton(
-                        issueCategory = "Dead Battery",
+                        issueCategory = "Cooling Problems",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Dead Battery"
+                            serviceRequestViewModel.issue.value = "Cooling Problems"
                         }
                     )
                 }

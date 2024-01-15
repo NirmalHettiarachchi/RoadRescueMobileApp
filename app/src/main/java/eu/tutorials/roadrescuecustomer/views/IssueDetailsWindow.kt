@@ -60,19 +60,22 @@ fun IssueDetailsWindow(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 val issueList = listOf(
+                    "Mechanical Issues",
+                    "Electrical Issues",
+                    "Engine Problems",
                     "Fuel Issues",
-                    "Engine Overheating",
-                    "Flat Tire",
-                    "Dead Battery",
+                    "Exhaust Issues",
+                    "Cooling Problems",
                     "Other"
                 )
-                serviceRequestViewModel.issue.value = dropDown("Issue", issueList)
+
+                var selectedIssue = dropDown("Issue", issueList)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Select the indicators...",
+                    text = "Select the indicators (optional)",
                     style = textStyle2
                 )
 
@@ -157,6 +160,12 @@ fun IssueDetailsWindow(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                CommonButton(btnName = "Save", modifier = Modifier) {
+                    serviceRequestViewModel.issue.value = selectedIssue
+                    if(serviceRequestViewModel.issue.value.isNotEmpty()) {
+                        onDismiss()
+                    }
+                }
             }
         }
     )
