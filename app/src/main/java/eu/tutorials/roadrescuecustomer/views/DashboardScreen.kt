@@ -322,6 +322,8 @@ fun RequestServiceScreen(
 ) {
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
+    var vehicleMake by remember { mutableStateOf("") }
+    var vehicleModel by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
     var showCostDetailWindow by remember { mutableStateOf(false) }
@@ -444,7 +446,7 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             RequestServiceButton(modifier = Modifier) {
-                if(serviceRequestViewModel.issue.value != "Issue" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
+                if(serviceRequestViewModel.issue.value != "" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
                     currentStateViewModel.setCurrentState(true,
                         isReqServiceWindowOpened = false
                     )
@@ -452,6 +454,8 @@ fun RequestServiceScreen(
                         serviceRequestViewModel.issue.value,
                         vehicleType,
                         fuelType,
+                        vehicleMake,
+                        vehicleModel,
                         0.00,
                         description
                     )
