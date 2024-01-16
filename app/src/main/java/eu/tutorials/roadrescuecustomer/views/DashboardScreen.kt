@@ -65,6 +65,7 @@ import kotlinx.coroutines.launch
 fun DashboardScreen(
     navigationToProfileScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
+    navigationToActivitiesScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
@@ -134,7 +135,7 @@ fun DashboardScreen(
                     }
                     HelpBox()
                 }
-                Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen)
+                Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen, navigationToActivitiesScreen)
             }
         }
     }

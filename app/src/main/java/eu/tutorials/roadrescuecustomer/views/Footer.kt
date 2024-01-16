@@ -22,7 +22,8 @@ import eu.tutorials.roadrescuecustomer.R
 fun Footer(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit
+    navigationToTrackLocationScreen: () -> Unit,
+    navigationToActivitiesScreen: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -37,7 +38,7 @@ fun Footer(
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable{},
+                .clickable{ navigationToActivitiesScreen() },
             tint = Color.Unspecified, contentDescription = null
         )
         Icon(

@@ -44,9 +44,11 @@ import kotlinx.coroutines.launch
 fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
+    navigationToActivitiesScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
     locationViewModel: LocationViewModel,
-    navHostController: NavHostController, context: MainActivity
+    navHostController: NavHostController,
+    context: MainActivity
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -89,7 +91,7 @@ fun TrackLocationScreen(
                     }
                     HelpBox()
                 }
-                Footer(navigationToDashboardScreen, navigationToProfileScreen) {}
+                Footer(navigationToDashboardScreen, navigationToProfileScreen, {}, navigationToActivitiesScreen)
             }
         }
     }

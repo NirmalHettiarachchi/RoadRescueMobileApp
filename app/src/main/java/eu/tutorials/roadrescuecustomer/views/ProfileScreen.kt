@@ -59,6 +59,7 @@ import java.util.concurrent.TimeUnit
 fun ProfileScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
+    navigationToActivitiesScreen: () -> Unit,
     profileViewModel: ProfileViewModel,
     navController: NavHostController,
     context: MainActivity
@@ -102,7 +103,7 @@ fun ProfileScreen(
                         ProfileBox(profileViewModel)
                         HelpBox()
                     }
-                    Footer(navigationToDashboardScreen, {}, navigationToTrackLocationScreen)
+                    Footer(navigationToDashboardScreen, {}, navigationToTrackLocationScreen, navigationToActivitiesScreen)
                 }
             }
         }

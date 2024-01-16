@@ -36,12 +36,15 @@ fun App(
             DashboardScreen(
                 { navController.navigate("profilescreen") },
                 { navController.navigate("tracklocationscreen") },
+                { navController.navigate("activitiesscreen") },
                 currentStateViewModel = currentStateViewModel,
                 serviceRequestViewModel = serviceRequestViewModel,
                 locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
                 context = context,
-                profileViewModel = profileViewModel, navController, context
+                profileViewModel = profileViewModel,
+                navController,
+                context
             )
         }
         composable("loginscreen") {
@@ -54,15 +57,30 @@ fun App(
             ProfileScreen(
                 { navController.navigate("dashboardscreen") },
                 { navController.navigate("tracklocationscreen") },
-                profileViewModel = profileViewModel, navController, context
+                { navController.navigate("activitiesscreen") },
+                profileViewModel = profileViewModel,
+                navController,
+                context
             )
         }
         composable("tracklocationscreen") {
             TrackLocationScreen(
                 { navController.navigate("dashboardscreen") },
                 { navController.navigate("profilescreen") },
+                { navController.navigate("activitiesscreen")},
                 currentStateViewModel,
-                locationViewModel, navController, context
+                locationViewModel,
+                navController,
+                context
+            )
+        } 
+        composable("activitiesscreen") {
+            ActivitiesScreen(
+                navigationToDashboardScreen = { navController.navigate("dashboardscreen") },
+                navigationToTrackLocationScreen = { navController.navigate("tracklocationscreen") },
+                navigationToProfileScreen = { navController.navigate("profilescreen") },
+                navHostController = navController,
+                context = context
             )
         }
     }
