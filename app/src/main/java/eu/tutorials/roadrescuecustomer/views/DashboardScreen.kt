@@ -187,14 +187,14 @@ fun PendingActivityDashboard(
                     .width(250.dp)
             )
             DashboardFieldButton(
-                fieldName = "Vehicle Type",
+                fieldName = "Vehicle",
                 fieldValue = serviceRequestViewModel.vehicleType.value,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(250.dp)
             )
             DashboardFieldButton(
-                fieldName = "Fuel Type",
+                fieldName = "Request ID",
                 fieldValue = serviceRequestViewModel.fuelType.value,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -389,7 +389,15 @@ fun RequestServiceScreen(
             ) {
                 showIssueDetailsWindow = true
             }
-            FillDetailsButton(detailButtonName = "Vehicle Details") {
+            FillDetailsButton(detailButtonName = "Vehicle Details" +
+                    if (serviceRequestViewModel.vehicleModel.value.isEmpty()) ""
+                    else ": ${serviceRequestViewModel.vehicleMake.value + 
+                            " " + 
+                            serviceRequestViewModel.vehicleModel.value + 
+                            " {" +
+                            serviceRequestViewModel.fuelType.value +
+                            "}"
+                    } ") {
                 showVehicleDetailsWindow = true
             }
 
@@ -479,7 +487,7 @@ fun RequestServiceScreen(
     }
 
     if(showVehicleDetailsWindow) {
-        VehicleDetailsWindow {
+        VehicleDetailsWindow (serviceRequestViewModel) {
             showVehicleDetailsWindow = false
         }
     }

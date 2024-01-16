@@ -18,9 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
-fun VehicleDetailsWindow(onDismiss: () -> Unit) {
+fun VehicleDetailsWindow(
+    serviceRequestViewModel: ServiceRequestViewModel,
+    onDismiss: () -> Unit
+) {
 
     var vehicleType by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
@@ -61,7 +65,17 @@ fun VehicleDetailsWindow(onDismiss: () -> Unit) {
                 vehicleMake = dropDown("Vehicle Make", vehicleMakeList)
                 vehicleModel = dropDown("Vehicle Model",  vehicleModelList)
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                CommonButton(btnName = "Save", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    if(vehicleModel.isNotEmpty()) {
+                        serviceRequestViewModel.vehicleType.value = vehicleType
+                        serviceRequestViewModel.fuelType.value = fuelType
+                        serviceRequestViewModel.vehicleMake.value = vehicleMake
+                        serviceRequestViewModel.vehicleModel.value = vehicleModel
+                        onDismiss()
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     )

@@ -20,6 +20,8 @@ class ServiceRequestViewModel : ViewModel() {
     val issue: MutableState<String> = _issue
     val vehicleType: MutableState<String> = _vehicleType
     val fuelType: MutableState<String> = _fuelType
+    val vehicleMake: MutableState<String> = _vehicleMake
+    val vehicleModel: MutableState<String> = _vehicleModel
     val approximatedCost: MutableState<Double> = _approximatedCost
     val description: MutableState<String> = _description
 
