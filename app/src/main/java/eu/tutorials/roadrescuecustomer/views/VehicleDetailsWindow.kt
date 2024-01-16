@@ -50,7 +50,7 @@ fun VehicleDetailsWindow(
             ){
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Fill you vehicle details here...",
+                    text = "Fill your vehicle details here...",
                     style = textStyle2
                 )
                 Spacer(modifier = Modifier.height(16.dp))

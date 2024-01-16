@@ -394,9 +394,9 @@ fun RequestServiceScreen(
                     else ": ${serviceRequestViewModel.vehicleMake.value + 
                             " " + 
                             serviceRequestViewModel.vehicleModel.value + 
-                            " {" +
+                            " (" +
                             serviceRequestViewModel.fuelType.value +
-                            "}"
+                            ")"
                     } ") {
                 showVehicleDetailsWindow = true
             }
@@ -454,7 +454,9 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             RequestServiceButton(modifier = Modifier) {
-                if(serviceRequestViewModel.issue.value != "" && vehicleType != "Vehicle Type" && fuelType != "Fuel Type") {
+                if(serviceRequestViewModel.issue.value != ""
+                    && serviceRequestViewModel.vehicleModel.value != ""
+                    ) {
                     currentStateViewModel.setCurrentState(true,
                         isReqServiceWindowOpened = false
                     )
