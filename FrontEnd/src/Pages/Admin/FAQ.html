@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+            rel="stylesheet" />
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <!-- CSS Stylesheets -->
+        <link rel="stylesheet" href="../../assets/css/customerStyle.css" />
+        <link rel="stylesheet" href="../../assets/css/Admin CS/sideNav.css" />
+        <link rel="stylesheet" href="../../assets/css/Admin CS/table.css" />
+        <link rel="stylesheet" href="../../assets/css/Admin CS/admin.css" />
+
+
+
+        <title>Road Rescue</title>
+    </head>
+
+    <body>
+
+        <!-- ***************************************HEADER************************************ -->
+        <div class="navbar">
+            <div class="logo">
+                <img src="../../assets/img/RRLogo.png" alt="logo" />
+            </div>
+
+            <div class="navActions">
+                <a href="notification.html" style="margin-right: 2.5vw;">
+                    <img class="notificationAlert icons" src="../../assets/img/notifications.svg" />
+                </a>
+                <a href="../../index.html">
+                    <h3>LOG OUT</h3>
+                </a>
+            </div>
+        </div>
+        <!-- ******************************************body************************************************ -->
+
+        <div id="main">
+            <!-- *************side bar************* -->
+            <div class="sidenav">
+                <img src="../../assets/img/pic.png" alt="Profile Picture">
+                <h1>Isuri Chathurika</h1>
+                <ul>
+                    <li>
+
+                        <a href="dashboard.html" class="sideNavLink" onclick="clickOption(this)">
+                            <span class="material-symbols-outlined">
+                                home
+                            </span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="users.html" class="sideNavLink "><span class="material-symbols-outlined">
+                                group
+                            </span>
+                            Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="verification.html" class="sideNavLink "><span class="material-symbols-outlined">
+                                check_circle
+                            </span>
+                            Verification
+                        </a>
+                    </li>
+                    <li>
+                        <a href="system.html" class="sideNavLink  active"><span class="material-symbols-outlined">
+                                receipt_long
+                            </span>
+                            System
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="sideNavLink" onclick="clickOption(this)"><span
+                                class="material-symbols-outlined">
+                                person
+                            </span>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+
+
+
+
+            </div>
+
+            <!-- *************content************** -->
+            <div class="content">
+                <div class="content-box">
+                    <h1>System > Edit FAQ</h1>
+
+                    <input type="text" placeholder="newQuestion">
+                    <textarea name="answer" id="answer" placeholder="newAnswer"></textarea>
+                    <button id="button" onclick="addFAQ" >Add</button>
+
+                    <section class="faq" id="faq">
+                        <h1>Current FAQ</h1>
+                        <div class="faq-item active">
+                            <button class="question">Do we need to share our location?
+                                <div>
+                                    <span class="material-symbols-outlined">
+                                        edit
+                                    </span>
+                                    <span class="material-symbols-outlined">
+                                        remove
+                                    </span>
+                                    <span class="material-symbols-outlined">
+                                        expand_circle_down
+                                    </span>
+                                </div></button>
+                            <div class="answer">
+                                <p>Yes, After you log in to Road Rescue or request for the service we will automatically track your location
+                                    to
+                                    provide you
+                                    better and faster service.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item active">
+                            <button class="question">Can we choose service provider near us ?<div>
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                                <span class="material-symbols-outlined">
+                                    remove
+                                </span>
+                                <span class="material-symbols-outlined">
+                                    expand_circle_down
+                                </span>
+                            </div></button>
+                            <div class="answer">
+                                <p>Yes, After you log in to the system you will see nearby garage list. Then you can select service provider
+                                    you
+                                    want and
+                                    send service request them.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item active">
+                            <button class="question">Can we track technician location ?<div>
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                                <span class="material-symbols-outlined">
+                                    remove
+                                </span>
+                                <span class="material-symbols-outlined">
+                                    expand_circle_down
+                                </span>
+                            </div></button>
+                            <div class="answer">
+                                <p>Yes, After a service peovider accepts your request you can trac their location.</p>
+                            </div>
+                        </div>
+                    
+                    </section>
+                    </table>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- **************************FOOTER********************** -->
+        <footer>
+            <div class="social">
+                <h4>CONTACT US</h4>
+                <div class="socialIcons">
+                    <a href="#facebook"><img src="../../assets/images/facebook.svg" /></a>
+                    <a href="#linkedin"><img src="../../assets/images/linkedin.svg" /></a>
+                    <a href="#github"><img src="../../assets/images/github.svg" /></a>
+                    <a href="#whatsapp"><img src="../../assets/images/whatsapp.svg" /></a>
+                </div>
+            </div>
+            <div class="fSection">
+                <img src="../../assets/img/RRLogo.png" />
+                <h4>DEVELOPED AND MAINTAINED BY A TEAM OF UNDERGRADUTES AT UCSC</h4>
+            </div>
+        </footer>
+    </body>
+
+    <script src="../../assets/js/admin.js"></script>
+    <script src="../../assets/js/CustomerSupport.js"></script>
+    <script src="jQuery/jquery-3.6.0.min.js"></script>
+
+</html>

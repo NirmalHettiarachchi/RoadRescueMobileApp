@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="../../assets/css/customerStyle.css" />
+    <link rel="stylesheet" href="../../assets/css/form.css" />
+
+    <title>Road Rescue</title>
+  </head>
+
+  <body onload="vehicle()">
+    <div class="navbar">
+      <div class="menu" onclick="toggleMenu()">
+        <img src="./images/menu.svg" alt="logo" />
+      </div>
+
+      <div id="menu" class="sidebar hide">
+        <div class="bar">
+          <div class="menuBar">
+            <button onclick="toggleMenu()">Close Menu</button>
+            <div class="menuItem" onclick="serviceForm()">
+              <img src="./images/send.svg" />
+              <h4>Request Service</h4>
+            </div>
+            <hr />
+            <a class="menuItem" href="activities.html">
+              <img src="./images/activities.svg" />
+
+              <h4>Activities</h4>
+            </a>
+            <hr />
+
+            <a class="menuItem" href="index.html">
+              <img src="./images/home.svg" />
+              <h4>Home</h4>
+            </a>
+            <hr />
+
+            <a class="menuItem" href="help.html">
+              <img src="./images/question.svg" />
+              <h4>Help</h4>
+            </a>
+            <hr />
+
+            <a class="menuItem" href="helpRequest.html">
+              <img src="./images/question.svg" />
+              <h4>Help Request</h4>
+            </a>
+            <hr />
+
+            <a class="menuItem" href="message.html">
+              <img src="./images/messages.svg" />
+              <h4>Messages</h4>
+            </a>
+            <hr />
+
+            <a class="menuItem" href="notification.html">
+              <img src="./images/notifications.svg" />
+              <h4>Notifications</h4>
+            </a>
+            <hr />
+          </div>
+        </div>
+      </div>
+
+      <div class="logo">
+        <img src="./images/logo.png" alt="logo" />
+      </div>
+
+      <div class="navActions">
+        <button id="button" class="requestBtn" onclick="serviceForm()">
+          <img src="./images/send.svg" />Request Service
+        </button>
+        <a class="activityButton" href="activities.html"
+          ><img src="./images/activities.svg" />Activities</a
+        >
+        <a href="index.html"><img src="images/home.svg" class="icons" /></a>
+        <div class="helpIcon">
+          <img
+            src="images/question.svg"
+            class="icons"
+            onclick="toggleNotificationMenu()"
+          />
+          <div id="helpMenu" class="helpMenu hide">
+            <a href="help.html">Help</a>
+            <hr />
+            <a href="helpRequest.html">Help Request</a>
+            <hr />
+          </div>
+        </div>
+        <a href="message.html">
+          <img class="messageAlert icons" src="images/messages.svg" />
+        </a>
+        <a href="notification.html">
+          <img class="notificationAlert icons" src="images/notifications.svg" />
+        </a>
+        <div class="profileIcon">
+          <img src="images/profile.svg" onclick="toggleProfileMenu()" />
+          <div id="profileMenu" class="profileMenu hide">
+            <a href="profile.html">Profile</a>
+            <hr />
+            <a href="vehicles.html">Vehicles</a>
+            <hr />
+
+            <a href="settings.html">Settings</a>
+            <hr />
+
+            <a href="javascript:logout()">Log Out</a>
+            <hr />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="vehicleMain">
+      <div id="vehicleContainer"></div>
+
+      <template id="vehicleTemplate">
+        <div id="vehicle" style="width: 50%">
+          <h1>Vehicles</h1>
+          <div class="vehicleSection">
+            <table id="viewVehicleTable">
+              <tr>
+                <th>Vehicle</th>
+                <th>Number Plate</th>
+                <th>Type</th>
+                <th></th>
+              </tr>
+            </table>
+
+            <div style="width: 85%">
+              <button onclick="addVehicle()">
+                <img src="images/add.svg" style="margin-right: 10px" />ADD NEW
+                VEHICLE
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template id="addVehicleTemplate">
+        <div id="addVehicle" style="width: 50%">
+          <h1>Add New Vehicle</h1>
+          <div class="vehicleSection">
+            <form onsubmit="vehicleSubmit(event, this)">
+              <table>
+                <tr>
+                  <td>Make:</td>
+                  <td>
+                    <select id="make" name="make" onchange="selectMake()" required>
+                      <option selected disabled hidden value="">Select make</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Model:</td>
+                  <td>
+                    <select id="model" name="model" required>
+                      <option selected disabled hidden>Select the model</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Year:</td>
+                  <td>
+                    <select id="year" name="year" required>
+                      <option selected disabled hidden value="">Select year</option>
+                      <option value="2010">2010</option>
+                      <option value="2011">2011</option>
+                      <option value="2012">2012</option>
+                      <option value="2013">2013</option>
+                      <option value="2014">2014</option>
+                      <option value="2015">2015</option>
+                      <option value="2016">2016</option>
+                      <option value="2017">2017</option>
+                      <option value="2018">2018</option>
+                      <option value="2019">2019</option>
+                      <option value="2020">2020</option>
+                      <option value="2021">2021</option>
+                      <option value="2022">2022</option>
+                      <option value="2023">2023</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Number Plate:</td>
+                  <td>
+                    <input id="numberPlate" name="numberPlate" required />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Type:</td>
+                  <td>
+                    <select id="type" name="type" required>
+                      <option selected disabled hidden>Select type</option>
+                      <option value="Car">Car</option>
+                      <option value="Bike">Bike</option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="width: 100%">
+                <button type="button" onclick="vehicle()" style="margin-left: 20px">
+                  <img
+                    src="images/cancel.svg"
+                    style="margin-right: 10px"
+                  />Cancel
+                </button>
+                <button type="submit" >
+                  <img src="images/save.svg" style="margin-right: 10px" />Save
+                  Vehicle
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </template>
+
+      <template id="editVehicleTemplate">
+        <div id="editVehicle" style="width: 50%">
+          <h1>Edit Vehicle</h1>
+          <div class="vehicleSection">
+            <form onsubmit="editVehicleSubmit(event, this)">
+              <table>
+                <tr>
+                  <td>Make:</td>
+                  <td>
+                    <select id="make" name="make" onchange="selectMake()" required>
+                      <option selected disabled hidden value="">Select make</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Model:</td>
+                  <td>
+                    <select id="model" name="model" required>
+                      <option selected disabled hidden>Select the model</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Year:</td>
+                  <td>
+                    <select id="year" name="year" required>
+                      <option selected disabled hidden value="">Select year</option>
+                      <option value="2010">2010</option>
+                      <option value="2011">2011</option>
+                      <option value="2012">2012</option>
+                      <option value="2013">2013</option>
+                      <option value="2014">2014</option>
+                      <option value="2015">2015</option>
+                      <option value="2016">2016</option>
+                      <option value="2017">2017</option>
+                      <option value="2018">2018</option>
+                      <option value="2019">2019</option>
+                      <option value="2020">2020</option>
+                      <option value="2021">2021</option>
+                      <option value="2022">2022</option>
+                      <option value="2023">2023</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Number Plate:</td>
+                  <td>
+                    <input id="numberPlate" name="numberPlate" disabled required />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Type:</td>
+                  <td>
+                    <select id="type" name="type" required>
+                      <option selected disabled hidden>Select type</option>
+                      <option value="Car">Car</option>
+                      <option value="Bike">Bike</option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="width: 100%">
+                <button type="button" onclick="vehicle()" style="margin-left: 20px">
+                  <img
+                          src="images/cancel.svg"
+                          style="margin-right: 10px"
+                  />Cancel
+                </button>
+                <button type="submit" >
+                  <img src="images/save.svg" style="margin-right: 10px" />Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </template>
+    </main>
+
+    <footer>
+      <div class="social">
+        <h4>CONTACT US</h4>
+        <div class="socialIcons">
+          <a href="#facebook"><img src="images/facebook.svg" /></a>
+          <a href="#linkedin"><img src="images/linkedin.svg" /></a>
+          <a href="#github"><img src="images/github.svg" /></a>
+          <a href="#whatsapp"><img src="images/whatsapp.svg" /></a>
+        </div>
+      </div>
+      <div class="fSection">
+        <img src="images/logo.png" />
+        <h4>DEVELOPED AND MAINTAINED BY A TEAM OF UNDERGRADUTES AT UCSC</h4>
+      </div>
+    </footer>
+  </body>
+
+  <script src="js/main.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="jQuery/jquery-3.6.0.min.js"></script></html>
