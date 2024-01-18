@@ -1,0 +1,687 @@
+:root {
+    --button-color: #23A6F0;
+    --background-color1: #252B42;
+    --background-color2: #3B4055;
+    --background-color3: #1C85C0;
+    --font-color1-white: white;
+    --font-color-lightBlue: #BDE4FB;
+    --icon-color-dark-blue: #125378;
+    --h1: 58px;
+    --h2: 40px;
+    --h3: 36px;
+    --h4: 32px;
+    --h5: 28px;
+    --h6: 24px;
+    --h7: 20px;
+    --h8: 16px;
+
+    --bold: 800;
+    --semi-bold: 600;
+    --thin-bold: 500;
+    --normal: 400;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color1);
+    margin: 0;
+}
+
+/* ***************************************HEADER*********************************** */
+header {
+    margin-left: 90px;
+    margin-right: 90px;
+
+    /* height: 91px; */
+    display: flex;
+}
+
+nav {
+    width: 100%;
+    /* height: 91px; */
+
+}
+
+header img {
+    width: 103px;
+    height: 55px;
+    flex-shrink: 0;
+}
+
+nav ul {
+    list-style: none;
+    display: inline-flex;
+    gap: 21px;
+
+}
+
+nav ul li {
+    font-weight: var(--semi-bold);
+}
+
+nav ul.right {
+    margin-top: 0px;
+    float: right;
+}
+
+nav ul.right li {
+
+    align-self: center;
+}
+
+nav ul.left {
+    float: left;
+}
+
+nav ul li a {
+
+    text-decoration: none;
+    color: white;
+}
+
+/* ***************************************BUTTON*********************************** */
+.button {
+    font-weight: var(--semi-bold);
+    text-decoration: none;
+    color: white;
+    border-radius: 5px;
+    background: var(--primary-color, #23A6F0);
+    display: inline-flex;
+    padding: 15px 25px;
+    align-items: center;
+    gap: 15px;
+}
+
+/* ***************************************SECTION*********************************** */
+main section {
+    height: 80vh;
+    width: auto;
+
+}
+
+main section:nth-child(odd) {
+    background-color: var(--background-color1);
+}
+
+main section:nth-child(even) {
+    background-color: var(--background-color2);
+}
+
+/* ***************************************Home*********************************** */
+.home {
+    background-image: url("../img/homebackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw 100vh;
+
+
+    padding: 80px 162px 80px 162px;
+    display: grid;
+    grid-template-columns: 36vw 40vw;
+    grid-column-gap: 8%;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-areas:
+        "headtext mainImg"
+        "subtext mainImg"
+        "requestServiceButton .";
+
+
+}
+
+.headtext {
+    font-size: var(--h1);
+    font-weight: var(--bold);
+    color: var(--font-color1-white);
+    grid-area: headtext;
+
+}
+
+.subtext {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: var(--h7);
+    font-weight: var(--normal);
+    color: var(--font-color1-white);
+    grid-area: subtext;
+
+}
+
+.requestServiceButton {
+
+    border-radius: 50%;
+    padding-top: 22px;
+    grid-area: requestServiceButton;
+
+}
+
+.mainImg {
+    height: fit-content;
+    width: 40vw;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    align-content: center;
+    grid-area: mainImg;
+    padding-top: 14vh;
+
+}
+
+.mainImg > img {
+    max-width: 50vw;
+    max-height: 50vh;
+}
+
+/* ***************************************About Us*********************************** */
+.aboutUs {
+    background-image: url("../img/aboutUsBackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw auto;
+    padding: 150px 10% 200px 10%;
+    display: block;
+}
+
+.aboutUs > .container {
+    width: 100%;
+    height: auto;
+    display: grid;
+    grid-template-columns: auto;
+
+    grid-template-areas:
+        "c1 image";
+
+    align-items: center;
+    color: var(--font-color1-white);
+}
+
+.aboutUs > .container > .c1 {
+    padding-right: 7%;
+}
+
+.aboutUs > .container > .c1 > #p1 {
+    font-size: var(--h7);
+    align-self: end;
+    grid-area: p1;
+
+    margin-bottom: 0;
+}
+
+.aboutUs > .container > .c1 > h1 {
+    height: fit-content;
+    margin: 15px 0 15px 0;
+    font-size: var(--h2);
+    grid-area: heading;
+
+}
+
+.aboutUs > .container > .c1 > #p2 {
+    font-size: var(--h8);
+    margin-top: 0;
+    grid-area: p2;
+
+}
+
+.aboutUs > .container > img {
+    border-radius: 25%;
+    max-width: 100%;
+    max-height: auto;
+    grid-area: image;
+
+}
+
+/* ***************************************How it works*********************************** */
+
+.howItWorks {
+    background-image: url("../img/HIWbackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw auto;
+    padding: 60px 10% 100px 10%;
+    display: block;
+    color: var(--font-color1-white);
+}
+
+.howItWorks > .r1 {
+    display: flex;
+    justify-content: center;
+
+}
+
+.howItWorks > .r1 h1 {
+    font-size: var(--h2);
+}
+
+.howItWorks > .r2 {
+    display: flex;
+    gap: 80px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.howItWorks > .r2 > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.howItWorks > .r2 > div h2 {
+    font-size: var(--h5);
+    color: var(--font-color-lightBlue);
+}
+
+.howItWorks > .r2 > div p {
+
+    font-size: var(--h8);
+    font-weight: var(--thin-bold);
+}
+
+.howItWorks > .r2 > div img {
+
+    max-width: 70%;
+}
+
+.howItWorks > .r2 > .col3 {
+    display: flex;
+    gap: 14px;
+
+}
+
+/* ***************************************Faster Service*********************************** */
+
+.fastService {
+    background-image: url("../img/FSsbackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw auto;
+    padding: 80px 10% 130px 10%;
+    display: flex;
+    color: var(--font-color1-white);
+    gap: 30px;
+}
+
+
+
+.fastService > .col1 {
+    display: flex;
+    align-content: center;
+    margin: 5%;
+}
+
+.fastService > .col1 img {
+    margin-top: 3vh;
+    max-width: 32vw;
+    height: auto;
+
+}
+
+.fastService > .col2 {
+    margin-top: 42px;
+
+}
+
+.fastService > .col2 > h2 {
+    font-size: var(--h3);
+}
+
+.fastService > .col2 > .cards {
+
+    display: flex;
+    flex-flow: row wrap;
+
+    /* justify-content: center;
+    align-items: center; */
+
+}
+
+.fastService > .col2 > .cards div {
+    display: flex;
+    flex-basis: 45%;
+    margin: 9px;
+    background-color: var(--background-color3);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 13px;
+
+}
+
+.fastService > .col2 > .cards div h5 {
+    font-size: var(--h3);
+    margin-top: 30px;
+    margin-bottom: 0;
+}
+
+
+/* ***************************************FAQ*********************************** */
+
+
+.faq {
+    background-image: url("../img/FAQbackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw auto;
+    padding: 80px 10% 130px 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+.faq h1 {
+    font-size: var(--h2);
+    color: var(--font-color1-white);
+}
+
+.active {
+    width: 80%;
+}
+
+.faq-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 80%;
+    align-items: center;
+}
+
+.question {
+    min-width: 100%;
+
+    display: flex;
+    background-color: var(--font-color1-white);
+    color: black;
+    padding: 25px 20px;
+    cursor: pointer;
+    justify-content: space-between;
+    border-radius: 15px;
+    border: none;
+    font-size: var(--h7);
+    font-weight: var(--semi-bold);
+}
+
+.question > span {
+    float: right;
+}
+
+.answer {
+    font-size: var(--h8);
+    width: 100%;
+    display: none;
+
+    background-color: white;
+    border-radius: 0 0 15px 15px;
+}
+
+.answer p {
+    padding: 0 30px 0 30px;
+}
+
+.clicked {
+    border-radius: 15px 15px 0 0;
+}
+
+.clicked > .material-symbols-outlined {
+    transform: rotate(180deg);
+
+}
+
+/* ***************************************Contact Us*********************************** */
+.contactUs {
+    background-image: url("../img/FAQbackground.png");
+    background-repeat: no-repeat;
+    background-size: 100vw auto;
+    padding: 80px 10% 130px 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.contactUs > .headers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--font-color1-white);
+}
+
+.contactUs > .headers h1 {
+    font-size: var(--h2);
+    margin-bottom: 0;
+}
+
+.contactUs > .cards {
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    cursor: pointer;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+
+.contactUs > .cards div {
+    width: 100%;
+    display: flex;
+    /* flex-basis: 45%; */
+    margin: 9px;
+    background-color: var(--font-color1-white);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0 40px 0;
+    border-radius: 13px;
+
+}
+
+.contactUs > .cards div span {
+    font-size: 75px;
+    color: var(--icon-color-dark-blue);
+}
+
+.contactUs > .cards div h3 {
+    font-size: var(--h5);
+    font-weight: var(--semi-bold);
+    color: var(--button-color);
+    margin-bottom: 0;
+}
+
+/* ***************************************Footer*********************************** */
+
+footer {
+    background-color: #0F111A;
+    color: white;
+    padding: 37px 195px 16px 148px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+footer p {
+    line-height: 4vh;
+
+}
+
+footer .fgrid {
+    display: flex;
+    border-bottom: solid;
+    gap: 10vw;
+}
+
+.CompanyInfo li {
+    list-style: none;
+    line-height: 3vh;
+}
+
+.CompanyInfo a {
+    padding-left: 1vw;
+    text-decoration: none;
+    color: white;
+
+}
+
+.fa {
+    margin: 1vh;
+    text-decoration: none;
+    color: white;
+    font-size: var(--h7);
+}
+
+.fgrid > .contactDetails > p {
+    padding-left: 1vw;
+}
+
+footer .fgrid > .logo > img {
+    height: 30vh;
+}
+/* ***************************************TimeLine*********************************** */
+.HIWtimeline {
+    display: flex;
+    height: auto;
+    background-image: url("../img/HIWsp.png");
+    background-repeat: no-repeat;
+    background-size: 100vw;
+    flex-direction: column;
+        align-items: center;
+        padding-top: 5vh;
+    }
+.HIWtimeline> div> h1{
+   
+    font-size: var(--h2);
+    color: var(--font-color1-white);
+}
+
+.HIWtimeline > div > img {
+    width:13vw;
+    margin: 5vh;
+}
+    
+    .timeline {
+        position: relative;
+        max-width: 1200px;
+        margin: 5vh 10vw;
+        width: -webkit-fill-available;
+    }
+    
+    /* The actual timeline (the vertical ruler) */
+    .timeline::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        background-color: white;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -3px;
+    }
+    
+    /* Container around content */
+    .timeline>.container {
+        padding: 10px 40px;
+        position: relative;
+        background-color: inherit;
+        width: 43%;
+    }
+    
+    /* The circles on the timeline */
+    .timeline >.container::after {
+        content: '';
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        right: -17px;
+        background-color: white;
+        border: 4px solid #ffffff;
+        top: 15px;
+        border-radius: 50%;
+        z-index: 1;
+    
+    }
+    
+    /* Place the container to the left */
+        .timeline >.left {
+        left: 0;}
+    
+        /* Place the container to the right */
+        .timeline >.right {
+            left: 50%;
+        }
+    
+        /* Add arrows to the left container (pointing right) */
+        .timeline >.left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid white;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent white;
+        }
+    
+        /* Add arrows to the right container (pointing left) */
+        .timeline >.right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent white transparent transparent;
+        }
+    
+        /* Fix the circle for containers on the right side */
+        .timeline >.right::after {
+            left: -16px;
+        }
+    
+        /* The actual content */
+        .timeline >.container>.content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+        }
+    
+        /* Media queries - Responsive timeline on screens less than 600px wide */
+        @media screen and (max-width: 600px) {
+    
+            /* Place the timelime to the left */
+            .timeline::after {
+                left: 31px;
+            }
+    
+            /* Full-width containers */
+            .timeline >.container {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+    
+            /* Make sure that all arrows are pointing leftwards */
+            .timeline >.container::before {
+                left: 60px;
+                border: medium solid white;
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+    
+            /* Make sure all circles are at the same spot */
+            .timeline >.left::after,
+            .timeline >.right::after {
+                left: 15px;
+            }
+    
+            /* Make all right containers behave like the left ones */
+            .timeline >.right {
+                left: 0%;
+            }
+        }

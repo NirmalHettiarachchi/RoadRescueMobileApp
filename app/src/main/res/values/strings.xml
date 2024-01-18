@@ -1,4 +1,3 @@
 <resources>
-    <string name="app_name">RoadRescueCustomer</string>
-    <string name="log_in_to_road_rescue">Log in to Road-Rescue</string>
+    <string name="app_name">Garage</string>
 </resources>
