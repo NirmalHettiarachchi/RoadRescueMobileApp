@@ -13,22 +13,35 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.garage.viewModels.GarageTechnician
 
 @Composable
@@ -106,10 +119,16 @@ fun TechniciansList(){
                 }
             }
 
-            // Load technicians
+            // Load technicians   list ekk dala load karanna
 
             TechniciansLoadStretcher(techDetails)
-
+            Divider()
+            TechniciansLoadStretcher(techDetails)
+            Divider()
+            TechniciansLoadStretcher(techDetails)
+            Divider()
+            TechniciansLoadStretcher(techDetails)
+            Divider()
 
 
         }
@@ -128,6 +147,9 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
+
+        var showDeleteDialog by remember { mutableStateOf(false) }
+
         Box (
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -162,7 +184,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                 horizontalArrangement = Arrangement.SpaceAround,
             ){
 
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { showDeleteDialog=true }) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription =null,
@@ -198,9 +220,63 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                     )
                 }
             }
+        }
+
+        if (showDeleteDialog){
+            Dialog(
+                onDismissRequest = {  },
+                content = {
+                    Column (
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .fillMaxHeight(0.35f)
+                            .background(
+                                Color(0xFFACB3C0),
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ){
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Delete.!",color = Color.Red, style = textStyle5)
+                        }
 
 
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Do you want to delete the user account with the name Thiran Sasanaka ? ",style = textStyleDefault)
+                        }
 
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDeleteDialog=false})
+
+                            CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {showDeleteDialog=false})
+
+                        }
+
+
+                    }
+                }
+                )
         }
     }
 }

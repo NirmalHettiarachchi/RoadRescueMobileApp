@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
@@ -60,6 +61,23 @@ val textStyle4=TextStyle(
     letterSpacing = 0.15.sp,
     fontSize = 16.sp,
     color = Color(0xFF253555)
+)
+
+val textStyle5=TextStyle(
+    fontFamily= FontFamily.Serif,
+    fontWeight = FontWeight.Medium,
+    letterSpacing = 0.15.sp,
+    fontSize = 32.sp,
+    color = Color.Red
+)
+
+val textStyleDefault=TextStyle(
+    fontFamily= FontFamily.Serif,
+    fontWeight = FontWeight.Normal,
+    letterSpacing = 0.15.sp,
+    fontSize = 20.sp,
+    color = Color.Black,
+    textAlign = TextAlign.Center
 )
 
 val backgroundModifier = Modifier
