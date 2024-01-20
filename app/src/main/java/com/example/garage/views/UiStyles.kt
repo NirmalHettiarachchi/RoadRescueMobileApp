@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -103,5 +104,5 @@ val cardDefaultModifier=Modifier
     .fillMaxHeight(0.85f)
 
  val closerButtonStyles=Modifier
-     .background(Color(0xFF253555), shape = CircleShape)
-     .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = CircleShape)
+     .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
+     .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = RoundedCornerShape(20.dp))

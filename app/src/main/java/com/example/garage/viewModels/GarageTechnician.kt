@@ -1,7 +1,7 @@
 package com.example.garage.viewModels
 
 class GarageTechnician {
-
+    private var _techId:String=""
     private var _techFirstName: String = ""
     private var _techLastName: String = ""
     private var _techStatus: String = ""
@@ -9,12 +9,14 @@ class GarageTechnician {
     private var _techExpertiseAreas: List<String>? = null
 
     constructor(
+        _techId: String,
         _techFirstName: String,
         _techLastName: String,
         _techStatus: String,
         _techContactNumber: String,
         _techExpertiseAreas: List<String>?,
     ) {
+        this._techId = _techId
         this._techFirstName = _techFirstName
         this._techLastName = _techLastName
         this._techStatus = _techStatus
@@ -23,7 +25,13 @@ class GarageTechnician {
     }
 
 
+    fun getTechId(): String {
+        return this._techId
+    }
 
+    fun setTechId(techId: String) {
+        this._techId = techId
+    }
 
     fun getTechFirstName(): String {
         return this._techFirstName

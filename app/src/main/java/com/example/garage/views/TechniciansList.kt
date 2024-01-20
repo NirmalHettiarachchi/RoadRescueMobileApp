@@ -2,6 +2,7 @@ package com.example.garage.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +53,8 @@ fun TechniciansList(){
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-        var techDetails=GarageTechnician("Thiran","Sasanka","Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
+        var techDetails=GarageTechnician("T-001","Thiran","Sasanka",
+            "Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
 
         Header(menuClicked = {})
 
@@ -149,6 +151,8 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
     ){
 
         var showDeleteDialog by remember { mutableStateOf(false) }
+        var showEditDialog by remember { mutableStateOf(false) }
+        var showInfoDialog by remember { mutableStateOf(false) }
 
         Box (
             modifier = Modifier
@@ -196,7 +200,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                     )
                 }
 
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { showEditDialog=true }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription =null,
@@ -208,7 +212,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                     )
                 }
 
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { showInfoDialog=true }) {
                     Icon(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = null,
@@ -221,6 +225,8 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                 }
             }
         }
+
+        // Delete Dialog
 
         if (showDeleteDialog){
             Dialog(
@@ -278,5 +284,159 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                 }
                 )
         }
+
+
+        if (showInfoDialog){
+            Dialog(
+                onDismissRequest = {  },
+                content = {
+                    Column (
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .fillMaxHeight(0.35f)
+                            .background(
+                                Color(0xFFACB3C0),
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ){
+
+                        Row (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ){
+
+                            IconButton(onClick = { showInfoDialog = false  }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit icon",
+                                    modifier = closerButtonStyles
+                                )
+                            }
+
+                            IconButton(onClick = { showInfoDialog = false  }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "close icon",
+                                    modifier = closerButtonStyles
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
+                                append("Tech Id ")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Text(text = technician.getTechId(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
+                                append("Name ")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
+                                append("Status ")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Text(text = technician.getTechStatus(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
+                                append("Expertise Areas")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            ){
+                                //Check ExpertiseAreas list isEmpty and list load
+
+                                technician.getTechExpertiseAreas()?.forEach {temp->
+                                    Text(text = temp,color = Color.Black, textAlign = TextAlign.Center,modifier = Modifier)
+                                }
+                            }
+                        }
+
+                    }
+                }
+            )
+        }
+
     }
 }
