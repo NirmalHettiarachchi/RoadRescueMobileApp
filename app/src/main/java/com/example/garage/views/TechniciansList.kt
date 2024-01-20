@@ -8,17 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,17 +26,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.garage.R
-import java.util.jar.Attributes.Name
+import com.example.garage.viewModels.GarageTechnician
 
 @Composable
 fun TechniciansList(){
+
     Column (
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
+
+        var techDetails=GarageTechnician("Thiran","Sasanka","Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
+
         Header(menuClicked = {})
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -86,7 +88,7 @@ fun TechniciansList(){
                 Box (
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .weight(1f),
+                        .weight(0.8f),
                     contentAlignment = Alignment.Center){
 
                     Text(text = "Status", style = textStyle1, modifier = Modifier)
@@ -96,78 +98,18 @@ fun TechniciansList(){
                 Box (
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .weight(1f),
+                        .weight(1.3f),
                     contentAlignment = Alignment.Center){
 
                     Text(text = "", style = textStyle1, modifier = Modifier)
 
                 }
-
-                /*Text(text = "Name", style = textStyle1, modifier = Modifier
-                    .weight(1f)
-                    .padding(32.dp, 0.dp, 0.dp, 0.dp,))*/
-
-
-
             }
 
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.09f),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center){
+            // Load technicians
 
-                    Text(text = "Thiran Sasanka", fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+            TechniciansLoadStretcher(techDetails)
 
-                }
-
-                Box (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterVertically)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ){
-
-                    Text(text = "Available", fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
-
-                }
-
-                Box (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterVertically)
-                        .weight(1f),
-                     contentAlignment = Alignment.Center
-                ){
-
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription =null,
-                            modifier = Modifier.background(Color.White, shape = CircleShape),
-                            tint = Color.Black
-                        )
-                    }
-
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription =null,
-                            modifier = Modifier.background(Color.Red, shape = CircleShape),
-                            tint = Color.Black
-                        )
-                    }
-
-                }
-            }
 
 
         }
@@ -175,5 +117,90 @@ fun TechniciansList(){
         Spacer(modifier = Modifier.height(26.dp))
 
         Footer()
+    }
+}
+
+@Composable
+fun TechniciansLoadStretcher(technician: GarageTechnician){
+    Row (
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Box (
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
+                .padding(8.dp, 0.dp),
+            contentAlignment = Alignment.Center){
+
+            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(), textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+
+        }
+
+        Box (
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterVertically)
+                .weight(0.8f),
+            contentAlignment = Alignment.Center
+        ){
+
+            Text(text = technician.getTechStatus(),textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+
+        }
+
+        Box (
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.3f),
+        ){
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ){
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription =null,
+                        modifier = Modifier
+                            .background(Color.White, shape = CircleShape)
+                            .weight(1f)
+                            .size(25.dp),
+                        tint = Color.Black
+                    )
+                }
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription =null,
+                        modifier = Modifier
+                            .background(Color.White, shape = CircleShape)
+                            .weight(1f)
+                            .size(25.dp),
+                        tint = Color.Black
+                    )
+                }
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .background(Color.White, shape = CircleShape)
+                            .weight(1f)
+                            .size(25.dp),
+                        tint = Color.Black
+                    )
+                }
+            }
+
+
+
+        }
     }
 }
