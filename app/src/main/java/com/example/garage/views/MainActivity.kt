@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import com.example.garage.ui.theme.GarageTheme
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
+import com.example.garage.viewModels.GarageProfileViewModel
 import java.text.SimpleDateFormat
 import java.time.Period
 import java.util.Date
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     )*/
 
 
-                   // garageProfileEdit()
+                  //  garageProfileEdit()
 
                    // GridWithTwoRows()
 

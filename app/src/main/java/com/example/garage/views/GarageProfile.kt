@@ -310,12 +310,7 @@ fun GarageProfile(
 
                 val listOfServices = ArrayList<GarageProfileViewModel>()
 
-                listOfServices.add(
-                    GarageProfileViewModel(
-                        R.drawable.break_system_repair,
-                        "Break System Repair"
-                    )
-                )
+                listOfServices.add(GarageProfileViewModel(R.drawable.break_system_repair, "Break System Repair"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.oill_change, "Oil Change"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.engine_repeir, "Engine Repair"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
