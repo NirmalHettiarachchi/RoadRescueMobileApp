@@ -24,6 +24,18 @@ class GarageTechnician {
         this._techExpertiseAreas = _techExpertiseAreas
     }
 
+    constructor(
+        _techId: String,
+        _techFirstName: String,
+        _techLastName: String,
+        _techContactNumber: String,
+    ) {
+        this._techId = _techId
+        this._techFirstName = _techFirstName
+        this._techLastName = _techLastName
+        this._techContactNumber = _techContactNumber
+    }
+
 
     fun getTechId(): String {
         return this._techId

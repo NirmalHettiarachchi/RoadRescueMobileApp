@@ -102,7 +102,9 @@ class MainActivity : ComponentActivity() {
 
                    // TechniciansList()
 
-                    RegisterTechnician()
+                  //  RegisterTechnician()
+
+                    TechnicianProfile()
 
                 }
             }
