@@ -7,7 +7,7 @@ class GarageProfileViewModel {
     private var _garageId: String = ""
     private var _ownerName: String = ""
     private var _garageContactNumber: String = ""
-    private var _garageEmail: String = "null"
+    private var _garageEmail: String = ""
     private var _iconPath: Int = 0
     private var _IconName: String = ""
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
@@ -62,6 +64,23 @@ val textStyle4=TextStyle(
     color = Color(0xFF253555)
 )
 
+val textStyle5=TextStyle(
+    fontFamily= FontFamily.Serif,
+    fontWeight = FontWeight.Medium,
+    letterSpacing = 0.15.sp,
+    fontSize = 32.sp,
+    color = Color.Red
+)
+
+val textStyleDefault=TextStyle(
+    fontFamily= FontFamily.Serif,
+    fontWeight = FontWeight.Normal,
+    letterSpacing = 0.15.sp,
+    fontSize = 20.sp,
+    color = Color.Black,
+    textAlign = TextAlign.Center
+)
+
 val backgroundModifier = Modifier
     .fillMaxSize()
     .background(
@@ -85,5 +104,5 @@ val cardDefaultModifier=Modifier
     .fillMaxHeight(0.85f)
 
  val closerButtonStyles=Modifier
-     .background(Color(0xFF253555), shape = CircleShape)
-     .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = CircleShape)
+     .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
+     .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = RoundedCornerShape(20.dp))

@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,9 +27,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,15 +38,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
-import com.example.garage.viewModels.GarageProfileEditViewModel
+import com.example.garage.viewModels.CheckBoxDetailsModel
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,68 +126,28 @@ fun garageProfileEdit(){
 
                     }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(textFirstName, true, "First Name")
-                    }
+
+                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(textLastName, true, "Last Name")
-                    }
+
+                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f)
-                    ) {
-                        TextFieldModifier(garageName, true, "Garage Name")
-                    }
+
+                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(contactNumber, false, "Contact number")
-                    }
+
+                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f))
+
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(email, true, "Email")
-                    }
+                        CommonTextField(email, true, "Email",Modifier.weight(1f))
 
 
                     //-----------------------------------------------------------------
@@ -225,11 +181,11 @@ fun garageProfileEdit(){
                             ){
                                 val checkboxColor = if(isCheckedBraekSysytem) Color(0xFF253555) else Color.White
 
-                                val servicesList= ArrayList<GarageProfileEditViewModel>()
-                                servicesList.add(GarageProfileEditViewModel("Break System Repair", false))
-                                servicesList.add(GarageProfileEditViewModel("Oil Change",false))
-                                servicesList.add(GarageProfileEditViewModel("Tire Replacement",false))
-                                servicesList.add(GarageProfileEditViewModel("Engine Repair",false))
+                                val servicesList= ArrayList<CheckBoxDetailsModel>()
+                                servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
+                                servicesList.add(CheckBoxDetailsModel("Oil Change",false))
+                                servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                                servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
 
 
                                 LazyVerticalGrid(
@@ -297,59 +253,4 @@ fun garageProfileEdit(){
             //Footer()
         }
 
-}
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TextFieldModifier(value:String,isEditing:Boolean,placeholderName:String):String{
-
-    var textFieldValue by remember { mutableStateOf(value) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(0.9f),
-        contentAlignment = Alignment.Center
-    ){
-        OutlinedTextField(
-            value = textFieldValue,
-            onValueChange = {textFieldValue = it },
-            textStyle = TextStyle(
-                Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize =16.sp,
-                letterSpacing = 0.15.sp,
-                textAlign = TextAlign.Center,
-                fontFamily = fontFamily
-            ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor =Color.Transparent
-            ),
-            modifier = Modifier
-                .background(Color.White, shape = RoundedCornerShape(10.dp))
-                .border(
-                    BorderStroke(0.dp, Color.Unspecified),
-                    shape = RoundedCornerShape(50.dp)
-                )
-                .height(IntrinsicSize.Min)
-                .width(IntrinsicSize.Max),
-            enabled = isEditing,
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text = placeholderName,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF253555),
-                    modifier = Modifier.padding(85.dp,0.dp,0.dp,0.dp),
-                    fontFamily= fontFamily
-                )
-            },
-        )
-    }
-
-    return textFieldValue
 }
