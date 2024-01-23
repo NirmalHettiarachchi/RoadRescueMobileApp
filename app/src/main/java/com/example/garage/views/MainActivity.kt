@@ -99,7 +99,9 @@ class MainActivity : ComponentActivity() {
                             "T-002",3000f,"I need to replace a tire on my car","Thiran Sasanka")
                     )*/
 
-                    TechniciansList()
+                   // TechniciansList()
+
+                    RegisterTechnician()
 
                 }
             }

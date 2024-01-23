@@ -130,68 +130,28 @@ fun garageProfileEdit(){
 
                     }
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(textFirstName, true, "First Name")
-                    }
+
+                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(textLastName, true, "Last Name")
-                    }
+
+                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f)
-                    ) {
-                        TextFieldModifier(garageName, true, "Garage Name")
-                    }
+
+                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f))
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(contactNumber, false, "Contact number")
-                    }
+
+                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f))
+
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f)
-                            .weight(0.5f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextFieldModifier(email, true, "Email")
-                    }
+                        CommonTextField(email, true, "Email",Modifier.weight(1f))
 
 
                     //-----------------------------------------------------------------
@@ -297,59 +257,4 @@ fun garageProfileEdit(){
             //Footer()
         }
 
-}
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TextFieldModifier(value:String,isEditing:Boolean,placeholderName:String):String{
-
-    var textFieldValue by remember { mutableStateOf(value) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(0.9f),
-        contentAlignment = Alignment.Center
-    ){
-        OutlinedTextField(
-            value = textFieldValue,
-            onValueChange = {textFieldValue = it },
-            textStyle = TextStyle(
-                Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize =16.sp,
-                letterSpacing = 0.15.sp,
-                textAlign = TextAlign.Center,
-                fontFamily = fontFamily
-            ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor =Color.Transparent
-            ),
-            modifier = Modifier
-                .background(Color.White, shape = RoundedCornerShape(10.dp))
-                .border(
-                    BorderStroke(0.dp, Color.Unspecified),
-                    shape = RoundedCornerShape(50.dp)
-                )
-                .height(IntrinsicSize.Min)
-                .width(IntrinsicSize.Max),
-            enabled = isEditing,
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text = placeholderName,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF253555),
-                    modifier = Modifier.padding(85.dp,0.dp,0.dp,0.dp),
-                    fontFamily= fontFamily
-                )
-            },
-        )
-    }
-
-    return textFieldValue
 }
