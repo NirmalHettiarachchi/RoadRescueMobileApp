@@ -1,9 +1,7 @@
 package com.example.garage.views
 
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,11 +30,14 @@ import androidx.compose.ui.unit.sp
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
 @Composable
-fun RegisterTechnician() {
+fun AddTechnician() {
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
+
+
         Header(menuClicked = {})
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -162,11 +163,12 @@ fun RegisterTechnician() {
 
                  Spacer(modifier = Modifier.height(16.dp))
 
-                CommonButton(btnName = "Register", modifier = Modifier, onClickButton = {})
+                CommonButton(btnName = "Register", modifier = Modifier, onClickButton = {
+                    
+                })
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
 
         }
         Spacer(modifier = Modifier.height(26.dp))

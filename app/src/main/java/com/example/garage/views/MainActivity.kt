@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-                    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                   /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
                         val garageDashboardViewModel = GarageDashboardViewModel(
                             "Nirmal Dakshina", Period.of(1, 2, 3),
@@ -102,9 +102,12 @@ class MainActivity : ComponentActivity() {
 
                    // TechniciansList()
 
-                    RegisterTechnician()
+                  //  AddTechnician()
+
+                    TechnicianProfile()
 
                 }
+
             }
         }
     }

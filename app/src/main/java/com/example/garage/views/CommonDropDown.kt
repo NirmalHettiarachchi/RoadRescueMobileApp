@@ -1,6 +1,8 @@
 package com.example.garage.views
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -21,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -52,12 +56,12 @@ fun CommonDropdown(
 
             Text("$selectedOption", color = Color(0xFF253555) , style = textStyle4)
 
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Color(0xFF253555),
+                )
 
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = Color(0xFF253555),
-            )
         }
 
 
@@ -65,9 +69,12 @@ fun CommonDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .background(Color.White, shape = RoundedCornerShape(20.dp))
+                .fillMaxWidth(0.8f).fillMaxHeight(0.2f)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White, )
+                .border(BorderStroke(1.dp, Color.Unspecified))
                 .align(Alignment.CenterStart)
+
         ) {
 
             optionList.forEach{option ->
