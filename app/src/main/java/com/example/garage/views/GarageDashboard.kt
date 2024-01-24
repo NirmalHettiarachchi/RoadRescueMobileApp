@@ -199,7 +199,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
 
             if (showDialog){
                 Dialog(
-                    onDismissRequest = { showDialog = false },
+                    onDismissRequest = {  },
                     content = {
                         Column(
                             modifier = Modifier
@@ -264,3 +264,6 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+
+
+

@@ -82,7 +82,7 @@ fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifi
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF253555).copy(alpha = 0.5f),
-                        modifier = Modifier.padding(85.dp,0.dp,0.dp,0.dp),
+                        modifier = Modifier.padding(15.dp,0.dp,0.dp,0.dp),
                         fontFamily= fontFamily
                     )
                 },
