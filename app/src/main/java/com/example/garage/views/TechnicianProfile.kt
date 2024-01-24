@@ -132,7 +132,12 @@ fun TechnicianProfile(){
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+
                     CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp) )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    CommonButton(btnName = "Edit Profile", modifier = Modifier, onClickButton = {})
                 }
             }
 
