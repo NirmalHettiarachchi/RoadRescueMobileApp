@@ -110,10 +110,15 @@ fun EditTechnician(){
                         AsyncImage(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Green)
+                                .background(Color.Unspecified)
                                 .clip(CircleShape).clickable {  }
                                 .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                            model = selectedImageUri,
+                            model = if(selectedImageUri==null)
+                            {
+                                R.drawable.user_fill
+                            }else{
+                                selectedImageUri
+                                 },
                             contentDescription = "Technician Pitcher",
                             contentScale = ContentScale.Crop,
 
