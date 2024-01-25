@@ -74,13 +74,13 @@ fun AddTechnician() {
                         .weight(1f)
                 ){
                     Spacer(modifier = Modifier.height(16.dp))
-                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f))
+                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f))
+                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f))
+                    CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
                 }

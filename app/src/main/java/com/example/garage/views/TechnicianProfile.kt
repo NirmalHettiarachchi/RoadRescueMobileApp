@@ -108,7 +108,7 @@ fun TechnicianProfile(){
                     )
 
 
-                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier )
+                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier,false )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -133,7 +133,7 @@ fun TechnicianProfile(){
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp) )
+                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp),true )
 
                     Spacer(modifier = Modifier.height(16.dp))
 

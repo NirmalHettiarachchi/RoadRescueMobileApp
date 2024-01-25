@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -34,7 +38,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifier: Modifier):String{
+fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifier: Modifier,prefixStatus:Boolean):String{
     var textFieldValue by remember { mutableStateOf(value) }
 
 
@@ -85,7 +89,17 @@ fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifi
                         modifier = Modifier.padding(15.dp,0.dp,0.dp,0.dp),
                         fontFamily= fontFamily
                     )
-                },
+                }, suffix = {
+                    if(prefixStatus){
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Info,
+                                contentDescription = "Change ContactNumber",
+                                tint = Color(0xFF253555)
+                            )
+                        }
+                    }
+                }
             )
         }
     }

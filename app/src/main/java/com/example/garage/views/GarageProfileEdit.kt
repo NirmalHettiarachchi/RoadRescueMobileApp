@@ -127,27 +127,27 @@ fun garageProfileEdit(){
                     }
 
 
-                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f))
+                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f))
+                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f))
+                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f))
+                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f),false)
 
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                        CommonTextField(email, true, "Email",Modifier.weight(1f))
+                        CommonTextField(email, true, "Email",Modifier.weight(1f),false)
 
 
                     //-----------------------------------------------------------------
