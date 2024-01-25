@@ -16,13 +16,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.garage.R
+import com.example.garage.repository.Screen
 
 @Composable
 fun Footer(
-//    navigationToDashboardScreen:()->Unit,
-//    navigationToProfileScreen:()->Unit,
-
+    navController: NavController
 ){
     Row (
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -69,7 +69,9 @@ fun Footer(
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable {  }
+                .clickable {
+                           navController.navigate(route = Screen.Activities.route)
+                }
             ,
             tint = Color.Unspecified,
             contentDescription = null

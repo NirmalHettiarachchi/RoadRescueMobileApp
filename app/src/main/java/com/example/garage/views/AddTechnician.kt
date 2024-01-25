@@ -27,10 +27,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
 @Composable
-fun AddTechnician() {
+fun AddTechnician(
+    navController: NavController
+) {
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -172,6 +175,6 @@ fun AddTechnician() {
 
         }
         Spacer(modifier = Modifier.height(26.dp))
-        Footer()
+        Footer(navController)
     }
 }

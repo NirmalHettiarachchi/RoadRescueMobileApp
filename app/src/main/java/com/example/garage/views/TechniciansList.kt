@@ -43,10 +43,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import com.example.garage.viewModels.GarageTechnician
 
 @Composable
-fun TechniciansList(){
+fun TechniciansList(
+    navController: NavController
+){
 
     Column (
         modifier = defaultBackground,
@@ -137,7 +140,7 @@ fun TechniciansList(){
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer()
+        Footer(navController)
     }
 }
 

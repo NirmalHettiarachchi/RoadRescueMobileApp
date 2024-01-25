@@ -40,11 +40,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.garage.R
 
 @Composable
-fun TechnicianProfile(){
+fun TechnicianProfile(
+    navController: NavController
+){
 
     Column(
         modifier = defaultBackground,
@@ -186,7 +189,7 @@ fun TechnicianProfile(){
         }
 
         Spacer(modifier = Modifier.height(26.dp))
-        Footer()
+        Footer(navController)
 
     }
 }

@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,6 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.garage.ui.theme.GarageTheme
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
@@ -34,7 +38,10 @@ class MainActivity : ComponentActivity() {
             selectedImageUri = uri
         }
 
+    lateinit var navController:NavController
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -43,7 +50,11 @@ class MainActivity : ComponentActivity() {
 //            window.navigationBarColor=getColor(R.color.purple_700)
             GarageTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
+
+                navController= rememberNavController()
+                SetupNavGraph(navController = navController as NavHostController)
+
+                /*Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
@@ -58,12 +69,9 @@ class MainActivity : ComponentActivity() {
 
 
 
-                   /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                   *//* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-                        val garageDashboardViewModel = GarageDashboardViewModel(
-                            "Nirmal Dakshina", Period.of(1, 2, 3),
-                            "Tire Punch", "Need help as soon as possible", 25000.00
-                        )
+
 
                         val technicians = listOf<String>("Saman Kumara","Tharindu Dakshina","Ajith Muthukumara","Namal Rajapakasha")
 
@@ -71,17 +79,17 @@ class MainActivity : ComponentActivity() {
                            garageDetails = garageDashboardViewModel, technicianList = technicians
                         )
 
-                    }*/
+                    }*//*
 
 
 
 
 
-                    /*GarageProfile(
+                    *//*GarageProfile(
                         GarageProfileViewModel("Nirmal","C-001","Thiran Sasanka",
                             "+94761339805", "tharindudakshina@gmail.com"
                         )
-                    )*/
+                    )*//*
 
 
                    // garageProfileEdit()
@@ -95,10 +103,10 @@ class MainActivity : ComponentActivity() {
 
 
 
-                    /*Activities(
+                    *//*Activities(
                         GarageActivityDetails(currentTime,currentDate, "Gayan","Axio 2017",
                             "T-002",3000f,"I need to replace a tire on my car","Thiran Sasanka")
-                    )*/
+                    )*//*
 
                    // TechniciansList()
 
@@ -106,9 +114,11 @@ class MainActivity : ComponentActivity() {
 
                   //  TechnicianProfile()
 
-                    EditTechnician()
+                  //  EditTechnician()
 
-                }
+                   // Message()
+
+                }*/
 
             }
         }

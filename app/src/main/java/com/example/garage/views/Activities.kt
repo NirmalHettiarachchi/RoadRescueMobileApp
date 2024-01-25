@@ -42,12 +42,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
 fun Activities(
-    activityDetails:GarageActivityDetails
+    activityDetails:GarageActivityDetails,navController: NavController
 ){
         Column (
             modifier = defaultBackground,
@@ -96,7 +97,7 @@ fun Activities(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            Footer()
+            Footer(navController)
         }
 }
 

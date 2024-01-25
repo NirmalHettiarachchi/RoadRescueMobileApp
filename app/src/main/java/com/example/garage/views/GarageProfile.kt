@@ -46,12 +46,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.garage.R
 import com.example.garage.viewModels.GarageProfileViewModel
 
 @Composable
 fun GarageProfile(
-    garageProfileDetails:GarageProfileViewModel
+    garageProfileDetails:GarageProfileViewModel,navController: NavController
 ) {
     Column(
         modifier = defaultBackground,
@@ -353,6 +354,6 @@ fun GarageProfile(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer()
+        Footer(navController)
     }
 }
