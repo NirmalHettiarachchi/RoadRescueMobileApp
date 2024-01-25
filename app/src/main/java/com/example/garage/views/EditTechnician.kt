@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -47,16 +48,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.garage.R
+import com.example.garage.viewModels.CheckBoxDetailsModel
 
 @Composable
 fun EditTechnician(){
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
+    var textTechFirstName by remember { mutableStateOf("") }
+    var textTechLastName by remember { mutableStateOf("") }
     var photoPickerLauncher= rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult ={
@@ -111,7 +115,8 @@ fun EditTechnician(){
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Unspecified)
-                                .clip(CircleShape).clickable {  }
+                                .clip(CircleShape)
+                                .clickable { }
                                 .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
                             model = if(selectedImageUri==null)
                             {
@@ -134,12 +139,17 @@ fun EditTechnician(){
                             .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
                             .clickable {
                                 photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
                                 )
-                            ) }
+                            }
                     )
 
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
 
                 Column (
                     modifier = Modifier
@@ -147,8 +157,110 @@ fun EditTechnician(){
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
+                    CommonTextField(
+                        value = textTechFirstName,
+                        isEditing = true,
+                        placeholderName = "First Name...",
+                        modifier = Modifier,
+                        prefixStatus = false
+                    )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    CommonTextField(
+                        value = textTechLastName,
+                        isEditing = true,
+                        placeholderName = "Last Name...",
+                        modifier = Modifier.height(52.dp),
+                        prefixStatus = false
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.779f)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+
+                        val isCheckedBreakSystem by remember { mutableStateOf(false) }
+                        val checkboxColor = if(isCheckedBreakSystem) Color(0xFF253555) else Color.White
+
+                        val servicesList= ArrayList<CheckBoxDetailsModel>()
+                        servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
+                        servicesList.add(CheckBoxDetailsModel("Oil Change",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+
+
+
+                        Text(text = "Expertise Technician", style = textStyle1, modifier = Modifier.padding(16.dp))
+
+                        servicesList.forEach{service->
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            var isChecked by remember { mutableStateOf(service.getIsSelected()) }
+
+                            Row {
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Checkbox(
+                                    checked = isChecked,
+                                    onCheckedChange = {
+                                        if (!isChecked){
+                                            isChecked = true
+                                        }else{
+                                            isChecked = false
+                                        }
+
+                                        service.setIsSelected(isChecked)
+                                    },
+                                    modifier = Modifier
+                                        .background(color = checkboxColor)
+                                        .size(20.dp)
+                                        .padding(4.dp)
+                                        .align(Alignment.CenterVertically)
+                                )
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Text(
+                                    text = service.getCheckBoxName(),
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = fontFamily
+                                )
+
+                            }
+
+                        }
+
+                    }
+
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {})
+                        CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {})
+                    }
                 }
+
+
             }
         }
 

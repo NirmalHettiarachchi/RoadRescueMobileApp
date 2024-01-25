@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     )*/
 
 
-                    garageProfileEdit()
+                   // garageProfileEdit()
 
                    // GridWithTwoRows()
 
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
                   //  TechnicianProfile()
 
-                  //  EditTechnician()
+                    EditTechnician()
 
                 }
 
