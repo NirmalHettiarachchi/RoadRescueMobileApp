@@ -104,7 +104,9 @@ class MainActivity : ComponentActivity() {
 
                   //  AddTechnician()
 
-                    TechnicianProfile()
+                 //   TechnicianProfile()
+
+                    EditTechnician()
 
                 }
 
