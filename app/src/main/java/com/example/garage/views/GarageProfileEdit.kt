@@ -1,9 +1,14 @@
 package com.example.garage.views
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +26,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -35,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -42,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.garage.R
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
@@ -60,8 +69,6 @@ fun garageProfileEdit(){
             verticalArrangement = Arrangement.Center
         ) {
 
-
-
             Card(
                 modifier = cardDefaultModifier,
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
@@ -70,6 +77,15 @@ fun garageProfileEdit(){
                 Column(modifier = Modifier
                     .fillMaxSize()
                 ) {
+
+                    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+                    var photoPickerLauncher= rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.PickVisualMedia(),
+                        onResult ={
+                            selectedImageUri=it
+                        }
+                    )
 
                     var textFirstName by remember{ mutableStateOf("") }
                     var textLastName by remember{ mutableStateOf("") }
@@ -85,69 +101,71 @@ fun garageProfileEdit(){
                     ) {
                         Card(
                             shape = CircleShape,
-                            border = BorderStroke(width = 2.dp, color = Color.White),
+                            border = BorderStroke(width = 2.dp, color = Color.Unspecified),
                             modifier = Modifier
                                 .padding(8.dp, 16.dp, 8.dp, 8.dp)
-                                .fillMaxHeight(0.25f)
-                                .fillMaxWidth(0.5f)
-                                .border(BorderStroke(2.dp, Color(0xFF253555)), shape = CircleShape)
+                                .fillMaxHeight(0.15f)
+                                .fillMaxWidth(0.3f)
                         ) {
 
-                            Image(
-                                painter = painterResource(id = R.drawable.profile_pitcher),
-                                contentDescription = "my pitcher",
-                                contentScale = ContentScale.FillBounds,
+                            AsyncImage(
                                 modifier = Modifier
-                                    .background(Color(0xDFFFFFFF))
+                                    .fillMaxSize()
+                                    .background(Color.Unspecified)
+                                    .clip(CircleShape).clickable {  }
+                                    .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                                model = if(selectedImageUri==null)
+                                {
+                                    R.drawable.user_fill
+                                }else{
+                                    selectedImageUri
+                                },
+                                contentDescription = "Technician Pitcher",
+                                contentScale = ContentScale.Crop,
 
-                            )
+                                )
                         }
 
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier.padding(0.dp, 120.dp, 0.dp, 0.dp)
-
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.edit),
-                                contentDescription = "edit icon",
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .background(Color(0xFF253555), shape = RoundedCornerShape(5.dp))
-                                    .border(
-                                        BorderStroke(0.dp, Color.White),
-                                        shape = RoundedCornerShape(5.dp)
-                                    )
-
-                            )
-
-                        }
+                        Icon(imageVector = Icons.Rounded.Edit,
+                            contentDescription = "edit Image",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.Bottom)
+                                .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
+                                .clickable {
+                                    photoPickerLauncher.launch(
+                                        PickVisualMediaRequest(
+                                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                                        )
+                                    ) }
+                        )
 
                     }
 
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f))
+                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f))
+                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f))
+                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f),false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f))
+                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f),false)
 
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                        CommonTextField(email, true, "Email",Modifier.weight(1f))
+                        CommonTextField(email, true, "Email",Modifier.weight(1f),false)
 
 
                     //-----------------------------------------------------------------

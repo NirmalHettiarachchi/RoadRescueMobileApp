@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
+import com.example.garage.viewModels.CheckBoxDetailsModel
 
 
 val fontFamily= FontFamily(
@@ -72,6 +73,7 @@ val textStyle5=TextStyle(
     color = Color.Red
 )
 
+
 val textStyleDefault=TextStyle(
     fontFamily= FontFamily.Serif,
     fontWeight = FontWeight.Normal,
@@ -106,3 +108,4 @@ val cardDefaultModifier=Modifier
  val closerButtonStyles=Modifier
      .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
      .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = RoundedCornerShape(20.dp))
+

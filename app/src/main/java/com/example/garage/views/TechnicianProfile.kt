@@ -1,9 +1,14 @@
 package com.example.garage.views
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +18,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,15 +34,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.garage.R
 
 @Composable
-fun TechnicianProfile(){
+fun TechnicianProfile(
+    navController: NavController
+){
 
     Column(
         modifier = defaultBackground,
@@ -41,6 +56,15 @@ fun TechnicianProfile(){
 
         var textTechName by remember { mutableStateOf("") }
         var textTechContactNub by remember { mutableStateOf("") }
+
+        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+        var photoPickerLauncher= rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult ={
+                selectedImageUri=it
+            }
+        )
 
         Header(menuClicked = {})
 
@@ -60,8 +84,7 @@ fun TechnicianProfile(){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -81,15 +104,37 @@ fun TechnicianProfile(){
                             .fillMaxHeight(0.93f)
                             .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape)
                     ){
-                        Image(
-                            painter = painterResource(id = R.drawable.profile_pitcher),
-                            contentDescription = "Technician Pitcher",
-                            contentScale = ContentScale.FillBounds,
+                        AsyncImage(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape)
-                        )
+                                .background(Color.Unspecified)
+                                .clip(CircleShape).clickable {  }
+                                .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                            model = if(selectedImageUri==null)
+                            {
+                                R.drawable.user_fill
+                            }else{
+                                selectedImageUri
+                            },
+                            contentDescription = "Technician Pitcher",
+                            contentScale = ContentScale.Crop,
+
+                            )
                     }
+
+                    Icon(imageVector = Icons.Rounded.Edit,
+                        contentDescription = "edit Image",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.Bottom)
+                            .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                ) }
+                    )
                 }
 
                 Column (
@@ -108,7 +153,7 @@ fun TechnicianProfile(){
                     )
 
 
-                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier )
+                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier,false )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -133,7 +178,7 @@ fun TechnicianProfile(){
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp) )
+                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp),true )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -144,7 +189,7 @@ fun TechnicianProfile(){
         }
 
         Spacer(modifier = Modifier.height(26.dp))
-        Footer()
+        Footer(navController)
 
     }
 }

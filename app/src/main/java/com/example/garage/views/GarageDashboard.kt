@@ -42,11 +42,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
 fun GarageDashboard(
-    garageDetails:GarageDashboardViewModel, technicianList:List<String>
+    garageDetails:GarageDashboardViewModel, technicianList:List<String>,navController: NavController
 ) {
 
     Column (
@@ -93,7 +94,7 @@ fun GarageDashboard(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Footer()
+        Footer(navController)
     }
 }
 
@@ -222,7 +223,8 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "close icon",
-                                        modifier = closerButtonStyles
+                                        modifier = closerButtonStyles,
+                                        tint = Color.White
                                     )
                                 }
                             }
