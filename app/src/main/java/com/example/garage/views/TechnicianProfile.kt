@@ -60,8 +60,7 @@ fun TechnicianProfile(){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
 
                 Spacer(modifier = Modifier.height(16.dp))
