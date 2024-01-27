@@ -77,7 +77,9 @@ fun TechniciansList(
                         .align(Alignment.CenterVertically)
                         .width(156.dp)
                         .height(50.dp),
-                    onClickButton = {}
+                    onClickButton = {
+                        navController.navigate(route = Screen.AddTechnician.route)
+                    }
                 )
 
         }
