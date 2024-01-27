@@ -65,7 +65,9 @@ fun Activities(
             Spacer(modifier = Modifier.height(8.dp))
 
             Card(
-                modifier = cardDefaultModifier.align(Alignment.CenterHorizontally).verticalScroll(rememberScrollState()),
+                modifier = cardDefaultModifier
+                    .align(Alignment.CenterHorizontally)
+                    .verticalScroll(rememberScrollState()),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
                 border = BorderStroke(width = 2.dp, Color.White),
             ) {

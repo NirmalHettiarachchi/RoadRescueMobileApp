@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
@@ -53,223 +55,236 @@ import com.example.garage.R
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GarageProfileEdit(
     navController: NavHostController,
-    navStatus:String
-){
+    navStatus: String,
+) {
 
 
-       // Header()
+    Column(
+        modifier = defaultBackground,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Column(
-            modifier = defaultBackground,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Header(menuClicked = {})
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Card(
+            modifier = cardDefaultModifier,
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+            border = BorderStroke(width = 2.dp, Color.White),
         ) {
-
-            Card(
-                modifier = cardDefaultModifier,
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
-                border = BorderStroke(width = 2.dp, Color.White),
-            ) {
-                Column(modifier = Modifier
+            Column(
+                modifier = Modifier
                     .fillMaxSize()
+            ) {
+
+                var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+                val photoPickerLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.PickVisualMedia(),
+                    onResult = {
+                        selectedImageUri = it
+                    }
+                )
+
+                val textFirstName by remember { mutableStateOf("") }
+                val textLastName by remember { mutableStateOf("") }
+                val garageName by remember { mutableStateOf("") }
+                val contactNumber by remember { mutableStateOf("") }
+                val email by remember { mutableStateOf("") }
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
+                    Card(
+                        shape = CircleShape,
+                        border = BorderStroke(width = 2.dp, color = Color.Unspecified),
+                        modifier = Modifier
+                            .padding(8.dp, 16.dp, 8.dp, 8.dp)
+                            .fillMaxHeight(0.15f)
+                            .fillMaxWidth(0.28f)
+                    ) {
 
-                    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Unspecified)
+                                .clip(CircleShape)
+                                .clickable { }
+                                .border(
+                                    BorderStroke(2.dp, Color.Unspecified),
+                                    shape = CircleShape
+                                ),
+                            model = if (selectedImageUri == null) {
+                                R.drawable.user_fill
+                            } else {
+                                selectedImageUri
+                            },
+                            contentDescription = "Technician Pitcher",
+                            contentScale = ContentScale.Crop,
 
-                    var photoPickerLauncher= rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.PickVisualMedia(),
-                        onResult ={
-                            selectedImageUri=it
-                        }
+                            )
+                    }
+
+                    Icon(imageVector = Icons.Rounded.Edit,
+                        contentDescription = "edit Image",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.Bottom)
+                            .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
+                            }
                     )
 
-                    var textFirstName by remember{ mutableStateOf("") }
-                    var textLastName by remember{ mutableStateOf("") }
-                    var garageName by remember{ mutableStateOf("") }
-                    var contactNumber by remember{ mutableStateOf("") }
-                    var email by remember { mutableStateOf("") }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CommonTextField(textFirstName, true, "First Name", Modifier.height(46.dp), false)
+
+                Spacer(modifier = Modifier.height(8.dp))
 
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
+                CommonTextField(textLastName, true, "Last Name", Modifier.height(46.dp), false)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                CommonTextField(garageName, true, "Garage Name", Modifier.height(46.dp), false)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                CommonTextField(contactNumber, false, "Contact number", Modifier.height(46.dp), false)
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CommonTextField(email, true, "Email", Modifier.height(46.dp), false)
+
+
+                //-----------------------------------------------------------------
+
+
+                Text(
+                    text = "Services",
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 26.sp,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+
+
+
+                val isCheckedBraekSysytem by remember { mutableStateOf(false) }
+                var isCheckedOilChange by remember { mutableStateOf(false) }
+                var isCheckedEngineRepair by remember { mutableStateOf(false) }
+                var isCheckedTireRepair by remember { mutableStateOf(false) }
+
+                val checkboxColor =
+                    if (isCheckedBraekSysytem) Color(0xFF253555) else Color.White
+
+                val servicesList = ArrayList<CheckBoxDetailsModel>()
+                servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
+                servicesList.add(CheckBoxDetailsModel("Oil Change", false))
+                servicesList.add(CheckBoxDetailsModel("Tire Replacement", false))
+                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+
+
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.6f)
+                        .padding(start = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Card(
-                            shape = CircleShape,
-                            border = BorderStroke(width = 2.dp, color = Color.Unspecified),
-                            modifier = Modifier
-                                .padding(8.dp, 16.dp, 8.dp, 8.dp)
-                                .fillMaxHeight(0.15f)
-                                .fillMaxWidth(0.3f)
-                        ) {
+                        items(servicesList) { service ->
 
-                            AsyncImage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Unspecified)
-                                    .clip(CircleShape).clickable {  }
-                                    .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                                model = if(selectedImageUri==null)
-                                {
-                                    R.drawable.user_fill
-                                }else{
-                                    selectedImageUri
-                                },
-                                contentDescription = "Technician Pitcher",
-                                contentScale = ContentScale.Crop,
 
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+
+                            var isChecked by remember { mutableStateOf(service.getIsSelected()) }
+
+                                Checkbox(
+                                    checked = service.getIsSelected(),
+                                    onCheckedChange = { newCheckState ->
+                                        isChecked = newCheckState
+                                    },
+                                    modifier = Modifier
+                                        .background(color = checkboxColor)
+                                        .size(20.dp)
+                                        .padding(4.dp)
+                                        .align(Alignment.CenterStart)
                                 )
-                        }
 
-                        Icon(imageVector = Icons.Rounded.Edit,
-                            contentDescription = "edit Image",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .align(Alignment.Bottom)
-                                .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
-                                .clickable {
-                                    photoPickerLauncher.launch(
-                                        PickVisualMediaRequest(
-                                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                                        )
-                                    ) }
-                        )
+                                Spacer(modifier = Modifier.width(8.dp))
 
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-                    CommonTextField(garageName, true, "Garage Name",Modifier.weight(1f),false)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-                        CommonTextField(contactNumber, false, "Contact number",Modifier.weight(1f),false)
-
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                        CommonTextField(email, true, "Email",Modifier.weight(1f),false)
-
-
-                    //-----------------------------------------------------------------
-
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .weight(1.5f)
-                            .padding(16.dp, 0.dp, 0.dp, 0.dp)
-                    ){
-                        Column {
-                            val isCheckedBraekSysytem by remember { mutableStateOf(false) }
-                            var isCheckedOilChange by remember { mutableStateOf(false) }
-                            var isCheckedEngineRepair by remember { mutableStateOf(false) }
-                            var isCheckedTireRepair by remember { mutableStateOf(false) }
-
-                            Text(
-                                text = "Services",
-                                color = Color.White,
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 26.sp,
-                                textDecoration = TextDecoration.Underline
-                            )
-
-                            Row (
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .fillMaxHeight(0.75f),
-                                verticalAlignment = Alignment.CenterVertically
-                            ){
-                                val checkboxColor = if(isCheckedBraekSysytem) Color(0xFF253555) else Color.White
-
-                                val servicesList= ArrayList<CheckBoxDetailsModel>()
-                                servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
-                                servicesList.add(CheckBoxDetailsModel("Oil Change",false))
-                                servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                                servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-
-
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(2),
-                                ){
-                                    items(servicesList){ service ->
-                                        Box(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .align(Alignment.CenterVertically)
-                                        ){
-
-                                            var isChecked by remember { mutableStateOf(service.getIsSelected()) }
-
-                                            Checkbox(
-                                                checked = service.getIsSelected(),
-                                                onCheckedChange ={ newCheckState -> isChecked = newCheckState },
-                                                modifier = Modifier
-                                                    .background(color = checkboxColor)
-                                                    .size(20.dp)
-                                                    .padding(4.dp)
-                                                    .align(Alignment.CenterStart)
-                                            )
-
-                                            Spacer(modifier = Modifier.width(8.dp))
-
-                                            Text(
-                                                text = service.getCheckBoxName(),
-                                                color = Color.Black,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.padding(24.dp,0.dp,0.dp,0.dp),
-                                                fontFamily = fontFamily
-                                            )
-                                        }
-                                    }
-                                }
+                                Text(
+                                    text = service.getCheckBoxName(),
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start = 24.dp),
+                                    fontFamily = fontFamily
+                                )
                             }
-
-
                         }
-                    }
-
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.15f),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        CommonButton(btnName = "Cancel", modifier = Modifier.weight(1f)) {}
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        CommonButton(btnName = "Save", modifier = Modifier.weight(1f)) {}
-
-                        Spacer(modifier = Modifier.width(8.dp))
                     }
 
                 }
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    CommonButton(btnName = "Cancel", modifier = Modifier) {}
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    CommonButton(btnName = "Save", modifier = Modifier) {}
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                }
+
             }
-            //Footer()
+
         }
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Footer(navController, navStatus)
+    }
 
 }

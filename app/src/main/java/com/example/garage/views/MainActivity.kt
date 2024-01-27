@@ -46,10 +46,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-//            window.statusBarColor=getColor(R.color.purple_700)
-//            window.navigationBarColor=getColor(R.color.purple_700)
             GarageTheme {
-                // A surface container using the 'background' color from the theme
 
                 navController= rememberNavController()
                 SetupNavGraph(navController = navController as NavHostController)
