@@ -43,15 +43,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.garage.R
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
 
@@ -62,6 +66,7 @@ fun GarageProfileEdit(
     navStatus: String,
 ) {
 
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = defaultBackground,
@@ -268,11 +273,14 @@ fun GarageProfileEdit(
                 ) {
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    CommonButton(btnName = "Cancel", modifier = Modifier) {}
+                    CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {
+
+                        navController.navigate(route = Screen.GarageDashboard.route)
+                    })
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    CommonButton(btnName = "Save", modifier = Modifier) {}
+                    CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {showDialog=true})
 
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -285,6 +293,57 @@ fun GarageProfileEdit(
         Spacer(modifier = Modifier.height(25.dp))
 
         Footer(navController, navStatus)
+    }
+
+
+
+    if (showDialog){
+        Dialog(
+            onDismissRequest = {  },
+            content = {
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .fillMaxHeight(0.2f)
+                        .background(
+                            Color(0xFFACB3C0),
+                            shape = RoundedCornerShape(20.dp)
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Your details was updated.",style = textStyleDefault)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDialog=false})
+
+                        CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
+                            showDialog=false
+                            navController.navigate(route = Screen.GarageProfile.route)
+                        })
+
+                    }
+
+
+                }
+            }
+        )
     }
 
 }

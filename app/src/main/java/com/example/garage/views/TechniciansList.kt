@@ -3,6 +3,7 @@ package com.example.garage.views
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageTechnician
 
 @Composable
@@ -68,7 +73,10 @@ fun TechniciansList(
 
                 CommonButton(
                     btnName = "Add Technician",
-                    modifier = Modifier.align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .width(156.dp)
+                        .height(50.dp),
                     onClickButton = {}
                 )
 
@@ -126,14 +134,41 @@ fun TechniciansList(
 
             // Load technicians   list ekk dala load karanna
 
-            TechniciansLoadStretcher(techDetails)
-            Divider()
-            TechniciansLoadStretcher(techDetails)
-            Divider()
-            TechniciansLoadStretcher(techDetails)
-            Divider()
-            TechniciansLoadStretcher(techDetails)
-            Divider()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+                TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                Divider()
+            }
+
+
 
 
         }
@@ -145,7 +180,7 @@ fun TechniciansList(
 }
 
 @Composable
-fun TechniciansLoadStretcher(technician: GarageTechnician){
+fun TechniciansLoadStretcher(technician: GarageTechnician,navController: NavController, navyStatus:String){
     Row (
         modifier = Modifier
             .fillMaxWidth(),
@@ -203,7 +238,9 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                     )
                 }
 
-                IconButton(onClick = { showEditDialog=true }) {
+                IconButton(onClick = {
+                    navController.navigate(route = Screen.EditTechnician.route)
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription =null,
@@ -309,11 +346,15 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                             horizontalArrangement = Arrangement.End
                         ){
 
-                            IconButton(onClick = { showInfoDialog = false  }) {
+                            IconButton(onClick = {
+                                showInfoDialog=false
+                                navController.navigate(route = Screen.EditTechnician.route)
+                            }) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
                                     contentDescription = "Edit icon",
-                                    modifier = closerButtonStyles
+                                    modifier = closerButtonStyles,
+                                    tint = Color.White
                                 )
                             }
 
@@ -321,7 +362,8 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "close icon",
-                                    modifier = closerButtonStyles
+                                    modifier = closerButtonStyles.clickable {  },
+                                    tint = Color.White
                                 )
                             }
                         }
@@ -348,7 +390,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                             }, color = Color.Black, modifier = Modifier
                                 .weight(1f)
                                 .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechId(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                            Text(text = technician.getTechId(),color = Color.Black, modifier = Modifier.weight(1f))
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -373,7 +415,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                             }, color = Color.Black, modifier = Modifier
                                 .weight(1f)
                                 .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(),color = Color.Black,modifier = Modifier.weight(1f))
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -398,7 +440,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician){
                             }, color = Color.Black, modifier = Modifier
                                 .weight(1f)
                                 .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechStatus(),color = Color.Black, /*textAlign = TextAlign.Center,*/modifier = Modifier.weight(1f))
+                            Text(text = technician.getTechStatus(),color = Color.Black, modifier = Modifier.weight(1f))
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
