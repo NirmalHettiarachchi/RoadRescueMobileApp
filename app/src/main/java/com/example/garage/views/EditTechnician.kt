@@ -50,7 +50,7 @@ import com.example.garage.viewModels.CheckBoxDetailsModel
 
 @Composable
 fun EditTechnician(
-    navController: NavController
+    navController: NavController, navyStatus:String
 ){
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -261,6 +261,6 @@ fun EditTechnician(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer(navController)
+        Footer(navController,navyStatus)
     }
 }

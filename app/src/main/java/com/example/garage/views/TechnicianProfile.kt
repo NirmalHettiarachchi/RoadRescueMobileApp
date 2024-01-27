@@ -46,7 +46,7 @@ import com.example.garage.R
 
 @Composable
 fun TechnicianProfile(
-    navController: NavController
+    navController: NavController, navyStatus:String
 ){
 
     Column(
@@ -189,7 +189,7 @@ fun TechnicianProfile(
         }
 
         Spacer(modifier = Modifier.height(26.dp))
-        Footer(navController)
+        Footer(navController,navyStatus)
 
     }
 }

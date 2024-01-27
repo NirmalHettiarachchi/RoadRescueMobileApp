@@ -22,7 +22,8 @@ import com.example.garage.repository.Screen
 
 @Composable
 fun Footer(
-    navController: NavController
+    navController: NavController,
+    navStatus:String
 ){
     Row (
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -33,16 +34,18 @@ fun Footer(
             .background(color = Color(0xFF253555))
     ){
         Icon(
-            painter = painterResource(id = R.drawable.book_fill),
+            painter = painterResource(id = R.drawable.technicins_footer),
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable { },
-            tint = Color.Unspecified,
-            contentDescription = null
+                .clickable {
+                       navController.navigate(route = Screen.TechnicianList.route)
+                },
+            tint = Color.White,
+            contentDescription = "footer technician"
         )
 
-        Icon(
+        /*Icon(
             painter = painterResource(id = R.drawable.compass_fill),
             modifier = Modifier
                 .padding(16.dp)
@@ -51,17 +54,19 @@ fun Footer(
             ,
             tint = Color.Unspecified,
             contentDescription = null
-        )
+        )*/
 
         Icon(
             painter = painterResource(id = R.drawable.home),
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable {  }
+                .clickable {
+                    navController.navigate(route = Screen.GarageDashboard.route)
+                }
             ,
             tint = Color.Unspecified,
-            contentDescription = null
+            contentDescription = "home"
         )
 
         Icon(
@@ -70,11 +75,14 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                           navController.navigate(route = Screen.Activities.route)
+                    val screen=Screen.Activities.route
+                    if (screen != navStatus){
+                        navController.navigate(route = screen)
+                    }
                 }
             ,
             tint = Color.Unspecified,
-            contentDescription = null
+            contentDescription = "garage activities"
         )
 
         Icon(
@@ -82,10 +90,12 @@ fun Footer(
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable {  }
+                .clickable {
+                           navController.navigate(route = Screen.GarageProfile.route)
+                }
             ,
             tint = Color.Unspecified,
-            contentDescription = null
+            contentDescription = "garage profile"
         )
 
     }

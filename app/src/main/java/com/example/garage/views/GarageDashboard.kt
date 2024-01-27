@@ -47,7 +47,10 @@ import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
 fun GarageDashboard(
-    garageDetails:GarageDashboardViewModel, technicianList:List<String>,navController: NavController
+    garageDetails:GarageDashboardViewModel,
+    technicianList:List<String>,
+    navController: NavController,
+    navStatus:String
 ) {
 
     Column (
@@ -94,7 +97,7 @@ fun GarageDashboard(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Footer(navController)
+        Footer(navController,navStatus)
     }
 }
 
@@ -248,7 +251,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                             )
 
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(64.dp))
 
                             // accept button load
 

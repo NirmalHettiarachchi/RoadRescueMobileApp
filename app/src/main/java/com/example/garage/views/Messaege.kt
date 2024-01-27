@@ -37,7 +37,7 @@ import com.example.garage.ui.theme.PurpleGrey80
 
 @Composable
 fun Message(
-    navController: NavController
+    navController: NavController, navyStatus:String
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,6 +104,6 @@ fun Message(
 
 
         Spacer(modifier = Modifier.height(26.dp))
-        Footer(navController)
+        Footer(navController,navyStatus)
     }
 }

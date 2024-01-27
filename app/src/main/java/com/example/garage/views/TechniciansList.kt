@@ -48,7 +48,7 @@ import com.example.garage.viewModels.GarageTechnician
 
 @Composable
 fun TechniciansList(
-    navController: NavController
+    navController: NavController, navyStatus:String
 ){
 
     Column (
@@ -140,7 +140,7 @@ fun TechniciansList(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer(navController)
+        Footer(navController,navyStatus)
     }
 }
 

@@ -48,7 +48,7 @@ import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
 fun Activities(
-    activityDetails:GarageActivityDetails,navController: NavController
+    activityDetails:GarageActivityDetails,navController: NavController,navStatus:String
 ){
         Column (
             modifier = defaultBackground,
@@ -97,7 +97,7 @@ fun Activities(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            Footer(navController)
+            Footer(navController,navStatus)
         }
 }
 
@@ -295,7 +295,8 @@ fun ActivityCard(activityDetails:GarageActivityDetails, modifier: Modifier){
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "close icon",
-                                        modifier = closerButtonStyles
+                                        modifier = closerButtonStyles,
+                                        tint = Color.White
                                     )
                                 }
                             }
