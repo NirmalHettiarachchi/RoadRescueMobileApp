@@ -32,7 +32,7 @@ import com.example.garage.viewModels.CheckBoxDetailsModel
 
 @Composable
 fun AddTechnician(
-    navController: NavController
+    navController: NavController, navyStatus:String
 ) {
     Column(
         modifier = defaultBackground,
@@ -175,6 +175,6 @@ fun AddTechnician(
 
         }
         Spacer(modifier = Modifier.height(26.dp))
-        Footer(navController)
+        Footer(navController,navyStatus)
     }
 }

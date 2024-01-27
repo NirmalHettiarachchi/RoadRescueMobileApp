@@ -5,11 +5,15 @@ package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,18 +25,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,17 +59,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.garage.R
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageProfileViewModel
 
 @Composable
 fun GarageProfile(
-    garageProfileDetails:GarageProfileViewModel,navController: NavController
+    garageProfileDetails:GarageProfileViewModel,navController: NavController, navyStatus:String
 ) {
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
+        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+
+
+
 
         Header(menuClicked = {})
 
@@ -78,31 +98,55 @@ fun GarageProfile(
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     // set profile pitcher
                     Card(
                         shape = CircleShape,
                         border = BorderStroke(width = 2.dp, color = Color.White),
                         modifier = Modifier
                             .weight(0.5f)
-                            .padding(8.dp, 16.dp, 8.dp, 8.dp)
-                            .fillMaxHeight(0.15f)
-                            .border(BorderStroke(2.dp, Color(0xFF253555)), shape = CircleShape)
+                            .fillMaxHeight(0.17f)
+                            .fillMaxWidth(1.5f)
                     ) {
 
-                        Image(
-                            painter = painterResource(id = R.drawable.profile_pitcher),
-                            contentDescription = "my pitcher",
-                            contentScale = ContentScale.FillBounds,
+                        AsyncImage(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xDFFFFFFF))
+                                .background(Color.Unspecified)
+                                .clip(CircleShape)
+                                .clickable { }
+                                .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                            model = if(selectedImageUri==null)
+                            {
+                                R.drawable.user_fill
+                            }else{
+                                selectedImageUri
+                            },
+                            contentDescription = "Technician Pitcher",
+                            contentScale = ContentScale.Crop,
 
-                        )
+                            )
                     }
 
 
+                    Icon(imageVector = Icons.Rounded.Edit,
+                        contentDescription = "edit Image",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .align(Alignment.Bottom)
+                            .background(Color(0xFF253555), shape = RoundedCornerShape(4.dp))
+                            .clickable {
+                                navController.navigate(route = Screen.GarageProfileEdit.route)
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Box(
                         modifier = Modifier
@@ -311,49 +355,60 @@ fun GarageProfile(
 
                 val listOfServices = ArrayList<GarageProfileViewModel>()
 
-                listOfServices.add(GarageProfileViewModel(R.drawable.break_system_repair, "Break System Repair"))
+                listOfServices.add(GarageProfileViewModel(R.drawable.break_system_repair, "$selectedImageUri"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.oill_change, "Oil Change"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.engine_repeir, "Engine Repair"))
+                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
+                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
+                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
+                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
                 listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
 
                 // import services
 
-                listOfServices.forEach { services ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    listOfServices.forEach { services ->
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.2f)
-                            .weight(1f)
-                            .padding(16.dp, 0.dp, 0.dp, 0.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = services.getIconPath()),
-                            contentDescription = services.getIconName(),
-                            tint = Color.Black,
+                        Row(
                             modifier = Modifier
-                                .size(32.dp),
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.2f)
+                                .padding(16.dp, 0.dp, 0.dp, 0.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = services.getIconPath()),
+                                contentDescription = services.getIconName(),
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(32.dp),
 
+                                )
+
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Text(
+                                text = services.getIconName(),
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
                             )
-
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Text(
-                            text = services.getIconName(),
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
+                        }
                     }
                 }
+
             }
+
         }
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer(navController)
+        Footer(navController,navyStatus)
     }
 }

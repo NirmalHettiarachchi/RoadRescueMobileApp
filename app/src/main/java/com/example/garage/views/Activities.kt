@@ -48,7 +48,7 @@ import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
 fun Activities(
-    activityDetails:GarageActivityDetails,navController: NavController
+    activityDetails:GarageActivityDetails,navController: NavController,navStatus:String
 ){
         Column (
             modifier = defaultBackground,
@@ -65,7 +65,9 @@ fun Activities(
             Spacer(modifier = Modifier.height(8.dp))
 
             Card(
-                modifier = cardDefaultModifier.align(Alignment.CenterHorizontally).verticalScroll(rememberScrollState()),
+                modifier = cardDefaultModifier
+                    .align(Alignment.CenterHorizontally)
+                    .verticalScroll(rememberScrollState()),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
                 border = BorderStroke(width = 2.dp, Color.White),
             ) {
@@ -97,7 +99,7 @@ fun Activities(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            Footer(navController)
+            Footer(navController,navStatus)
         }
 }
 
@@ -295,7 +297,8 @@ fun ActivityCard(activityDetails:GarageActivityDetails, modifier: Modifier){
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "close icon",
-                                        modifier = closerButtonStyles
+                                        modifier = closerButtonStyles,
+                                        tint = Color.White
                                     )
                                 }
                             }
