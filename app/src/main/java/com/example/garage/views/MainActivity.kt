@@ -1,6 +1,7 @@
 package com.example.garage.views
 
 
+import android.icu.lang.UCharacter.GraphemeClusterBreak.V
 import android.net.Uri
 import android.os.Build
 
@@ -12,6 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
@@ -44,12 +46,17 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
 
             GarageTheme {
 
                 navController= rememberNavController()
                 SetupNavGraph(navController = navController as NavHostController)
+
+
+
 
                 /*Surface(
                     modifier = Modifier.fillMaxSize(),

@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -38,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        dataBinding=true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -78,9 +80,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     //Compose viewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-view-model-compose:2.7.0")
 
 
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // websocket
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
 }
