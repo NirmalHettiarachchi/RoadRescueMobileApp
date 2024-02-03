@@ -111,7 +111,7 @@ fun GarageProfile(
                         modifier = Modifier
                             .weight(0.5f)
                             .fillMaxHeight(0.17f)
-                            .fillMaxWidth(1.5f)
+                            .fillMaxWidth()
                     ) {
 
                         AsyncImage(

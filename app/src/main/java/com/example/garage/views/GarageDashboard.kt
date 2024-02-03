@@ -1,9 +1,8 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.garage.repository.GarageApiClient
 import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
@@ -50,8 +51,11 @@ fun GarageDashboard(
     garageDetails:GarageDashboardViewModel,
     technicianList:List<String>,
     navController: NavController,
-    navStatus:String
+    navStatus:String,
+
 ) {
+
+//GarageApiClient.getGarage()
 
     Column (
         modifier = defaultBackground,
