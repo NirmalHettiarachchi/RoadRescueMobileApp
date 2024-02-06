@@ -11,7 +11,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GarageApiClient {
-    private const val BASE_URL = "http://192.168.1.21:8082/RoadRescueBackend/garage"
+    private const val BASE_URL = "http://192.168.56.1:8082/RoadRescueBackend/garage"
 
     fun getGarage(){
         val response= URL(BASE_URL).readText()
