@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.garage.repository.GarageApiClient
+import com.example.garage.repository.sendRequest
 import com.example.garage.ui.theme.GarageTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,15 +40,16 @@ class MainActivity : ComponentActivity()  {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        lifecycleScope.launch {
-//            GarageApiClient.getGarage()
-//
-//        }
-        CoroutineScope(
+        /*lifecycleScope.launch {
+            GarageApiClient.getGarage()
+
+        }*/
+       /* CoroutineScope(
             Dispatchers.IO
+
         ).launch {
             GarageApiClient.getGarage()
-        }
+        }*/
         setContent {
 
             GarageTheme {
@@ -57,8 +59,6 @@ class MainActivity : ComponentActivity()  {
             }
         }
     }
-
-
 }
 
 

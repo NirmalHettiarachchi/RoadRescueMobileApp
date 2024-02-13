@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.garage.repository.GarageApiClient
+import com.example.garage.repository.sendRequest
 import com.example.garage.viewModels.GarageDashboardViewModel
 
 @Composable
@@ -56,6 +57,7 @@ fun GarageDashboard(
 ) {
 
 //GarageApiClient.getGarage()
+
 
     Column (
         modifier = defaultBackground,
