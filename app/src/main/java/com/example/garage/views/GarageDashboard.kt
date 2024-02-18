@@ -21,12 +21,12 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,10 +42,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.garage.repository.GarageApiClient
-import com.example.garage.repository.sendRequest
+import com.example.garage.repository.MainViewModel
 import com.example.garage.viewModels.GarageDashboardViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun GarageDashboard(
@@ -110,6 +113,12 @@ fun GarageDashboard(
 
 @Composable
 fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
+
+    val garageViewModel:MainViewModel = viewModel()
+
+
+
+
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -261,10 +270,40 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
 
                             // accept button load
 
+
                             CommonButton(
                                 btnName = "Accept",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                                onClickButton = {}
+                                onClickButton = {
+
+
+                                    garageViewModel.fetchBackend()
+                                    Log.d("rsp","request is ok ")
+
+                                    val  viewState by garageViewModel.backendState
+
+                                    /*CoroutineScope(
+                                        Dispatchers.IO
+
+                                    ).launch {
+                                        val viewState by garageViewModel.backendState
+
+                                        when{
+                                            viewState.loading -> {
+                                                Log.d("rsp","request is ok ")
+                                            }
+
+                                            viewState.error !=null ->{
+
+                                                Log.d("err","${viewState.error}")
+                                            }
+
+                                            else ->{
+                                                // Display garageResponse
+                                            }
+                                        }
+                                    }*/
+                                }
                             )
 
                         }
