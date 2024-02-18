@@ -281,6 +281,22 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                     Log.d("rsp","request is ok ")
 
                                     val  viewState by garageViewModel.backendState
+                                    when{
+
+                                        viewState.loading -> {
+                                            // loading  wenna mona hari danna
+                                        }
+
+                                        viewState.error !=null ->{
+                                            Log.d("err","${viewState.error}")
+                                        }
+
+                                        viewState.response !=null -> {
+                                            Log.d("data","${viewState.response}")
+                                        }
+                                    }
+
+
 
                                     /*CoroutineScope(
                                         Dispatchers.IO
