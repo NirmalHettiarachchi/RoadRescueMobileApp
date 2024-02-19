@@ -284,7 +284,8 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                     when{
 
                                         viewState.loading -> {
-                                            // loading  wenna mona hari danna
+                                            // loading  wanna mona hari danna
+                                            Log.d("loading","${viewState.loading}")
                                         }
 
                                         viewState.error !=null ->{
