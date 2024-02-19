@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 
-private val retrofit=Retrofit.Builder().baseUrl("https://10.22.162.54:8082/RoadRescueBackend/")
+private val retrofit=Retrofit.Builder().baseUrl("http://10.22.162.54:8082/RoadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
@@ -19,5 +19,5 @@ val garageService= retrofit.create(ApiService::class.java)
 interface ApiService {
 
     @GET("garage")
-   suspend fun getData():Call<ResponseBody>
+   fun getData():Call<ResponseBody>
 }
