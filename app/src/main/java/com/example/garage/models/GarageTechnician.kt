@@ -1,4 +1,4 @@
-package com.example.garage.viewModels
+package com.example.garage.models
 
 class GarageTechnician {
     private var _techId:String=""

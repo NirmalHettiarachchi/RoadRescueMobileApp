@@ -297,29 +297,6 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                         }
                                     }
 
-
-
-                                    /*CoroutineScope(
-                                        Dispatchers.IO
-
-                                    ).launch {
-                                        val viewState by garageViewModel.backendState
-
-                                        when{
-                                            viewState.loading -> {
-                                                Log.d("rsp","request is ok ")
-                                            }
-
-                                            viewState.error !=null ->{
-
-                                                Log.d("err","${viewState.error}")
-                                            }
-
-                                            else ->{
-                                                // Display garageResponse
-                                            }
-                                        }
-                                    }*/
                                 }
                             )
 

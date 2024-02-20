@@ -41,8 +41,6 @@ import androidx.compose.ui.unit.sp
 fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifier: Modifier,prefixStatus:Boolean):String{
     var textFieldValue by remember { mutableStateOf(value) }
 
-
-
     Row(
         modifier = modifier
             .fillMaxWidth()
