@@ -1,5 +1,6 @@
 package com.example.garage.views
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -63,7 +64,7 @@ fun AddTechnician(
             var textFirstName by remember { mutableStateOf("") }
             var textLastName by remember { mutableStateOf("") }
             var textContactNumber by remember { mutableStateOf("") }
-
+            var selectedServices by remember { mutableStateOf(emptyList<String>()) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -77,13 +78,13 @@ fun AddTechnician(
                         .weight(1f)
                 ){
                     Spacer(modifier = Modifier.height(16.dp))
-                    CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
+                    textFirstName=CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
+                    textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false)
+                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false)
                     Spacer(modifier = Modifier.height(16.dp))
 
                 }
@@ -121,26 +122,24 @@ fun AddTechnician(
                     servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
                     servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
 
+
+
                     servicesList.forEach{service->
 
                         Spacer(modifier = Modifier.height(8.dp))
-
-                        var isChecked by remember { mutableStateOf(service.getIsSelected()) }
 
                         Row {
 
                             Spacer(modifier = Modifier.width(8.dp))
 
                             Checkbox(
-                                checked = isChecked,
-                                onCheckedChange = {
-                                    if (isChecked==false){
-                                        isChecked = true
-                                    }else{
-                                        isChecked = false
+                                checked = selectedServices.contains(service.getCheckBoxName()),
+                                onCheckedChange = { isChecked ->
+                                    selectedServices = if (isChecked) {
+                                        selectedServices + service.getCheckBoxName()
+                                    } else {
+                                        selectedServices - service.getCheckBoxName()
                                     }
-
-                                    service.setIsSelected(isChecked)
                                 },
                                 modifier = Modifier
                                     .background(color = checkboxColor)
@@ -166,9 +165,16 @@ fun AddTechnician(
 
                  Spacer(modifier = Modifier.height(16.dp))
 
-                CommonButton(btnName = "Register", modifier = Modifier, onClickButton = {
-                    
-                })
+                CommonButton(
+                    btnName = "Register",
+                    modifier = Modifier,
+                    onClickButton = {
+                        Log.d("typeData", textFirstName)
+                        Log.d("typeData", textLastName)
+                        Log.d("typeData", textContactNumber)
+                        Log.d("checkedData", selectedServices.toString())
+
+                    })
 
                 Spacer(modifier = Modifier.height(16.dp))
             }

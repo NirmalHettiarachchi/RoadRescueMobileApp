@@ -2,7 +2,6 @@ package com.example.garage.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.GarageTechnician
+import com.example.garage.models.GarageTechnician
 
 @Composable
 fun TechniciansList(
@@ -61,7 +60,7 @@ fun TechniciansList(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-        var techDetails=GarageTechnician("T-001","Thiran","Sasanka",
+        var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
             "Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
 
         Header(menuClicked = {})
@@ -77,7 +76,9 @@ fun TechniciansList(
                         .align(Alignment.CenterVertically)
                         .width(156.dp)
                         .height(50.dp),
-                    onClickButton = {}
+                    onClickButton = {
+                        navController.navigate(route = Screen.AddTechnician.route)
+                    }
                 )
 
         }
@@ -180,7 +181,7 @@ fun TechniciansList(
 }
 
 @Composable
-fun TechniciansLoadStretcher(technician: GarageTechnician,navController: NavController, navyStatus:String){
+fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavController, navyStatus:String){
     Row (
         modifier = Modifier
             .fillMaxWidth(),

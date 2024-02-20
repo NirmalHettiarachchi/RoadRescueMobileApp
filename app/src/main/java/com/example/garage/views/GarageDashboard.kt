@@ -1,9 +1,8 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,16 +42,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.repository.MainViewModel
 import com.example.garage.viewModels.GarageDashboardViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun GarageDashboard(
     garageDetails:GarageDashboardViewModel,
     technicianList:List<String>,
     navController: NavController,
-    navStatus:String
+    navStatus:String,
+
 ) {
+
+//GarageApiClient.getGarage()
+
 
     Column (
         modifier = defaultBackground,
@@ -104,6 +113,12 @@ fun GarageDashboard(
 
 @Composable
 fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
+
+    val garageViewModel:MainViewModel = viewModel()
+
+
+
+
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -255,10 +270,34 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
 
                             // accept button load
 
+
                             CommonButton(
                                 btnName = "Accept",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                                onClickButton = {}
+                                onClickButton = {
+
+
+                                    garageViewModel.fetchBackend()
+                                    Log.d("rsp","request is ok ")
+
+                                    val  viewState by garageViewModel.backendState
+                                    when{
+
+                                        viewState.loading -> {
+                                            // loading  wanna mona hari danna
+                                            Log.d("loading","${viewState.loading}")
+                                        }
+
+                                        viewState.error !=null ->{
+                                            Log.d("err","${viewState.error}")
+                                        }
+
+                                        viewState.response !=null -> {
+                                            Log.d("data","${viewState.response}")
+                                        }
+                                    }
+
+                                }
                             )
 
                         }
