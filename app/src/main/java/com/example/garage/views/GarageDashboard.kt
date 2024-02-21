@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,11 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.garage.repository.MainViewModel
+import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.GarageDashboardViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun GarageDashboard(
@@ -114,10 +110,7 @@ fun GarageDashboard(
 @Composable
 fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
 
-    val garageViewModel:MainViewModel = viewModel()
-
-
-
+    val garageViewModel: MainViewModel = viewModel()
 
     Card(
         modifier = modifier

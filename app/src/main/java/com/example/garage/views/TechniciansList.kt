@@ -61,7 +61,7 @@ fun TechniciansList(
     ){
 
         var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
-            "Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
+            "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),"Available")
 
         Header(menuClicked = {})
 

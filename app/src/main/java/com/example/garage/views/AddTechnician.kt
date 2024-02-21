@@ -28,8 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.GarageTechnician
 import com.example.garage.viewModels.CheckBoxDetailsModel
+import com.example.garage.viewModels.MainViewModel
 
 @Composable
 fun AddTechnician(
@@ -40,6 +43,7 @@ fun AddTechnician(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
+        val garageViewModel:MainViewModel= viewModel()
 
 
         Header(menuClicked = {})
@@ -169,6 +173,29 @@ fun AddTechnician(
                     btnName = "Register",
                     modifier = Modifier,
                     onClickButton = {
+
+                        garageViewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,"Available"))
+
+                        val viewState by garageViewModel.backendState
+                        when{
+
+                            viewState.loading->{
+                                // handle this
+                                Log.d("loading", "loading hutta")
+                            }
+
+                            viewState.error !=null->{
+                                Log.d("techAddError", "${viewState.error}")
+                            }
+
+                            viewState.response!=null->{
+                                Log.d("techAddSuccessfully", "${viewState.response}")
+                            }
+                        }
+
+
+
+
                         Log.d("typeData", textFirstName)
                         Log.d("typeData", textLastName)
                         Log.d("typeData", textContactNumber)
