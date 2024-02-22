@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -54,12 +55,12 @@ fun TechnicianProfile(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        var textTechName by remember { mutableStateOf("") }
-        var textTechContactNub by remember { mutableStateOf("") }
+        val textTechName by remember { mutableStateOf("") }
+        val textTechContactNub by remember { mutableStateOf("") }
 
         var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-        var photoPickerLauncher= rememberLauncherForActivityResult(
+        val photoPickerLauncher= rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia(),
             onResult ={
                 selectedImageUri=it

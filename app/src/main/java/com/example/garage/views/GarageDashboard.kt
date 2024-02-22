@@ -282,11 +282,11 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                         }
 
                                         viewState.error !=null ->{
-                                            Log.d("err","${viewState.error}")
+                                            Log.d("err", viewState.error!!.message)
                                         }
 
                                         viewState.response !=null -> {
-                                            Log.d("data","${viewState.response}")
+                                            Log.d("data","${viewState.response!!.data}")
                                         }
                                     }
 

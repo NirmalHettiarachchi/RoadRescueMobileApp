@@ -7,13 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.NewTechnician
+import com.example.garage.models.ResponseObject
 import com.example.garage.models.ResponseState
 import com.example.garage.repository.garageService
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -25,10 +22,6 @@ class MainViewModel : ViewModel() {
 
     private val _backendState = mutableStateOf(ResponseState())
     val backendState: State<ResponseState> = _backendState
-
-    var status:String?=null
-    var message:String?=null
-    var data:Any?=null
 
     fun fetchBackend() {
         viewModelScope.launch {
@@ -44,18 +37,18 @@ class MainViewModel : ViewModel() {
                             responseBody?.let {
                                 val jsonString = it.string() // Convert response body to JSON string
                                 val jsonObject = JSONObject(jsonString)
-                                val status = jsonObject.optString("status")
+                                val status = jsonObject.optString("status").toInt()
                                 val message = jsonObject.optString("message")
                                 val data = jsonObject.optString("data")
 
-                                Log.d("TAG", status)
+                                Log.d("TAG", status.toString())
                                 Log.d("TAG", message)
                                 Log.d("TAG", data)
 
                                 _backendState.value = _backendState.value.copy(
                                     loading = false,
                                     error = null,
-                                    response = data
+                                    response = ResponseObject(status,message,data)
                                 )
 
 
@@ -67,7 +60,7 @@ class MainViewModel : ViewModel() {
                             Log.d("Unsuccessfully", "response is not successfully")
                             _backendState.value = _backendState.value.copy(
                                 loading = false,
-                                error = response.toString(),
+                                error = ResponseObject(400,"Bad Request","Bad Request"),
                                 response = null
 
                             )
@@ -78,7 +71,7 @@ class MainViewModel : ViewModel() {
                         Log.d("onFailure", "response onFailure")
                         _backendState.value = _backendState.value.copy(
                             loading = false,
-                            error = "Error (on failure function ) : ${t.message}"
+                            error = ResponseObject(505,"HTTP Version Not Supported","HTTP Version Not Supported")
 
                         )
                     }
@@ -88,7 +81,7 @@ class MainViewModel : ViewModel() {
             } catch (e: Exception) {
                 _backendState.value = _backendState.value.copy(
                     loading = false,
-                    error = "Error (catch function ): ${e.message}"
+                    error = ResponseObject(405,"Method Not Allowed","Method Not Allowed")
 
                 )
             }
@@ -134,31 +127,35 @@ class MainViewModel : ViewModel() {
 
                         Log.d("TAG", "Hello Main 3")
 
-                        val responseBody=response.body()
-                        responseBody?.let {
-                            Log.d("TAG", "Hello Main 4")
-                            var jsonString=it.string();
-                            var jsonObject=JSONObject(jsonString)
-                             status=jsonObject.optString("status")
-                             message=jsonObject.optString("message")
-                             data=jsonObject.optString("data")
-                        }
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                Log.d("TAG", "Hello Main 4")
+                                val jsonString = it.string();
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
 
-                        if (response.code()==200){
-                            _backendState.value.copy(
-                                loading = false,
-                                error = null,
-                                response=message
-                            )
-                        }else if (response.code()==400){
-                            // handle this content
-                            _backendState.value.copy(
-                                loading = false,
-                                error = data,
-                                response=null
-                            )
-                        }
+                                if (status==201){
+                                    _backendState.value.copy(
+                                        loading = false,
+                                        error = null,
+                                        response= ResponseObject(status,message,data)
+                                    )
+                                }else if (status==500){
+                                    // handle this content
+                                    _backendState.value.copy(
+                                        loading = false,
+                                        error = ResponseObject(status,message,data),
+                                        response=null
+                                    )
+                                } else {
 
+                                }
+
+                            }
+                        }
                     }
 
                     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
@@ -169,7 +166,7 @@ class MainViewModel : ViewModel() {
             }catch (e:Exception){
                 _backendState.value = _backendState.value.copy(
                     loading = false,
-                    error = "Error (catch function ): ${e.message}"
+                    error = ResponseObject(405,"Method Not Allowed","Method Not Allowed")
                 )
             }
         }
