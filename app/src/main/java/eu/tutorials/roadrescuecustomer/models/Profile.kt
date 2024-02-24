@@ -18,9 +18,9 @@ data class Profile(
 class ProfileRepository() {
 
     private var _profile = Profile(
-        "Nirmal Hettiarachchi",
-        "nirmalhettiarachchi@gmail.com",
-        "+94 768879830",
+        "",
+        "",
+        "",
         2
     )
 

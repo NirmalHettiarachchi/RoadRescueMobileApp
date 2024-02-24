@@ -54,7 +54,9 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
                     .background(Color.White)
                     .height(2.dp))
             }
-            SidebarButton(buttonName = "Help", verticalPadding = 8,{})
+            SidebarButton(buttonName = "Help", verticalPadding = 8) {
+                navHostController.navigate("helpscreen")
+            }
             SidebarButton(buttonName = "Settings", verticalPadding = 8,{})
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {

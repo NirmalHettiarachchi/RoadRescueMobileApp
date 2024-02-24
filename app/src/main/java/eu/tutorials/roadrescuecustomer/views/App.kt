@@ -83,5 +83,15 @@ fun App(
                 context = context
             )
         }
+        composable("helpscreen") {
+            HelpScreen(
+                navigationToDashboardScreen = { navController.navigate("dashboardscreen") },
+                navigationToProfileScreen = { navController.navigate("profilescreen") },
+                navigationToTrackLocationScreen = { navController.navigate("tracklocationscreen") },
+                navigationToActivitiesScreen = { navController.navigate("activitiesscreen") },
+                context = context,
+                navController = navController
+            )
+        }
     }
 }
