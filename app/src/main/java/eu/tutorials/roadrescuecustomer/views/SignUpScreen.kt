@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -50,12 +51,18 @@ import com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
 import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
 import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
-import eu.tutorials.roadrescuecustomer.models.LoginResponse
 import eu.tutorials.roadrescuecustomer.api.RetrofitInstance
+import eu.tutorials.roadrescuecustomer.models.LoginResponse
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.Statement
 import java.util.concurrent.TimeUnit
+
 
 @Composable
 fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivity) {
@@ -83,6 +90,79 @@ fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivit
             }
         }
     }
+}
+
+interface AddUserCallback {
+    fun onUserAddedSuccessfully()
+    fun onUserAlreadyExists()
+    fun onError(errorMessage: String)
+}
+
+fun addUser(
+    context: Context,
+    firstName: String,
+    lastName: String,
+    phoneNumber: String,
+    email: String,
+    password: String,
+    callback: AddUserCallback
+) {
+    val DATABASE_NAME = "road_rescue"
+    val TABLE_NAME = "customer"
+    val url =
+        "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
+    val username = "admin"
+    val databasePassword = "admin123"
+    Thread {
+        try {
+            // Load the JDBC driver
+            Class.forName("com.mysql.jdbc.Driver")
+            // Establish connection to the database
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+
+            // Prepare a statement to check if the phone number already exists
+            val checkStmt =
+                connection.prepareStatement("SELECT COUNT(*) FROM $TABLE_NAME WHERE phone_number = ?")
+            checkStmt.setString(1, phoneNumber)
+
+            // Execute the query
+            val resultSet = checkStmt.executeQuery()
+
+            // Check if the phone number exists
+            var phoneNumberExists = false
+            if (resultSet.next()) {
+                phoneNumberExists = resultSet.getInt(1) > 0
+            }
+
+            // Insert the new user if the phone number does not exist
+            if (!phoneNumberExists) {
+                val insertStmt =
+                    connection.prepareStatement("INSERT INTO $TABLE_NAME(phone_number, email, f_name, l_name) VALUES(?, ?, ?, ?)")
+                insertStmt.setString(1, phoneNumber)
+                insertStmt.setString(2, email)
+                insertStmt.setString(3, firstName)
+                insertStmt.setString(4, lastName)
+
+                insertStmt.executeUpdate()
+                MainScope().launch {
+                    callback.onUserAddedSuccessfully()
+                }
+            } else {
+                MainScope().launch {
+                    callback.onUserAlreadyExists()
+                }
+            }
+
+            // Close the connection
+            connection.close()
+        } catch (e: Exception) {
+            MainScope().launch {
+                callback.onError(e.message ?: "An error occurred.")
+            }
+            e.printStackTrace()
+        }
+    }.start()
 }
 
 
@@ -116,148 +196,147 @@ fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
             phoneNumber = AuthField("A Valid Phone Number", "")
 
             AuthFieldBtn {
-                val apiService = RetrofitInstance.apiService
-                val call = apiService.signup(
-                    phoneNumber,
-                    "123456",
-                    "$firstName $lastName",
-                    "test${System.currentTimeMillis()}@gmail.com"
-                )
-                call.enqueue(object : Callback<LoginResponse> {
-                    override fun onResponse(
-                        call: Call<LoginResponse>,
-                        response: Response<LoginResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            if (response.body()?.message!="User already registered") {
-                                PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                                    phoneNumber.replace(" ", ""),  // Phone number to verify
-                                    60,  // Timeout duration
-                                    TimeUnit.SECONDS,  // Unit of timeout
-                                    mainActivity,  // Activity (for callback binding)
-                                    object : OnVerificationStateChangedCallbacks() {
-                                        override fun onCodeSent(
-                                            s: String,
-                                            forceResendingToken: ForceResendingToken
-                                        ) {
-                                            otpid = s
-                                            Toast.makeText(context, "OTP SENT", Toast.LENGTH_SHORT)
-                                                .show()
-                                        }
+                PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                    phoneNumber.replace(" ", ""),  // Phone number to verify
+                    60,  // Timeout duration
+                    TimeUnit.SECONDS,  // Unit of timeout
+                    mainActivity,  // Activity (for callback binding)
+                    object : OnVerificationStateChangedCallbacks() {
+                        override fun onCodeSent(
+                            s: String,
+                            forceResendingToken: ForceResendingToken
+                        ) {
+                            otpid = s
+                            Toast.makeText(context, "OTP SENT", Toast.LENGTH_SHORT)
+                                .show()
+                        }
 
-                                        override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
-                                            mAuth?.signInWithCredential(phoneAuthCredential)
-                                                ?.addOnCompleteListener(
-                                                    mainActivity
-                                                ) { task ->
-                                                    if (task.isSuccessful) {
-                                                        navController.navigate("dashboardscreen")
-                                                    } else {
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Error",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-                                                    }
-                                                }
-                                        }
+                        override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
+                            mAuth?.signInWithCredential(phoneAuthCredential)
+                                ?.addOnCompleteListener(
+                                    mainActivity
+                                ) { task ->
+                                    if (task.isSuccessful) {
+                                        navController.navigate("dashboardscreen")
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Error",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                        }
 
-                                        override fun onVerificationFailed(e: FirebaseException) {
-                                            Toast.makeText(
-                                                context,
-                                                e.message,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-
-
-                                        }
-                                    })
-                            }else{
-                                Toast.makeText(
-                                    context,
-                                    "User Already Registered",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
+                        override fun onVerificationFailed(e: FirebaseException) {
                             Toast.makeText(
                                 context,
-                                response.message().toString(),
-                                Toast.LENGTH_SHORT
+                                e.message,
+                                Toast.LENGTH_LONG
                             ).show()
+
+
                         }
-                    }
-
-                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                    }
-                })
-
+                    })
             }
-            otp = AuthField("Enter the OTP", "")
-            AuthCommonButton(
-                btnName = "Register",
-                Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(10.dp)
-            ) {
-                if (otp.isNotEmpty()) {
-                    val credential =
-                        otpid?.let { PhoneAuthProvider.getCredential(it, otp) }
-                    if (credential != null) {
-                        mAuth?.signInWithCredential(credential)
-                            ?.addOnCompleteListener(
-                                mainActivity
-                            ) { task ->
-                                if (task.isSuccessful) {
-                                    AppPreferences(context).setStringPreference(
-                                        "NAME",
-                                        "$firstName $lastName"
-                                    )
-                                    AppPreferences(context).setStringPreference(
-                                        "PHONE",
-                                        phoneNumber
-                                    )
-                                    AppPreferences(context).setStringPreference(
-                                        "EMAIL",
-                                        "test@gmail.com"
-                                    )
-                                    navController.navigate("dashboardscreen") {
-                                        popUpTo("dashboardscreen") { inclusive = true }
-                                    }
-                                } else {
+        }
+
+        otp = AuthField("Enter the OTP", "")
+        AuthCommonButton(
+            btnName = "Register",
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(10.dp)
+        ) {
+            if (otp.isNotEmpty()) {
+                val credential =
+                    otpid?.let { PhoneAuthProvider.getCredential(it, otp) }
+                if (credential != null) {
+                    mAuth?.signInWithCredential(credential)
+                        ?.addOnCompleteListener(
+                            mainActivity
+                        ) { task ->
+                            if (task.isSuccessful) {
+                                addUser(
+                                    context,
+                                    firstName,
+                                    lastName,
+                                    phoneNumber,
+                                    "",
+                                    "123456",
+                                    object : AddUserCallback {
+                                        override fun onUserAddedSuccessfully() {
+                                            AppPreferences(context).setStringPreference(
+                                                "NAME",
+                                                "$firstName $lastName"
+                                            )
+                                            AppPreferences(context).setStringPreference(
+                                                "PHONE",
+                                                phoneNumber
+                                            )
+                                            AppPreferences(context).setStringPreference(
+                                                "EMAIL",
+                                                "test@gmail.com"
+                                            )
+                                            navController.navigate("dashboardscreen") {
+                                                popUpTo("dashboardscreen") { inclusive = true }
+                                            }
+                                        }
+
+                                        override fun onUserAlreadyExists() {
+                                            MainScope().launch {
+                                                Toast.makeText(
+                                                    context,
+                                                    "User Already Exist",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
+                                        }
+
+                                        override fun onError(errorMessage: String) {
+                                            MainScope().launch {
+                                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT)
+                                                    .show()
+                                            }
+                                        }
+
+                                    })
+
+                            } else {
+                                MainScope().launch {
                                     Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                    }
-                } else {
-                    Toast.makeText(context, "Enter OTP", Toast.LENGTH_SHORT).show()
+                        }
                 }
+            } else {
+                Toast.makeText(context, "Enter OTP", Toast.LENGTH_SHORT).show()
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Spacer(
-                modifier = Modifier
-                    .height(2.dp)
-                    .fillMaxWidth()
-                    .background(Color.White)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Already registered?",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle2
-            )
-            AuthCommonButton(
-                btnName = "Log in",
-                Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(10.dp)
-            ) {
-                navController.navigate("loginscreen")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier
+                .height(2.dp)
+                .fillMaxWidth()
+                .background(Color.White)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Already registered?",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            style = textStyle2
+        )
+        AuthCommonButton(
+            btnName = "Log in",
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(10.dp)
+        ) {
+            navController.navigate("loginscreen")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
     }
 }
 

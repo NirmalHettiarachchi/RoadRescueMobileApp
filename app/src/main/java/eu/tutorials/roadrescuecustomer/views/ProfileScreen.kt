@@ -1,6 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,19 +41,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
 import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
-import eu.tutorials.roadrescuecustomer.api.RetrofitInstance
-import eu.tutorials.roadrescuecustomer.models.LoginResponse
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.concurrent.TimeUnit
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.Statement
+
 
 @Composable
 fun ProfileScreen(
@@ -100,14 +97,50 @@ fun ProfileScreen(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             style = textStyle1
                         )
+                        utilFun()
                         ProfileBox(profileViewModel)
                         HelpBox()
                     }
-                    Footer(navigationToDashboardScreen, {}, navigationToTrackLocationScreen, navigationToActivitiesScreen)
+                    Footer(
+                        navigationToDashboardScreen,
+                        {},
+                        navigationToTrackLocationScreen,
+                        navigationToActivitiesScreen
+                    )
                 }
             }
         }
     }
+}
+
+@Throws(SQLException::class)
+fun utilFun() {
+    Thread {
+        val DATABASE_NAME = "road_rescue"
+        val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
+                DATABASE_NAME
+        val username = "admin"
+        val databasePassword = "admin123"
+        //do your work
+        val records = StringBuilder()
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement: Statement = connection.createStatement()
+            val rs: ResultSet = statement.executeQuery("SELECT * FROM customer")
+            while (rs.next()) {
+                records.append(rs.getString(2))
+                    .append(rs.getString(3)).append("\n")
+                    .append(rs.getString(4)).append("\n")
+                    .append(rs.getString(5)).append("\n")
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        Log.d("Result", records.toString())
+    }.start()
 }
 
 @Composable
@@ -180,7 +213,12 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
                     //Save Button
                     CommonButton("Save", Modifier) {
                         if (newName.isNotEmpty() && newEmail.isNotEmpty()) {
-                            profileViewModel.updateProfile(newName,newEmail,context)
+                            profileViewModel.updateProfile(
+                                AppPreferences(context).getStringPreference(
+                                    "PHONE",
+                                    ""
+                                ), newName, newEmail, context
+                            )
                             isEditing = false
                         }
                     }

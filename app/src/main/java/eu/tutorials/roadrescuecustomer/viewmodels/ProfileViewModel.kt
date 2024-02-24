@@ -13,8 +13,8 @@ class ProfileViewModel : ViewModel() {
         mutableIntStateOf(_repository.getProfile().numOfServiceRequests)
     val numOfServiceRequests: MutableState<Int> = _numOfServiceRequests
 
-    fun updateProfile(name: String, email: String, context: Context) {
-        _repository.updateProfile(name, email, context)
+    fun updateProfile(phoneNumber: String, name: String, email: String, context: Context) {
+        _repository.updateProfile(phoneNumber, name, email, context)
     }
 }
 
