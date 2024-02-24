@@ -121,7 +121,7 @@ fun utilFun() {
                 DATABASE_NAME
         val username = "admin"
         val databasePassword = "admin123"
-        //do your work
+
         val records = StringBuilder()
         try {
             Class.forName("com.mysql.jdbc.Driver")

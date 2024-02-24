@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +21,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.Statement
 
 @Composable
 fun VehicleDetailsWindow(
@@ -55,7 +62,12 @@ fun VehicleDetailsWindow(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val vehicleTypeList = listOf("Car", "Van", "Lorry", "Bicycle")
+                //----------------------------------------------------
+                DisposableEffect(key1 = Unit) {
+                    serviceRequestViewModel.fetchVehicleTypes()
+                    onDispose { }
+                }
+                val vehicleTypeList by serviceRequestViewModel.vehicleTypes
                 val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
                 val vehicleMakeList = listOf("Toyota", "Honda", "BMW", "Audi")
                 val vehicleModelList = listOf("Axio", "Premio", "Allion", "Vezel", "Graze")

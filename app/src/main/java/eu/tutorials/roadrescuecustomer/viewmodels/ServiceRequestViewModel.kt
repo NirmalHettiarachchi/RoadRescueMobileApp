@@ -4,7 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.ResultSet
 
 class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
@@ -34,6 +41,43 @@ class ServiceRequestViewModel : ViewModel() {
         _vehicleModel.value = _repository.getServiceRequest().vehicleModel
         _approximatedCost.doubleValue = _repository.getServiceRequest().approximatedCost
         _description.value = _repository.getServiceRequest().description
+    }
+
+    val vehicleTypes = mutableStateOf(listOf<String>())
+    fun fetchVehicleTypes() {
+        viewModelScope.launch {
+            val fetchedVehicleTypes = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                getVehicleTypesFromDatabase()
+            }
+            vehicleTypes.value = fetchedVehicleTypes
+        }
+    }
+
+    private fun getVehicleTypesFromDatabase(): List<String> {
+        val vehicleTypeList = mutableListOf<String>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
+                    DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT vehicle_type FROM vehicle_type")
+
+            while (resultSet.next()) {
+                val vehicleType = resultSet.getString("vehicle_type")
+                vehicleTypeList.add(vehicleType)
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return vehicleTypeList
     }
 }
 
