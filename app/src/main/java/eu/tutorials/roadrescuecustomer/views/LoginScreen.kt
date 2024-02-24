@@ -32,13 +32,9 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
-import eu.tutorials.roadrescuecustomer.api.RetrofitInstance
 import eu.tutorials.roadrescuecustomer.models.LoginResponse
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException

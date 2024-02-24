@@ -3,12 +3,8 @@ package eu.tutorials.roadrescuecustomer.models
 import android.content.Context
 import android.widget.Toast
 import eu.tutorials.roadrescuecustomer.AppPreferences
-import eu.tutorials.roadrescuecustomer.api.RetrofitInstance
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.sql.Connection
 import java.sql.DriverManager
 
