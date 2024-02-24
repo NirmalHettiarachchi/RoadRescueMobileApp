@@ -12,16 +12,25 @@ import com.example.garage.models.ResponseState
 import com.example.garage.repository.garageService
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
+import okhttp3.internal.wait
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.await
+import retrofit2.awaitResponse
+import java.io.IOException
 
 class MainViewModel : ViewModel() {
 
 
     private val _backendState = mutableStateOf(ResponseState())
     val backendState: State<ResponseState> = _backendState
+
+    var status: Int = 0
+    var message: String? = null
+    var data: Any? = null
+
 
     fun fetchBackend() {
         viewModelScope.launch {
@@ -48,7 +57,7 @@ class MainViewModel : ViewModel() {
                                 _backendState.value = _backendState.value.copy(
                                     loading = false,
                                     error = null,
-                                    response = ResponseObject(status,message,data)
+                                    response = ResponseObject(status, message, data)
                                 )
 
 
@@ -60,7 +69,7 @@ class MainViewModel : ViewModel() {
                             Log.d("Unsuccessfully", "response is not successfully")
                             _backendState.value = _backendState.value.copy(
                                 loading = false,
-                                error = ResponseObject(400,"Bad Request","Bad Request"),
+                                error = ResponseObject(400, "Bad Request", "Bad Request"),
                                 response = null
 
                             )
@@ -71,7 +80,11 @@ class MainViewModel : ViewModel() {
                         Log.d("onFailure", "response onFailure")
                         _backendState.value = _backendState.value.copy(
                             loading = false,
-                            error = ResponseObject(505,"HTTP Version Not Supported","HTTP Version Not Supported")
+                            error = ResponseObject(
+                                505,
+                                "HTTP Version Not Supported",
+                                "HTTP Version Not Supported"
+                            )
 
                         )
                     }
@@ -81,7 +94,7 @@ class MainViewModel : ViewModel() {
             } catch (e: Exception) {
                 _backendState.value = _backendState.value.copy(
                     loading = false,
-                    error = ResponseObject(405,"Method Not Allowed","Method Not Allowed")
+                    error = ResponseObject(405, "Method Not Allowed", "Method Not Allowed")
 
                 )
             }
@@ -89,21 +102,9 @@ class MainViewModel : ViewModel() {
     }
 
 
-    fun addTechnician(technician: GarageTechnician) {
+    fun addTechnician(technician: GarageTechnician){
 
-        /*val list= buildJsonArray {
-            technician.getTechExpertiseAreas()?.forEach {temp->
-                add(temp)
-            }
-        }
-
-        val techObject= buildJsonObject {
-            put("techFirstName",technician.getTechFirstName())
-            put("techLastName",technician.getTechFirstName())
-            put("techContactNumber",technician.getTechContactNumber())
-            put("techStatus",technician.getTechStatus())
-            put("techExpertiseAreas",list)
-        }*/
+        var responseState: ResponseState? = null
 
         viewModelScope.launch {
             Log.d("TAG", "Hello Main")
@@ -118,12 +119,12 @@ class MainViewModel : ViewModel() {
                         technician.getTechStatus()
                     )
                 )
+
                 Log.d("TAG", "Hello Main 2")
-                call.enqueue(object :Callback<ResponseBody>{
-                    override fun onResponse(
-                        call: Call<ResponseBody>,
-                        response: Response<ResponseBody>,
-                    ) {
+
+                call.enqueue(object : Callback<ResponseBody> {
+
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody> ) {
 
                         Log.d("TAG", "Hello Main 3")
 
@@ -133,44 +134,59 @@ class MainViewModel : ViewModel() {
                                 Log.d("TAG", "Hello Main 4")
                                 val jsonString = it.string();
                                 val jsonObject = JSONObject(jsonString)
-                                val status = jsonObject.optString("status").toInt()
-                                val message = jsonObject.optString("message")
-                                val data = jsonObject.optString("data")
+                                status = jsonObject.optString("status").toInt()
+                                message = jsonObject.optString("message")
+                                data = jsonObject.optString("data")
 
-                                if (status==201){
-                                    _backendState.value.copy(
+                                Log.d("status", "$status")
+                                Log.d("message", "$message")
+                                Log.d("data", "$data")
+
+                                if (status == 201) {
+                                    _backendState.value = _backendState.value.copy(
                                         loading = false,
                                         error = null,
-                                        response= ResponseObject(status,message,data)
+                                        response = ResponseObject(status, message, data)
                                     )
-                                }else if (status==500){
+                                } else if (status == 500) {
                                     // handle this content
-                                    _backendState.value.copy(
+                                    _backendState.value = _backendState.value.copy(
                                         loading = false,
-                                        error = ResponseObject(status,message,data),
-                                        response=null
+                                        error = ResponseObject(status, message, data),
+                                        response = null
                                     )
                                 } else {
-
+                                    _backendState.value = _backendState.value.copy(
+                                        loading = false,
+                                        error = ResponseObject(status, message, data),
+                                        response = null
+                                    )
                                 }
-
                             }
                         }
+                        Log.d("backendState check", "${backendState.value.response?.message}")
+                        Log.d("backendState check", "${backendState.value.error?.data}")
+                        Log.d("backendState check", "${backendState.value.loading}")
                     }
 
                     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        TODO("Not yet implemented")
+                        _backendState.value = _backendState.value.copy(
+                            loading = false,
+                            error = ResponseObject(status, message, data),
+                            response = null
+                        )
                     }
 
                 })
-            }catch (e:Exception){
+
+            } catch (e: Exception) {
                 _backendState.value = _backendState.value.copy(
                     loading = false,
-                    error = ResponseObject(405,"Method Not Allowed","Method Not Allowed")
+                    error = ResponseObject(status, message, data),
+                    response = null
                 )
             }
         }
-
+//        return responseState
     }
-
 }

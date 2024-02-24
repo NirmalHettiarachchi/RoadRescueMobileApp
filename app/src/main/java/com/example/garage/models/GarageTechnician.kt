@@ -6,7 +6,7 @@ class GarageTechnician {
     private var _techLastName: String = ""
     private var _techContactNumber = ""
     private var _techExpertiseAreas: List<String> = emptyList()
-    private var _techStatus: String = ""
+    private var _techStatus: Int = 0
 
 
 
@@ -17,7 +17,7 @@ class GarageTechnician {
         _techLastName: String,
         _techContactNumber: String,
         _techExpertiseAreas: List<String>,
-        _techStatus: String,
+        _techStatus: Int,
     ) {
         this._techFirstName = _techFirstName
         this._techLastName = _techLastName
@@ -32,7 +32,7 @@ class GarageTechnician {
         _techLastName: String,
         _techContactNumber: String,
         _techExpertiseAreas: List<String>,
-        _techStatus: String,
+        _techStatus: Int,
     ) {
         this._techId = _techId
         this._techFirstName = _techFirstName
@@ -67,11 +67,11 @@ class GarageTechnician {
         this._techLastName = techLastName
     }
 
-    fun getTechStatus(): String {
+    fun getTechStatus(): Int {
         return this._techStatus
     }
 
-    fun setTechStatus(status: String) {
+    fun setTechStatus(status: Int) {
         this._techStatus = status
     }
 

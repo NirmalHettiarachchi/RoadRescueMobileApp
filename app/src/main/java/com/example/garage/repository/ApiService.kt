@@ -1,7 +1,5 @@
 package com.example.garage.repository
 
-
-
 import com.example.garage.models.NewTechnician
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -13,8 +11,8 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 
-
-private val retrofit = Retrofit.Builder().baseUrl("http://192.168.32.117:8082/roadRescueBackend/")
+private val ipV4Address="192.168.175.117"
+private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 

@@ -274,6 +274,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                     Log.d("rsp","request is ok ")
 
                                     val  viewState by garageViewModel.backendState
+
                                     when{
 
                                         viewState.loading -> {
@@ -282,11 +283,11 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                         }
 
                                         viewState.error !=null ->{
-                                            Log.d("err", viewState.error!!.message)
+                                            viewState.error!!.message?.let { Log.d("err", it) }
                                         }
 
                                         viewState.response !=null -> {
-                                            Log.d("data","${viewState.response!!.data}")
+                                            Log.d("data final","${viewState.response!!.data}")
                                         }
                                     }
 

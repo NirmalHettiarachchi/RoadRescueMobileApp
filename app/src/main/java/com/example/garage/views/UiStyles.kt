@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
+import com.example.garage.models.GarageTechnician
 import com.example.garage.viewModels.CheckBoxDetailsModel
 
 
@@ -109,3 +110,10 @@ val cardDefaultModifier=Modifier
      .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
      .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = RoundedCornerShape(20.dp))
 
+fun changeStatusType(technician: GarageTechnician): String {
+    return if (technician.getTechStatus()==1){
+        "Avail;ble"
+    }else{
+        "Not Available"
+    }
+}

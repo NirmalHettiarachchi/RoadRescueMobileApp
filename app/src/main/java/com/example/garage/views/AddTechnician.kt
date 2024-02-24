@@ -38,12 +38,13 @@ import com.example.garage.viewModels.MainViewModel
 fun AddTechnician(
     navController: NavController, navyStatus:String
 ) {
+    val viewModel= viewModel<MainViewModel>()
+    val  viewState by viewModel.backendState
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        val garageViewModel:MainViewModel= viewModel()
 
 
         Header(menuClicked = {})
@@ -174,22 +175,23 @@ fun AddTechnician(
                     modifier = Modifier,
                     onClickButton = {
 
-                        garageViewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,"Available"))
+                        viewModel.addTechnician(
+                            GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1))
 
-                        val viewState by garageViewModel.backendState
+                        Log.d("test", "hi 1")
+
                         when{
-
                             viewState.loading->{
                                 // handle this
-                                Log.d("loading", "loading hutta")
+                                Log.d("tech loading", "loading state")
                             }
 
                             viewState.error !=null->{
-                                Log.d("techAddError", "${viewState.error}")
+                                Log.d("techAddError", "${viewState.error!!.data}")
                             }
 
                             viewState.response!=null->{
-                                Log.d("techAddSuccessfully", "${viewState.response}")
+                                Log.d("techAddSuccessfully", "${viewState.response!!.message}")
                             }
                         }
 

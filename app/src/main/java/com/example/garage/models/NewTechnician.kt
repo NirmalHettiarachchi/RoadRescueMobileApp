@@ -12,5 +12,5 @@ data class NewTechnician(
     @SerializedName("techExpertiseAreas")
     val techExpertiseAreas:List<String>,
     @SerializedName("techStatus")
-    val techStatus:String,
+    val techStatus:Int,
 )
