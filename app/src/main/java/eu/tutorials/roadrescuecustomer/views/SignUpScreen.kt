@@ -270,7 +270,7 @@ fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
                                             )
                                             AppPreferences(context).setStringPreference(
                                                 "EMAIL",
-                                                "test@gmail.com"
+                                                ""
                                             )
                                             navController.navigate("dashboardscreen") {
                                                 popUpTo("dashboardscreen") { inclusive = true }
