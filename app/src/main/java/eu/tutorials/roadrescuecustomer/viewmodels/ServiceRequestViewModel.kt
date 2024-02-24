@@ -46,6 +46,7 @@ class ServiceRequestViewModel : ViewModel() {
     val vehicleTypes = mutableStateOf(listOf<String>())
     val fuelTypes = mutableStateOf(listOf<String>())
     val vehicleMakes = mutableStateOf(listOf<String>())
+    val vehicleModels = mutableStateOf(listOf<String>())
 
     fun fetchVehicleTypes() {
         viewModelScope.launch {
@@ -74,6 +75,16 @@ class ServiceRequestViewModel : ViewModel() {
                 getVehicleMakesFromDatabase()
             }
             vehicleMakes.value = fetchedVehicleMakes
+        }
+    }
+
+    fun fetchVehicleModels() {
+        viewModelScope.launch {
+            val fetchedVehicleModels = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                getVehicleModelsFromDatabase()
+            }
+            vehicleModels.value = fetchedVehicleModels
         }
     }
 
@@ -119,8 +130,8 @@ class ServiceRequestViewModel : ViewModel() {
             val resultSet: ResultSet = statement.executeQuery("SELECT fuel_type FROM fuel_type")
 
             while (resultSet.next()) {
-                val vehicleType = resultSet.getString("fuel_type")
-                fuelTypeList.add(vehicleType)
+                val fuelType = resultSet.getString("fuel_type")
+                fuelTypeList.add(fuelType)
             }
             connection.close()
         } catch (e: Exception) {
@@ -145,8 +156,8 @@ class ServiceRequestViewModel : ViewModel() {
             val resultSet: ResultSet = statement.executeQuery("SELECT make FROM vehicle_make")
 
             while (resultSet.next()) {
-                val vehicleType = resultSet.getString("make")
-                vehicleMakeList.add(vehicleType)
+                val vehicleMake = resultSet.getString("make")
+                vehicleMakeList.add(vehicleMake)
             }
             connection.close()
         } catch (e: Exception) {
@@ -154,5 +165,41 @@ class ServiceRequestViewModel : ViewModel() {
         }
         return vehicleMakeList
     }
+
+    private fun getVehicleModelsFromDatabase(): List<String> {
+        val vehicleModelList = mutableListOf<String>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
+                    DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery(
+                "SELECT model " +
+                        "FROM vehicle_model;")
+
+            while (resultSet.next()) {
+                val vehicleModel = resultSet.getString("model")
+                vehicleModelList.add(vehicleModel)
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return vehicleModelList
+    }
 }
 
+//"SELECT model " +
+//"FROM vehicle_model " +
+//"INNER JOIN vehicle_make ON vehicle_model.vehicle_make_id = vehicle_make.id " +
+//"INNER JOIN vehicle_type ON vehicle_model.vehicle_type_id = vehicle_type.id " +
+//"INNER JOIN fuel_type ON vehicle_model.fuel_type_id = fuel_type.id " +
+//"WHERE vehicle_make.make = ${vehicleMake.value} " +
+//"AND vehicle_type.vehicle_type = ${vehicleType.value} " +
+//"AND fuel_type.fuel_type = ${fuelType.value};"

@@ -67,17 +67,20 @@ fun VehicleDetailsWindow(
                     serviceRequestViewModel.fetchVehicleTypes()
                     serviceRequestViewModel.fetchFuelTypes()
                     serviceRequestViewModel.fetchVehicleMakes()
+                    serviceRequestViewModel.fetchVehicleModels()
                     onDispose { }
                 }
                 val vehicleTypeList by serviceRequestViewModel.vehicleTypes
                 val fuelTypeList by serviceRequestViewModel.fuelTypes
                 val vehicleMakeList by serviceRequestViewModel.vehicleMakes
-                val vehicleModelList = listOf("Axio", "Premio", "Allion", "Vezel", "Graze")
+                val vehicleModelList by serviceRequestViewModel.vehicleModels
+
 
                 vehicleType = dropDown("Vehicle Type", vehicleTypeList)
                 fuelType = dropDown("Fuel Type", fuelTypeList)
                 vehicleMake = dropDown("Vehicle Make", vehicleMakeList)
                 vehicleModel = dropDown("Vehicle Model",  vehicleModelList)
+
 
                 Spacer(modifier = Modifier.height(8.dp))
                 CommonButton(btnName = "Save", modifier = Modifier.align(Alignment.CenterHorizontally)) {
