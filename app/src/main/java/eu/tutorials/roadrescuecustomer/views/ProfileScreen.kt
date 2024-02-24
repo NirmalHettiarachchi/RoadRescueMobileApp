@@ -212,7 +212,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
                 ) {
                     //Save Button
                     CommonButton("Save", Modifier) {
-                        if (newName.isNotEmpty() && newEmail.isNotEmpty()) {
+                        if (newName.isNotEmpty()) {
                             profileViewModel.updateProfile(
                                 AppPreferences(context).getStringPreference(
                                     "PHONE",
