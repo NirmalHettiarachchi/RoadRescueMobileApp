@@ -44,6 +44,9 @@ class ServiceRequestViewModel : ViewModel() {
     }
 
     val vehicleTypes = mutableStateOf(listOf<String>())
+    val fuelTypes = mutableStateOf(listOf<String>())
+    val vehicleMakes = mutableStateOf(listOf<String>())
+
     fun fetchVehicleTypes() {
         viewModelScope.launch {
             val fetchedVehicleTypes = withContext(Dispatchers.IO) {
@@ -51,6 +54,26 @@ class ServiceRequestViewModel : ViewModel() {
                 getVehicleTypesFromDatabase()
             }
             vehicleTypes.value = fetchedVehicleTypes
+        }
+    }
+
+    fun fetchFuelTypes() {
+        viewModelScope.launch {
+            val fetchedFuelTypes = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                getFuelTypesFromDatabase()
+            }
+            fuelTypes.value = fetchedFuelTypes
+        }
+    }
+
+    fun fetchVehicleMakes() {
+        viewModelScope.launch {
+            val fetchedVehicleMakes = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                getVehicleMakesFromDatabase()
+            }
+            vehicleMakes.value = fetchedVehicleMakes
         }
     }
 
@@ -78,6 +101,58 @@ class ServiceRequestViewModel : ViewModel() {
             e.printStackTrace()
         }
         return vehicleTypeList
+    }
+
+    private fun getFuelTypesFromDatabase(): List<String> {
+        val fuelTypeList = mutableListOf<String>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
+                    DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT fuel_type FROM fuel_type")
+
+            while (resultSet.next()) {
+                val vehicleType = resultSet.getString("fuel_type")
+                fuelTypeList.add(vehicleType)
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return fuelTypeList
+    }
+
+    private fun getVehicleMakesFromDatabase(): List<String> {
+        val vehicleMakeList = mutableListOf<String>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
+                    DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT make FROM vehicle_make")
+
+            while (resultSet.next()) {
+                val vehicleType = resultSet.getString("make")
+                vehicleMakeList.add(vehicleType)
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return vehicleMakeList
     }
 }
 

@@ -65,11 +65,13 @@ fun VehicleDetailsWindow(
                 //----------------------------------------------------
                 DisposableEffect(key1 = Unit) {
                     serviceRequestViewModel.fetchVehicleTypes()
+                    serviceRequestViewModel.fetchFuelTypes()
+                    serviceRequestViewModel.fetchVehicleMakes()
                     onDispose { }
                 }
                 val vehicleTypeList by serviceRequestViewModel.vehicleTypes
-                val fuelTypeList = listOf("Petrol", "Diesel", "Hybrid", "Electric")
-                val vehicleMakeList = listOf("Toyota", "Honda", "BMW", "Audi")
+                val fuelTypeList by serviceRequestViewModel.fuelTypes
+                val vehicleMakeList by serviceRequestViewModel.vehicleMakes
                 val vehicleModelList = listOf("Axio", "Premio", "Allion", "Vezel", "Graze")
 
                 vehicleType = dropDown("Vehicle Type", vehicleTypeList)
