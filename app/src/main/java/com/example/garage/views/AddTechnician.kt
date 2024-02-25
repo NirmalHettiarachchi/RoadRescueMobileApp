@@ -1,5 +1,6 @@
 package com.example.garage.views
 
+
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -19,8 +20,10 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +36,18 @@ import androidx.navigation.NavController
 import com.example.garage.models.GarageTechnician
 import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddTechnician(
     navController: NavController, navyStatus:String
 ) {
     val viewModel= viewModel<MainViewModel>()
-    val  viewState by viewModel.backendState
+    val viewState by viewModel.backendState.observeAsState()
+//    val  viewState by viewModel.backendState
+    val coroutineScope = rememberCoroutineScope()
+
+
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -174,35 +182,22 @@ fun AddTechnician(
                     btnName = "Register",
                     modifier = Modifier,
                     onClickButton = {
+                        Log.d("TAG", "AddTechnician: Hello")
 
-                        viewModel.addTechnician(
-                            GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1))
 
-                        Log.d("test", "hi 1")
+                        coroutineScope.launch {
+                            viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
+                                // Execute your function here using the responseObject if needed
+                                // For example:
 
-                        when{
-                            viewState.loading->{
-                                // handle this
-                                Log.d("tech loading", "loading state")
-                            }
-
-                            viewState.error !=null->{
-                                Log.d("techAddError", "${viewState.error!!.data}")
-                            }
-
-                            viewState.response!=null->{
-                                Log.d("techAddSuccessfully", "${viewState.response!!.message}")
+                                Log.d("wada karpan hutta", responseObject.toString())
+                                if (responseObject != null) {
+                                    // Call your function here
+                                    Log.d("wada karpan hutta", "labbak maaha")
+                                    Log.d("sadhu sadhu", responseObject.message.toString())
+                                }
                             }
                         }
-
-
-
-
-                        Log.d("typeData", textFirstName)
-                        Log.d("typeData", textLastName)
-                        Log.d("typeData", textContactNumber)
-                        Log.d("checkedData", selectedServices.toString())
-
                     })
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -213,3 +208,5 @@ fun AddTechnician(
         Footer(navController,navyStatus)
     }
 }
+
+
