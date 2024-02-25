@@ -20,7 +20,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key.Companion.T
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,16 +37,21 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 @Composable
 fun AddTechnician(
     navController: NavController, navyStatus:String
 ) {
     val viewModel= viewModel<MainViewModel>()
-    val viewState by viewModel.backendState.observeAsState()
-//    val  viewState by viewModel.backendState
     val coroutineScope = rememberCoroutineScope()
+    val showDialog = remember { mutableStateOf(false) }
 
+    var status = remember { mutableStateOf(Int) }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var data by remember { mutableStateOf(T) }
 
     Column(
         modifier = defaultBackground,
@@ -185,28 +190,72 @@ fun AddTechnician(
                         Log.d("TAG", "AddTechnician: Hello")
 
 
-                        coroutineScope.launch {
-                            viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
-                                // Execute your function here using the responseObject if needed
-                                // For example:
 
-                                Log.d("wada karpan hutta", responseObject.toString())
-                                if (responseObject != null) {
-                                    // Call your function here
-                                    Log.d("wada karpan hutta", "labbak maaha")
-                                    Log.d("sadhu sadhu", responseObject.message.toString())
+                        coroutineScope.launch {
+                            try {
+                                viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
+
+                                    Log.d("wada karpan hutta", responseObject.toString())
+                                    if (responseObject != null) {
+                                        // Call your function here
+                                        Log.d("wada karpan hutta", "labbak maaha")
+                                        Log.d("sadhu sadhu", responseObject.message.toString())
+
+                                        if(responseObject.status==201){
+                                            showDialog.value=true
+                                            message= responseObject.message.toString()
+                                            buttonOneName= null.toString()
+                                            buttonTwoName=null.toString()
+
+                                            textFirstName = ""
+                                            textLastName = ""
+                                            textContactNumber = ""
+
+                                        }else if (responseObject.status==500){
+                                            showDialog.value=true
+                                            message= responseObject.message.toString()
+                                            buttonOneName= null.toString()
+                                            buttonTwoName=null.toString()
+                                        }else{
+                                            showDialog.value=true
+                                            message= responseObject.toString()
+                                            buttonOneName= null.toString()
+                                            buttonTwoName=null.toString()
+                                        }
+                                    }
                                 }
+                            }catch (e:SocketTimeoutException){
+                                // Handle timeout exception
+                                showDialog.value=true
+                                message= e.message.toString()
+                                buttonOneName= "Ok"
+                                buttonTwoName=null.toString()
+                                Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
+                            }catch (e:Exception){
+                                // Handle other exceptions
+                                showDialog.value=true
+                                message= e.message.toString()
+                                buttonOneName= "Ok"
+                                buttonTwoName=null.toString()
+                                Log.e("NetworkRequest", "Exception: ${e.message}")
                             }
                         }
                     })
+                if (showDialog.value){
+                    sweetAlertDialog(
+                        title = "Success",
+                        message = message,
+                        buttonOneName = buttonOneName,
+                        buttonTwoName = buttonTwoName,
+                        onConfirm = {showDialog.value=false}
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
         }
         Spacer(modifier = Modifier.height(26.dp))
         Footer(navController,navyStatus)
     }
 }
-
 
