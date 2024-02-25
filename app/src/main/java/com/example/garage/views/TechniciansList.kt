@@ -61,7 +61,7 @@ fun TechniciansList(
     ){
 
         var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
-            "Available","+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"))
+            "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),1)
 
         Header(menuClicked = {})
 
@@ -212,7 +212,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
             contentAlignment = Alignment.Center
         ){
 
-            Text(text = technician.getTechStatus(),textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+            Text(text = changeStatusType(technician),textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
 
         }
 
@@ -441,7 +441,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                             }, color = Color.Black, modifier = Modifier
                                 .weight(1f)
                                 .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechStatus(),color = Color.Black, modifier = Modifier.weight(1f))
+                            Text(text = changeStatusType(technician),color = Color.Black, modifier = Modifier.weight(1f))
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))

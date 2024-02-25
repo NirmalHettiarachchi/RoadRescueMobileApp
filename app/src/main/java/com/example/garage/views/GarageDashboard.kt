@@ -21,13 +21,13 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,11 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.garage.repository.MainViewModel
 import com.example.garage.viewModels.GarageDashboardViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.garage.viewModels.MainViewModel
 
 @Composable
 fun GarageDashboard(
@@ -114,11 +111,8 @@ fun GarageDashboard(
 @Composable
 fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
 
-    val garageViewModel:MainViewModel = viewModel()
-
-
-
-
+    val garageViewModel: MainViewModel = viewModel()
+    val viewState by garageViewModel.backendState.observeAsState()
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -280,20 +274,21 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                     garageViewModel.fetchBackend()
                                     Log.d("rsp","request is ok ")
 
-                                    val  viewState by garageViewModel.backendState
+//                                    val  viewState by garageViewModel.backendState
+
                                     when{
 
-                                        viewState.loading -> {
+                                        viewState!!.loading -> {
                                             // loading  wanna mona hari danna
-                                            Log.d("loading","${viewState.loading}")
+                                            Log.d("loading","${viewState?.loading}")
                                         }
 
-                                        viewState.error !=null ->{
-                                            Log.d("err","${viewState.error}")
+                                        viewState?.error !=null ->{
+                                            viewState?.error!!.message?.let { Log.d("err", "it") }
                                         }
 
-                                        viewState.response !=null -> {
-                                            Log.d("data","${viewState.response}")
+                                        viewState?.response !=null -> {
+                                            Log.d("data final","${viewState?.response!!.data}")
                                         }
                                     }
 
