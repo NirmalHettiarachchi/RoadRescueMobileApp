@@ -11,7 +11,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 
-private val ipV4Address="192.168.106.117"
+private val ipV4Address="10.22.162.54"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()

@@ -23,10 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
@@ -43,11 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -157,27 +154,28 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                CommonTextField(textFirstName, true, "First Name", Modifier.height(46.dp), false)
+                CommonTextField(textFirstName, true, "First Name", Modifier.height(46.dp), false,
+                    KeyboardType.Text)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(textLastName, true, "Last Name", Modifier.height(46.dp), false)
+                CommonTextField(textLastName, true, "Last Name", Modifier.height(46.dp), false,KeyboardType.Text)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(garageName, true, "Garage Name", Modifier.height(46.dp), false)
+                CommonTextField(garageName, true, "Garage Name", Modifier.height(46.dp), false,KeyboardType.Text)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(contactNumber, false, "Contact number", Modifier.height(46.dp), false)
+                CommonTextField(contactNumber, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number)
 
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                CommonTextField(email, true, "Email", Modifier.height(46.dp), false)
+                CommonTextField(email, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email)
 
 
                 //-----------------------------------------------------------------

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun sweetAlertDialog(
@@ -35,11 +36,25 @@ fun sweetAlertDialog(
                     verticalArrangement = Arrangement.SpaceAround,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    Text(
-                        text = title,
-                        style = textStyle5,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if(title.equals("Success")){
+                        Text(
+                            text = title,
+                            style = textStyle5,
+                            color = Color.Green
+                        )
+                    }else if(title.equals("Failed")){
+                        Text(
+                            text = title,
+                            style = textStyle5,
+                            color = Color.Red
+                        )
+                    }else{
+                        Text(
+                            text = title,
+                            style = textStyle5,
+                            color = Color.Black
+                        )
+                    }
                 }
             },
             text = {
@@ -51,12 +66,15 @@ fun sweetAlertDialog(
                     if (message != null) {
                         Text(
                             text = message,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = textStyle2,
+                            color = Color.Black,
+                            fontSize = 16.sp
                         )
                     }
                 }
             },
-            confirmButton = {}
+            confirmButton = {},
+            containerColor = Color(0xC1CCC0C0)
         )
     }else{
         AlertDialog(
@@ -83,7 +101,9 @@ fun sweetAlertDialog(
                     if (message != null) {
                         Text(
                             text = message,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = textStyle2,
+                            color = Color.Black,
+                            fontSize = 16.sp
                         )
                     }
                 }
@@ -96,7 +116,7 @@ fun sweetAlertDialog(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
 
-                    if (buttonOneName.isNullOrEmpty() || buttonTwoName.isNullOrEmpty()){
+                    if (buttonOneName.equals("null") || buttonTwoName.equals("null")){
                         Button(
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Gray)
@@ -111,7 +131,9 @@ fun sweetAlertDialog(
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Green)
                         ) {
-                            Text(text = buttonOneName)
+                            if (buttonOneName != null) {
+                                Text(text = buttonOneName)
+                            }
                         }
 
                         Spacer(modifier = Modifier.width(5.dp))
@@ -121,13 +143,16 @@ fun sweetAlertDialog(
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Green)
                         ) {
-                            Text(text = buttonTwoName)
+                            if (buttonTwoName != null) {
+                                Text(text = buttonTwoName)
+                            }
                         }
                     }
 
 
                 }
-            }
+            },
+            containerColor = Color(0xC1CCC0C0)
         )
     }
 }

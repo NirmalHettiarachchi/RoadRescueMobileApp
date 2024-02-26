@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,13 +33,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifier: Modifier,prefixStatus:Boolean):String{
+fun CommonTextField(
+    value:String,
+    isEditing:Boolean,
+    placeholderName:String,
+    modifier: Modifier,
+    prefixStatus:Boolean,
+    keyboardType: KeyboardType
+):String{
     var textFieldValue by remember { mutableStateOf(value) }
 
     Row(
@@ -88,7 +97,8 @@ fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifi
                         modifier = Modifier.padding(15.dp,0.dp,0.dp,0.dp),
                         fontFamily= fontFamily
                     )
-                }, suffix = {
+                },
+                suffix = {
                     if(prefixStatus){
                         IconButton(onClick = { /*TODO*/ }) {
                             Icon(
@@ -98,7 +108,10 @@ fun CommonTextField(value:String,isEditing:Boolean,placeholderName:String,modifi
                             )
                         }
                     }
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = keyboardType
+                )
             )
         }
     }

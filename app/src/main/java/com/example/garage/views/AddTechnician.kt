@@ -29,11 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key.Companion.T
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.models.GarageTechnician
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
@@ -46,8 +48,10 @@ fun AddTechnician(
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val showDialog = remember { mutableStateOf(false) }
+    var showProgressBar = remember { mutableStateOf(false) }
 
     var status = remember { mutableStateOf(Int) }
+    var title by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
@@ -96,13 +100,13 @@ fun AddTechnician(
                         .weight(1f)
                 ){
                     Spacer(modifier = Modifier.height(16.dp))
-                    textFirstName=CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false)
+                    textFirstName=CommonTextField(textFirstName, true, "First Name",Modifier.weight(1f),false,KeyboardType.Text)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false)
+                    textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false,KeyboardType.Text)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false)
+                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false,KeyboardType.Number)
                     Spacer(modifier = Modifier.height(16.dp))
 
                 }
@@ -187,12 +191,11 @@ fun AddTechnician(
                     btnName = "Register",
                     modifier = Modifier,
                     onClickButton = {
-                        Log.d("TAG", "AddTechnician: Hello")
-
 
 
                         coroutineScope.launch {
                             try {
+//                                showProgressBar.value=true
                                 viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
 
                                     Log.d("wada karpan hutta", responseObject.toString())
@@ -202,30 +205,38 @@ fun AddTechnician(
                                         Log.d("sadhu sadhu", responseObject.message.toString())
 
                                         if(responseObject.status==201){
-                                            showDialog.value=true
+                                            title="Success"
                                             message= responseObject.message.toString()
                                             buttonOneName= null.toString()
                                             buttonTwoName=null.toString()
+//                                            showProgressBar.value=false
+                                            showDialog.value=true
 
-                                            textFirstName = ""
-                                            textLastName = ""
-                                            textContactNumber = ""
+                                            textFirstName = textFirstName.trim()
+                                            textLastName = textLastName.trim()
+                                            textContactNumber = textContactNumber.trim()
 
                                         }else if (responseObject.status==500){
-                                            showDialog.value=true
+
+                                            title="Failed"
                                             message= responseObject.message.toString()
                                             buttonOneName= null.toString()
                                             buttonTwoName=null.toString()
-                                        }else{
+//                                            showProgressBar.value=false
                                             showDialog.value=true
+                                        }else{
+                                            title="Failed"
                                             message= responseObject.toString()
                                             buttonOneName= null.toString()
                                             buttonTwoName=null.toString()
+//                                            showProgressBar.value=false
+                                            showDialog.value=true
                                         }
                                     }
                                 }
                             }catch (e:SocketTimeoutException){
                                 // Handle timeout exception
+//                                showProgressBar.value=false
                                 showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "Ok"
@@ -233,6 +244,7 @@ fun AddTechnician(
                                 Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
                             }catch (e:Exception){
                                 // Handle other exceptions
+//                                showProgressBar.value=false
                                 showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "Ok"
@@ -241,13 +253,23 @@ fun AddTechnician(
                             }
                         }
                     })
+
+                // load progress bar
+                if(showProgressBar.value){
+                    circularIndicatorProgressBar()
+                }
+
+                // load response message
                 if (showDialog.value){
                     sweetAlertDialog(
-                        title = "Success",
+                        title = title,
                         message = message,
                         buttonOneName = buttonOneName,
                         buttonTwoName = buttonTwoName,
-                        onConfirm = {showDialog.value=false}
+                        onConfirm = {
+                            showDialog.value=false
+                            navController.navigate(route = Screen.TechnicianList.route)
+                        }
                     )
                 }
 
