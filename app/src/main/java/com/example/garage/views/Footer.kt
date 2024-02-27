@@ -22,10 +22,12 @@ import com.example.garage.repository.Screen
 
 @Composable
 fun Footer(
-    navController: NavController,
-    navStatus:String
-){
-    Row (
+    navigationToDashboardScreen: () -> Unit,
+    navigationToProfileScreen: () -> Unit,
+    navigationToTrackLocationScreen: () -> Unit,
+    navigationToActivitiesScreen: () -> Unit
+) {
+    Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier
@@ -38,11 +40,8 @@ fun Footer(
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
-                .clickable {
-                       navController.navigate(route = Screen.TechnicianList.route)
-                },
-            tint = Color.White,
-            contentDescription = "footer technician"
+                .clickable{ navigationToActivitiesScreen() },
+            tint = Color.Unspecified, contentDescription = null
         )
 
         /*Icon(
