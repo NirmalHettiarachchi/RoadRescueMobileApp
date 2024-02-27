@@ -73,7 +73,7 @@ fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivit
                     AuthHeader()
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(R.string.register_in_to_road_rescue),
+                        text = stringResource(R.string.log_in_to_road_rescue),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
