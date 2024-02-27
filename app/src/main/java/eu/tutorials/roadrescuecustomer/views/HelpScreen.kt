@@ -6,10 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +19,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
@@ -34,10 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
@@ -93,11 +98,20 @@ fun HelpScreen(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Help",
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
+                    Row (modifier = Modifier.align(Alignment.CenterHorizontally)){
+                        Icon(
+                            painter = painterResource(id = R.drawable.phone),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                                .size(30.dp),
+                            tint = Color.Unspecified
+                        )
+                        Text(
+                            text = "Help",
+                            style = textStyle1
+                        )
+                    }
                     RequestHelpBox()
                 }
             }
