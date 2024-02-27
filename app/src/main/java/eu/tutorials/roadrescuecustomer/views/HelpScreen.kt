@@ -2,6 +2,8 @@ package eu.tutorials.roadrescuecustomer.views
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,15 +19,24 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
@@ -96,6 +107,7 @@ fun HelpScreen(
 
 @Composable
 fun RequestHelpBox() {
+    var showContactSupportWindow by remember { mutableStateOf(false) }
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -122,15 +134,77 @@ fun RequestHelpBox() {
             Spacer(modifier = Modifier.height(16.dp))
 
             CommonButton(btnName = "Request Help", modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                
+                showContactSupportWindow = true
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if(showContactSupportWindow) {
+                RequestHelpWindow { showContactSupportWindow = false }
+            }
         }
     }
 }
 
 @Composable
-fun RequestHelpWindow() {
-    AlertDialog(onDismissRequest = { /*TODO*/ }, confirmButton = { /*TODO*/ })
+fun RequestHelpWindow(onDismiss: () -> Unit) {
+    var issue by remember { mutableStateOf("") }
+    var issueDetails by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        tonalElevation = 16.dp,
+        modifier = Modifier
+            .padding(8.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = Color(0xFFDCE4EC)
+            ),
+        containerColor = Color(0xFFDCE4EC),
+        confirmButton = {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Contact Support",
+                    style = textStyle2
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                var issueList by remember { mutableStateOf(listOf<String>()) }
+
+                issue = dropDown("Issue", issueList)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = issueDetails,
+                    onValueChange = { issueDetails = it },
+                    modifier = Modifier
+                        .height(100.dp)
+                        .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                        .shadow(2.dp, shape = RoundedCornerShape(20))
+                        .background(Color.White),
+                    placeholder = {
+                        Text(
+                            text = "Write more about your issue ... ",
+                            fontSize = 12.sp,
+                            color = Color(0xFF253555)
+                        )
+                    },
+                    textStyle = TextStyle(
+                        color = Color(0xFF253555)
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                CommonButton(btnName = "Submit", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    )
 }
