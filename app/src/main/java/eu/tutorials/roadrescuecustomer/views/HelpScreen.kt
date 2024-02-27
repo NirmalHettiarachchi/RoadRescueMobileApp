@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,9 +59,25 @@ fun HelpScreen(
             )
         }
     ) {
-        Scaffold {
+        Scaffold (
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(
+                    navigationToDashboardScreen,
+                    navigationToProfileScreen,
+                    navigationToTrackLocationScreen,
+                    navigationToActivitiesScreen
+                )
+            }
+        ){
             Column(
-                backgroundModifier.padding(it),
+                backgroundModifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
@@ -74,7 +92,6 @@ fun HelpScreen(
                     )
                     RequestHelpBox()
                 }
-                Footer(navigationToDashboardScreen, navigationToProfileScreen, navigationToTrackLocationScreen, navigationToActivitiesScreen)
             }
         }
     }

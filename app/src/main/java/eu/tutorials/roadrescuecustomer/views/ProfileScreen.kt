@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -78,9 +80,25 @@ fun ProfileScreen(
             )
         }
     ) {
-        Scaffold {
+        Scaffold (
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(
+                    navigationToDashboardScreen,
+                    {},
+                    navigationToTrackLocationScreen,
+                    navigationToActivitiesScreen
+                )
+            }
+        ){
             Column(
-                backgroundModifier.padding(it),
+                backgroundModifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(
@@ -88,25 +106,18 @@ fun ProfileScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Column {
-                        Header {
-                            scope.launch { drawerState.open() }
-                        }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Customer Profile",
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            style = textStyle1
-                        )
-                        utilFun()
-                        ProfileBox(profileViewModel)
-                        HelpBox()
+                        Column {
+                            Text(
+                                text = "Customer Profile",
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                style = textStyle1
+                            )
+                            utilFun()
+                            ProfileBox(profileViewModel)
+                            HelpBox()
+                        }
                     }
-                    Footer(
-                        navigationToDashboardScreen,
-                        {},
-                        navigationToTrackLocationScreen,
-                        navigationToActivitiesScreen
-                    )
                 }
             }
         }

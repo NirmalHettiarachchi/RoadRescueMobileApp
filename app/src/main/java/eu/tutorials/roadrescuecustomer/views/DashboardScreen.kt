@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -92,15 +94,28 @@ fun DashboardScreen(
                         )
                     }
                 ) {
-        Scaffold {
+        Scaffold (
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(
+                    {},
+                    navigationToProfileScreen,
+                    navigationToTrackLocationScreen,
+                    navigationToActivitiesScreen
+                )
+            }
+        ){
             Column(
-                backgroundModifier.padding(it),
+                backgroundModifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
-                    Header {
-                        scope.launch {drawerState.open()}
-                    }
                     //Welcome text
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -135,7 +150,6 @@ fun DashboardScreen(
                     }
                     HelpBox()
                 }
-                Footer({}, navigationToProfileScreen, navigationToTrackLocationScreen, navigationToActivitiesScreen)
             }
         }
     }
