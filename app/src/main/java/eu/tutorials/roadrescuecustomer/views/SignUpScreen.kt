@@ -82,9 +82,10 @@ fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivit
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     SignUpBox(navHostController, mainActivity)
                     HelpBox()
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -335,7 +336,6 @@ fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
             navController.navigate("loginscreen")
         }
         Spacer(modifier = Modifier.height(8.dp))
-
     }
 }
 

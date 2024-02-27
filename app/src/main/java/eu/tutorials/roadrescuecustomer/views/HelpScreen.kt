@@ -110,15 +110,15 @@ fun RequestHelpBox() {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Click on the button below to contact support...",
+                text = "Click on the button below to contact ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
-//            Text(
-//                text = "Just click on the button below...",
-//                modifier = Modifier.align(Alignment.CenterHorizontally),
-//                style = textStyle2
-//            )
+            Text(
+                text = "support...",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             CommonButton(btnName = "Request Help", modifier = Modifier.align(Alignment.CenterHorizontally)) {

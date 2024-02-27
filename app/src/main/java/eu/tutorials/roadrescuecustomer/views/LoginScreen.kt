@@ -65,9 +65,10 @@ fun LoginScreen(navController: NavHostController, context: MainActivity) {
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     LoginBox(navController, context)
                     HelpBox()
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
