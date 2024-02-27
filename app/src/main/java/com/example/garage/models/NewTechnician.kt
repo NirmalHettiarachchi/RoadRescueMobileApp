@@ -14,3 +14,8 @@ data class NewTechnician(
     @SerializedName("techStatus")
     val techStatus:Int,
 )
+
+data class SearchVarible(
+    @SerializedName("searchId")
+    val searchId:String
+)

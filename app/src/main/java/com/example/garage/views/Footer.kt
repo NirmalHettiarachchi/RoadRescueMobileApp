@@ -25,6 +25,8 @@ fun Footer(
     navController: NavController,
     navStatus:String
 ){
+
+
     Row (
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom,
@@ -39,7 +41,8 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                       navController.navigate(route = Screen.TechnicianList.route)
+                    navController.navigate(route = Screen.TechnicianList.route)
+                    // loadAllTechnicians()
                 },
             tint = Color.White,
             contentDescription = "footer technician"
@@ -75,8 +78,8 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    val screen=Screen.Activities.route
-                    if (screen != navStatus){
+                    val screen = Screen.Activities.route
+                    if (screen != navStatus) {
                         navController.navigate(route = screen)
                     }
                 }
@@ -91,7 +94,7 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                           navController.navigate(route = Screen.GarageProfile.route)
+                    navController.navigate(route = Screen.GarageProfile.route)
                 }
             ,
             tint = Color.Unspecified,
@@ -100,3 +103,4 @@ fun Footer(
 
     }
 }
+

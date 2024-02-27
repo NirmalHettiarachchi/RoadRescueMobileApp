@@ -42,6 +42,8 @@ class GarageTechnician {
         this._techStatus = _techStatus
     }
 
+    constructor()
+
 
     fun getTechId(): String {
         return this._techId

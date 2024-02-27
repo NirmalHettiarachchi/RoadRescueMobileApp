@@ -22,15 +22,24 @@ class MainViewModel : ViewModel() {
 
     val backendState = MutableLiveData(ResponseState())
 
-    fun fetchBackend() {
+    suspend fun getTechnicians(
+        searchId:String,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ) {
+
+        val deferred = CompletableDeferred<ResponseObject>()
+
         viewModelScope.launch {
             Log.d("TAG", "HEllo Main")
             try {
-                val call = garageService.getData()
+                Log.d("TAG", "HEllo Main 1")
+                val call = garageService.getTechnician(searchId,option)
+                Log.d("TAG", "HEllo Main 2")
                 call.enqueue(object : Callback<ResponseBody> {
-                    override fun onResponse(
-                        call: Call<ResponseBody>, response: Response<ResponseBody>,
-                    ) {
+
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        Log.d("TAG", "HEllo Main 3")
                         if (response.isSuccessful) {
                             val responseBody = response.body()
                             responseBody?.let {
@@ -40,55 +49,28 @@ class MainViewModel : ViewModel() {
                                 val message = jsonObject.optString("message")
                                 val data = jsonObject.optString("data")
 
-                                Log.d("TAG", status.toString())
-                                Log.d("TAG", message)
-                                Log.d("TAG", data)
+                                val responseObject = ResponseObject(status, message, data)
 
-                                backendState.value = backendState.value?.copy(
-                                    loading = false,
-                                    error = null,
-                                    response = ResponseObject(status, message, data)
-                                )
-
-
+                                onResponseReceived(responseObject) // Execute the function passed as lambda parameter
+                                deferred.complete(responseObject)
                             }
 
                             Log.d("Successfully", response.body().toString())
 
-                        } else {
-                            Log.d("Unsuccessfully", "response is not successfully")
-                            backendState.value = backendState.value?.copy(
-                                loading = false,
-                                error = ResponseObject(400, "Bad Request", "Bad Request"),
-                                response = null
-
-                            )
                         }
                     }
 
                     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        Log.d("onFailure", "response onFailure")
-                        backendState.value = backendState.value?.copy(
-                            loading = false,
-                            error = ResponseObject(
-                                505,
-                                "HTTP Version Not Supported",
-                                "HTTP Version Not Supported"
-                            )
-
-                        )
+                        deferred.completeExceptionally(t)
                     }
 
                 })
 
             } catch (e: Exception) {
-                backendState.value = backendState.value?.copy(
-                    loading = false,
-                    error = ResponseObject(405, "Method Not Allowed", "Method Not Allowed")
-
-                )
+                deferred.completeExceptionally(e)
             }
         }
+        deferred.await()
     }
 
 

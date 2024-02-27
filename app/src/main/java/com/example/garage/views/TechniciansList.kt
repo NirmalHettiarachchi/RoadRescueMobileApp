@@ -1,5 +1,7 @@
 package com.example.garage.views
 
+
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,13 +33,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.Key.Companion.T
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,14 +52,50 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.garage.repository.Screen
 import com.example.garage.models.GarageTechnician
+import com.example.garage.models.ResponseObject
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
     navController: NavController, navyStatus:String
 ){
+
+    val viewModel= viewModel<MainViewModel>()
+    val coroutineScope = rememberCoroutineScope()
+    var showLoadTechnicians by remember { mutableStateOf(false) }
+
+    var status = remember { mutableStateOf(Int) }
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var data by remember { mutableStateOf(T) }
+
+
+    LaunchedEffect(Unit) {
+        Log.d("sadu sadu paka 1",data.toString())
+        val response=loadAllTechnicians(viewModel,coroutineScope)
+        Log.d("response 1","$response")
+        if (response != null) {
+            Log.d("response 2","${response.data}")
+            if(response?.status==200){
+                data= response.data as Key
+                Log.d("response null","$data")
+                showLoadTechnicians=true
+            }
+        }else{
+            Log.d("response null","null")
+        }
+
+    }
+
+    Log.d("sadu sadu paka",data.toString())
 
     Column (
         modifier = defaultBackground,
@@ -140,6 +182,12 @@ fun TechniciansList(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
+
+                //
+                if (showLoadTechnicians){
+                    val techList = arrayListOf<String>()
+                    Log.d("check data in if condition ",data.toString())
+                }
                 TechniciansLoadStretcher(techDetails,navController,navyStatus)
                 Divider()
                 TechniciansLoadStretcher(techDetails,navController,navyStatus)
@@ -169,9 +217,6 @@ fun TechniciansList(
                 Divider()
             }
 
-
-
-
         }
 
         Spacer(modifier = Modifier.height(26.dp))
@@ -180,8 +225,34 @@ fun TechniciansList(
     }
 }
 
+suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
+    var response: ResponseObject? =null
+
+        try {
+            viewModel.getTechnicians("","getAll"){responseObject ->
+                if (responseObject!=null){
+                    Log.d("response","${responseObject.data}")
+                    response=responseObject
+                }else{
+                    response= ResponseObject(400,"response is null",null)
+                }
+            }
+        }catch (e:SocketTimeoutException){
+           // handle
+            response=ResponseObject(408,"Request time out.\n Please try again.",e.localizedMessage)
+        }catch (e:Exception){
+            response=ResponseObject(500,"Exception error.",e.localizedMessage)
+        }
+
+    return response
+}
+
 @Composable
-fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavController, navyStatus:String){
+fun TechniciansLoadStretcher(
+    technician: GarageTechnician,
+    navController: NavController,
+    navyStatus:String
+){
     Row (
         modifier = Modifier
             .fillMaxWidth(),
@@ -190,7 +261,6 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
     ){
 
         var showDeleteDialog by remember { mutableStateOf(false) }
-        var showEditDialog by remember { mutableStateOf(false) }
         var showInfoDialog by remember { mutableStateOf(false) }
 
         Box (
@@ -232,7 +302,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Delete,
                         contentDescription =null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
@@ -246,7 +316,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Edit,
                         contentDescription =null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
@@ -258,7 +328,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Info,
                         contentDescription = null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
