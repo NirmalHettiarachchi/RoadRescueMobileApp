@@ -81,9 +81,6 @@ fun HelpScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
-                    Header {
-                        scope.launch {drawerState.open()}
-                    }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Help",
