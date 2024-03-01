@@ -56,7 +56,6 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import org.json.JSONArray
 import java.net.SocketTimeoutException
@@ -69,34 +68,64 @@ fun TechniciansList(
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
     var showLoadTechnicians by remember { mutableStateOf(false) }
+    var showMessageDialog by remember { mutableStateOf(false) }
 
-    var status = remember { mutableStateOf(Int) }
+    var status by remember { mutableStateOf(0) }
     var title by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
     var techList by remember { mutableStateOf("") }
-    val gson = Gson()
-    var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
-        "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),1)
+    var techDetails= GarageTechnician()
 
     LaunchedEffect(Unit) {
 
         val response=loadAllTechnicians(viewModel,coroutineScope)
-        Log.d("response 1","$response")
         if (response != null) {
-            Log.d("response 2","${response.data}")
             if(response?.status==200){
+
                 techList= response.data!!.toString()
                 showLoadTechnicians=true
+
+            }else if(response.status==400){
+                title=response.status.toString()
+                message= response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+
+            }else if(response.status==404){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+
+            }else if(response.status==500){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+            }else if(response.status==508){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+            }else{
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
             }
         }else{
+            status=401
+            message="Cannot call the sever"
+            buttonOneName="Ok"
+            showMessageDialog=true
             Log.d("response null","null")
         }
 
     }
 
-//    Log.d("sadu sadu paka",data.toString())
+
 
     Column (
         modifier = defaultBackground,
@@ -174,7 +203,7 @@ fun TechniciansList(
                 }
             }
 
-            // Load technicians   list ekk dala load karanna
+
 
             Column(
                 modifier = Modifier
@@ -182,7 +211,7 @@ fun TechniciansList(
                     .verticalScroll(rememberScrollState())
             ) {
 
-                //
+                // load all technicians in the table
                 if (showLoadTechnicians){
 
                     val jsonArray= JSONArray(techList)
@@ -212,6 +241,18 @@ fun TechniciansList(
 
                 }
 
+                // load response message
+                if (showMessageDialog){
+                    sweetAlertDialog(
+                        title = title,
+                        message = message,
+                        buttonOneName = buttonOneName,
+                        buttonTwoName = buttonTwoName,
+                        onConfirm = {
+                            showMessageDialog=false
+                        }
+                    )
+                }
 
             }
 
@@ -225,29 +266,7 @@ fun TechniciansList(
 
 
 
-suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
-    var response: ResponseObject? =null
 
-        try {
-            viewModel.getTechnicians("","getAll"){responseObject ->
-                if (responseObject!=null){
-                    Log.d("response","${responseObject.data}")
-                    response=responseObject
-//                    responseObject.data.forEach{x->}
-
-                }else{
-                    response= ResponseObject(400,"response is null",null)
-                }
-            }
-        }catch (e:SocketTimeoutException){
-           // handle
-            response=ResponseObject(408,"Request time out.\n Please try again.",e.localizedMessage)
-        }catch (e:Exception){
-            response=ResponseObject(500,"Exception error.",e.localizedMessage)
-        }
-
-    return response
-}
 
 @Composable
 fun TechniciansLoadStretcher(
@@ -584,6 +603,27 @@ fun TechniciansLoadStretcher(
     }
 }
 
+
+suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
+    var response: ResponseObject? =null
+
+    try {
+        viewModel.getTechnicians("","getAll"){responseObject ->
+            if (responseObject!=null){
+                response=responseObject
+            }else{
+                response= ResponseObject(400,"response is null",null)
+            }
+        }
+    }catch (e:SocketTimeoutException){
+        // handle
+        response=ResponseObject(508,"Request time out.\n Please try again.",e.localizedMessage)
+    }catch (e:Exception){
+        response=ResponseObject(404 ,"Exception error.",e.localizedMessage)
+    }
+
+    return response
+}
 
 
 //    var techList by remember { mutableStateOf(Any()) }

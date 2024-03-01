@@ -1,6 +1,5 @@
 package com.example.garage.viewModels
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,15 +30,10 @@ class MainViewModel : ViewModel() {
         val deferred = CompletableDeferred<ResponseObject>()
 
         viewModelScope.launch {
-            Log.d("TAG", "HEllo Main")
             try {
-                Log.d("TAG", "HEllo Main 1")
                 val call = garageService.getTechnician(searchId,option)
-                Log.d("TAG", "HEllo Main 2")
                 call.enqueue(object : Callback<ResponseBody> {
-
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                        Log.d("TAG", "HEllo Main 3")
                         if (response.isSuccessful) {
                             val responseBody = response.body()
                             responseBody?.let {
@@ -51,11 +45,9 @@ class MainViewModel : ViewModel() {
 
                                 val responseObject = ResponseObject(status, message, data)
 
-                                onResponseReceived(responseObject) // Execute the function passed as lambda parameter
+                                onResponseReceived(responseObject)
                                 deferred.complete(responseObject)
                             }
-
-                            Log.d("Successfully", response.body().toString())
 
                         }
                     }

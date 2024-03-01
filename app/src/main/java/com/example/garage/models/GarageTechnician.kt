@@ -95,4 +95,4 @@ class GarageTechnician {
 }
 
 
-data class Tech(val techName: String, val techStatus: String)
+
