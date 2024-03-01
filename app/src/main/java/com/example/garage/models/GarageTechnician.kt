@@ -93,3 +93,6 @@ class GarageTechnician {
         this._techExpertiseAreas
     }
 }
+
+
+data class Tech(val techName: String, val techStatus: String)

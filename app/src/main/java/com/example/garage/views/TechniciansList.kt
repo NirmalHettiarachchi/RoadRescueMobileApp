@@ -42,8 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.Key.Companion.T
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +56,9 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
+import org.json.JSONArray
 import java.net.SocketTimeoutException
 
 @Composable
@@ -75,18 +75,19 @@ fun TechniciansList(
     var message by remember { mutableStateOf("") }
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
-    var data by remember { mutableStateOf(T) }
-
+    var techList by remember { mutableStateOf("") }
+    val gson = Gson()
+    var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
+        "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),1)
 
     LaunchedEffect(Unit) {
-        Log.d("sadu sadu paka 1",data.toString())
+
         val response=loadAllTechnicians(viewModel,coroutineScope)
         Log.d("response 1","$response")
         if (response != null) {
             Log.d("response 2","${response.data}")
             if(response?.status==200){
-                data= response.data as Key
-                Log.d("response null","$data")
+                techList= response.data!!.toString()
                 showLoadTechnicians=true
             }
         }else{
@@ -95,15 +96,14 @@ fun TechniciansList(
 
     }
 
-    Log.d("sadu sadu paka",data.toString())
+//    Log.d("sadu sadu paka",data.toString())
 
     Column (
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-        var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
-            "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),1)
+
 
         Header(menuClicked = {})
 
@@ -122,7 +122,6 @@ fun TechniciansList(
                         navController.navigate(route = Screen.AddTechnician.route)
                     }
                 )
-
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -185,36 +184,35 @@ fun TechniciansList(
 
                 //
                 if (showLoadTechnicians){
-                    val techList = arrayListOf<String>()
-                    Log.d("check data in if condition ",data.toString())
-                }
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
 
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
+                    val jsonArray= JSONArray(techList)
+
+                    for (i in 0 until jsonArray.length()){
+                        val jsonObject=jsonArray.getJSONObject(i)
+                        val techId=jsonObject.getString("techId")
+                        val techFirstName=jsonObject.getString("techFirstName")
+                        val techLastName=jsonObject.getString("techLastName")
+                        val techStatus=jsonObject.getString("techStatus")
+                        val techContactNumber=jsonObject.getString("techContactNumb")
+
+                        techDetails.setTechId(techId)
+                        techDetails.setTechFirstName(techFirstName)
+                        techDetails.setTechLastName(techLastName)
+                        techDetails.setTechContactNumber(techContactNumber)
+
+                        if (techStatus.equals("Available")){
+                            techDetails.setTechStatus(1)
+                        }else{
+                            techDetails.setTechStatus(0)
+                        }
+
+                        TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                        Divider()
+                    }
+
+                }
+
+
             }
 
         }
@@ -225,6 +223,8 @@ fun TechniciansList(
     }
 }
 
+
+
 suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
     var response: ResponseObject? =null
 
@@ -233,6 +233,8 @@ suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: Coroutin
                 if (responseObject!=null){
                     Log.d("response","${responseObject.data}")
                     response=responseObject
+//                    responseObject.data.forEach{x->}
+
                 }else{
                     response= ResponseObject(400,"response is null",null)
                 }
@@ -396,10 +398,10 @@ fun TechniciansLoadStretcher(
                 )
         }
 
-
+        // more info
         if (showInfoDialog){
             Dialog(
-                onDismissRequest = {  },
+                onDismissRequest = { showInfoDialog=false  },
                 content = {
                     Column (
                         modifier = Modifier
@@ -429,7 +431,7 @@ fun TechniciansLoadStretcher(
                                 )
                             }
 
-                            IconButton(onClick = { showInfoDialog = false  }) {
+                            IconButton(onClick = { showInfoDialog=false  }) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "close icon",
@@ -506,6 +508,31 @@ fun TechniciansLoadStretcher(
                                 ) {
                                     append("•  ")
                                 }
+                                append("Contact ")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Text(text = technician.getTechContactNumber(),color = Color.Black, modifier = Modifier.weight(1f))
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
                                 append("Status ")
 
                             }, color = Color.Black, modifier = Modifier
@@ -556,3 +583,7 @@ fun TechniciansLoadStretcher(
 
     }
 }
+
+
+
+//    var techList by remember { mutableStateOf(Any()) }

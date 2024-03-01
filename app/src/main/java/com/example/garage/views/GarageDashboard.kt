@@ -22,14 +22,20 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun GarageDashboard(
@@ -55,57 +62,83 @@ fun GarageDashboard(
     navStatus:String,
 
 ) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent(){
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                }
+            )
+        }
+    ) {
+        Scaffold (
+            topBar = {Header {
+                scope.launch { drawerState.open() }
+            }},
+            bottomBar = { Footer(navController,navStatus)
+            }
+        ){
+            Column (
+                modifier = defaultBackground.padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+                ){
+
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Welcome, ${garageDetails.getGarageName()}",
+                    color = Color(0xFF253555),
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = textStyle4
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.84f)
+                        .fillMaxHeight(0.85f)
+                        .verticalScroll(state = rememberScrollState()),
+                    shape= RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+                    border = BorderStroke(width = 2.dp, Color.White),
+
+                    ) {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Load are service requests
+
+                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+            }
+        }
+    }
+}
 //GarageApiClient.getGarage()
 
 
-    Column (
-        modifier = defaultBackground,
-        horizontalAlignment = Alignment.CenterHorizontally,
 
-    ){
 
-        Header(menuClicked = {})
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Welcome, ${garageDetails.getGarageName()}",
-            color = Color(0xFF253555),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            style = textStyle4
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.84f)
-                .fillMaxHeight(0.85f)
-                .verticalScroll(state = rememberScrollState()),
-            shape= RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
-            border = BorderStroke(width = 2.dp, Color.White),
-
-            ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Load are service requests
-
-            ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Footer(navController,navStatus)
-    }
-}
 
 
 @Composable

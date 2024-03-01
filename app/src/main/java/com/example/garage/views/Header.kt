@@ -1,7 +1,6 @@
 package com.example.garage.views
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -36,7 +35,7 @@ fun Header(menuClicked:()->Unit) {
             navigationIcon = {
                 IconButton(
                     onClick = {
-                        // menuClicked()
+                         menuClicked()
                     }
                 ) {
                     Icon(
