@@ -1,8 +1,9 @@
-package com.example.garage.views
+package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,78 +29,91 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
+import androidx.navigation.NavHostController
+import com.google.maps.android.compose.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun TrackLocationScreen(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
-
-){
-    val drawerState= rememberDrawerState(DrawerValue.Closed)
-    val scope= rememberCoroutineScope()
+    navigationToActivitiesScreen: () -> Unit,
+    currentStateViewModel: CurrentStateViewModel,
+    locationViewModel: LocationViewModel,
+    navHostController: NavHostController,
+    context: MainActivity
+) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                   /* SidebarContent {
-                        scope.launch { drawerState.close() }
-                    }*/
+                    SidebarContent({
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }, navHostController, context)
                 }
             )
         }
     ) {
-        Scaffold{
+        Scaffold {
             Column(
                 backgroundModifier.padding(it),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
-                    /*Header {
+                    Header {
                         scope.launch { drawerState.open() }
-                    }*/
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Track Location",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    if (true){
-                        noPendingActivityTrackLocationScreen()
-                    }else{
-                        pendingActivityTrackLocationScreen(
-                            //locationViewModel
+                    if (!currentStateViewModel.isServiceRequested.value) {
+                        NoPendingActivityTrackLocationScreen()
+                    } else {
+                        PendingActivityTrackLocationScreen(
+                            locationViewModel,
                         )
                     }
                     HelpBox()
                 }
-              // Footer(navigationToDashboardScreen,navigationToProfileScreen)
+                Footer(navigationToDashboardScreen, navigationToProfileScreen, {}, navigationToActivitiesScreen)
             }
         }
     }
 }
 
-
 @Composable
-fun noPendingActivityTrackLocationScreen(){
+fun NoPendingActivityTrackLocationScreen() {
     Card(
-        modifier= cardModifier,
-        border= BorderStroke(width = 2.dp,  Color.White),
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))
-    ){
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(128.dp))
             Text(
-                text = "No any pending sever request !",
+                text = "No any pending service requests!",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -108,30 +122,28 @@ fun noPendingActivityTrackLocationScreen(){
     }
 }
 
-
 @Composable
-fun pendingActivityTrackLocationScreen(
-    //locationViewModel: LocationViewModel
-){
+fun PendingActivityTrackLocationScreen(
+    locationViewModel: LocationViewModel,
+) {
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
-                text = "A technician from Tech Garage is",
+                text = "A technician from Tech Garage is ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
-
             Text(
                 text = "on the way to your location . . .",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -144,16 +156,15 @@ fun pendingActivityTrackLocationScreen(
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
-
             //displayLocation
-            /*LocationDisplay(
+            LocationDisplay(
                 locationViewModel = locationViewModel,
                 modifier = Modifier
                     .border(width = 2.dp, color = Color.White)
                     .size(320.dp)
                     .align(Alignment.CenterHorizontally)
                     .shadow(elevation = 8.dp)
-            )*/
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = { },
@@ -168,15 +179,39 @@ fun pendingActivityTrackLocationScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-
         }
     }
 }
 
 @Composable
 fun LocationDisplay(
-    locationViewModel: ViewModel,
+    locationViewModel: LocationViewModel,
     modifier: Modifier
-){
-    //val location =locationViewModel.location.value
+) {
+    val location = locationViewModel.location.value
+
+    if (location != null) {
+//        Text("Location: ${location.latitude} ${location.longitude}")
+        val curLocation = LatLng(location.latitude, location.longitude)
+
+        val cameraPosition = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(curLocation, 15f)
+        }
+        Box(
+            modifier = modifier
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(), // Ensure the map fills the entire Box
+                cameraPositionState = cameraPosition
+            ) {
+                Marker(
+                    state = MarkerState(position = curLocation),
+                    title = "Your Location"
+                )
+            }
+        }
+
+    } else {
+        //
+    }
 }
