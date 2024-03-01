@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,8 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -154,7 +152,8 @@ fun TechnicianProfile(
                     )
 
 
-                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier,false )
+                    CommonTextField(value = textTechName, isEditing = false, placeholderName = "Technician Name", modifier =Modifier,false,
+                        KeyboardType.Text )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -179,7 +178,7 @@ fun TechnicianProfile(
                     Spacer(modifier = Modifier.height(8.dp))
 
 
-                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp),true )
+                    CommonTextField(value = textTechContactNub, isEditing = false, placeholderName = "Phone Number", modifier =Modifier.height(52.dp),true,KeyboardType.Number )
 
                     Spacer(modifier = Modifier.height(16.dp))
 

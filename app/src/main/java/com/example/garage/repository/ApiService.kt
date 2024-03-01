@@ -9,9 +9,15 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 
-private val ipV4Address="192.168.106.117"
+// redmi ip = 192.168.38.117
+// student wifi = 10.22.162.54
+// bijja = 192.168.1.102
+
+
+private val ipV4Address="192.168.1.102"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
@@ -22,9 +28,9 @@ interface ApiService {
 
     @GET("garage")
     fun getData(): Call<ResponseBody>
-
+    @Headers("Content-Type: application/json")
     @GET("technician")
-    fun getTechnician(): Call<ResponseBody>
+    fun getTechnician(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
 
     @Headers("Content-Type: application/json")
     @POST("technician")

@@ -1,5 +1,7 @@
 package com.example.garage.views
 
+
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,9 +33,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,22 +50,89 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.garage.repository.Screen
 import com.example.garage.models.GarageTechnician
+import com.example.garage.models.ResponseObject
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import org.json.JSONArray
+import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
     navController: NavController, navyStatus:String
 ){
 
+    val viewModel= viewModel<MainViewModel>()
+    val coroutineScope = rememberCoroutineScope()
+    var showLoadTechnicians by remember { mutableStateOf(false) }
+    var showMessageDialog by remember { mutableStateOf(false) }
+
+    var status by remember { mutableStateOf(0) }
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var techList by remember { mutableStateOf("") }
+    var techDetails= GarageTechnician()
+
+    LaunchedEffect(Unit) {
+
+        val response=loadAllTechnicians(viewModel,coroutineScope)
+        if (response != null) {
+            if(response?.status==200){
+
+                techList= response.data!!.toString()
+                showLoadTechnicians=true
+
+            }else if(response.status==400){
+                title=response.status.toString()
+                message= response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+
+            }else if(response.status==404){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+
+            }else if(response.status==500){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+            }else if(response.status==508){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+            }else{
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showMessageDialog=true
+            }
+        }else{
+            status=401
+            message="Cannot call the sever"
+            buttonOneName="Ok"
+            showMessageDialog=true
+            Log.d("response null","null")
+        }
+
+    }
+
+
+
     Column (
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-        var techDetails= GarageTechnician("T-001","Thiran","Sasanka",
-            "+94761339805", listOf("Engine Repair","BreakSystem repair","Oil & filter change"),1)
+
 
         Header(menuClicked = {})
 
@@ -80,7 +151,6 @@ fun TechniciansList(
                         navController.navigate(route = Screen.AddTechnician.route)
                     }
                 )
-
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -133,44 +203,58 @@ fun TechniciansList(
                 }
             }
 
-            // Load technicians   list ekk dala load karanna
+
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
 
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
-                TechniciansLoadStretcher(techDetails,navController,navyStatus)
-                Divider()
+                // load all technicians in the table
+                if (showLoadTechnicians){
+
+                    val jsonArray= JSONArray(techList)
+
+                    for (i in 0 until jsonArray.length()){
+                        val jsonObject=jsonArray.getJSONObject(i)
+                        val techId=jsonObject.getString("techId")
+                        val techFirstName=jsonObject.getString("techFirstName")
+                        val techLastName=jsonObject.getString("techLastName")
+                        val techStatus=jsonObject.getString("techStatus")
+                        val techContactNumber=jsonObject.getString("techContactNumb")
+
+                        techDetails.setTechId(techId)
+                        techDetails.setTechFirstName(techFirstName)
+                        techDetails.setTechLastName(techLastName)
+                        techDetails.setTechContactNumber(techContactNumber)
+
+                        if (techStatus.equals("Available")){
+                            techDetails.setTechStatus(1)
+                        }else{
+                            techDetails.setTechStatus(0)
+                        }
+
+                        TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                        Divider()
+                    }
+
+                }
+
+                // load response message
+                if (showMessageDialog){
+                    sweetAlertDialog(
+                        title = title,
+                        message = message,
+                        buttonOneName = buttonOneName,
+                        buttonTwoName = buttonTwoName,
+                        onConfirm = {
+                            showMessageDialog=false
+                        }
+                    )
+                }
+
             }
-
-
-
 
         }
 
@@ -180,8 +264,16 @@ fun TechniciansList(
     }
 }
 
+
+
+
+
 @Composable
-fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavController, navyStatus:String){
+fun TechniciansLoadStretcher(
+    technician: GarageTechnician,
+    navController: NavController,
+    navyStatus:String
+){
     Row (
         modifier = Modifier
             .fillMaxWidth(),
@@ -190,7 +282,6 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
     ){
 
         var showDeleteDialog by remember { mutableStateOf(false) }
-        var showEditDialog by remember { mutableStateOf(false) }
         var showInfoDialog by remember { mutableStateOf(false) }
 
         Box (
@@ -232,7 +323,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Delete,
                         contentDescription =null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
@@ -246,7 +337,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Edit,
                         contentDescription =null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
@@ -258,7 +349,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                         imageVector = Icons.Outlined.Info,
                         contentDescription = null,
                         modifier = Modifier
-                            .background(Color.White, shape = CircleShape)
+                            .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
                             .size(25.dp),
                         tint = Color.Black
@@ -326,10 +417,10 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                 )
         }
 
-
+        // more info
         if (showInfoDialog){
             Dialog(
-                onDismissRequest = {  },
+                onDismissRequest = { showInfoDialog=false  },
                 content = {
                     Column (
                         modifier = Modifier
@@ -359,7 +450,7 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                                 )
                             }
 
-                            IconButton(onClick = { showInfoDialog = false  }) {
+                            IconButton(onClick = { showInfoDialog=false  }) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "close icon",
@@ -436,6 +527,31 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
                                 ) {
                                     append("•  ")
                                 }
+                                append("Contact ")
+
+                            }, color = Color.Black, modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp, 0.dp))
+                            Text(text = technician.getTechContactNumber(),color = Color.Black, modifier = Modifier.weight(1f))
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = buildAnnotatedString {
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("•  ")
+                                }
                                 append("Status ")
 
                             }, color = Color.Black, modifier = Modifier
@@ -486,3 +602,28 @@ fun TechniciansLoadStretcher(technician: GarageTechnician, navController: NavCon
 
     }
 }
+
+
+suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
+    var response: ResponseObject? =null
+
+    try {
+        viewModel.getTechnicians("","getAll"){responseObject ->
+            if (responseObject!=null){
+                response=responseObject
+            }else{
+                response= ResponseObject(400,"response is null",null)
+            }
+        }
+    }catch (e:SocketTimeoutException){
+        // handle
+        response=ResponseObject(508,"Request time out.\n Please try again.",e.localizedMessage)
+    }catch (e:Exception){
+        response=ResponseObject(404 ,"Exception error.",e.localizedMessage)
+    }
+
+    return response
+}
+
+
+//    var techList by remember { mutableStateOf(Any()) }

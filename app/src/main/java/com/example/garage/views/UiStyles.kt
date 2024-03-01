@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garage.R
 import com.example.garage.models.GarageTechnician
-import com.example.garage.viewModels.CheckBoxDetailsModel
 
 
 val fontFamily= FontFamily(
@@ -112,7 +109,7 @@ val cardDefaultModifier=Modifier
 
 fun changeStatusType(technician: GarageTechnician): String {
     return if (technician.getTechStatus()==1){
-        "Avail;ble"
+        "Available"
     }else{
         "Not Available"
     }

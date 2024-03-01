@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -157,7 +158,8 @@ fun EditTechnician(
                         isEditing = true,
                         placeholderName = "First Name...",
                         modifier = Modifier,
-                        prefixStatus = false
+                        prefixStatus = false,
+                        KeyboardType.Text
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -167,7 +169,8 @@ fun EditTechnician(
                         isEditing = true,
                         placeholderName = "Last Name...",
                         modifier = Modifier.height(52.dp),
-                        prefixStatus = false
+                        prefixStatus = false,
+                        KeyboardType.Text
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
