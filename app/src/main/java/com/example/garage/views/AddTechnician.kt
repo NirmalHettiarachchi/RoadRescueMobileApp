@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key.Companion.T
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -35,10 +35,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.models.GarageTechnician
+import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import java.net.SocketTimeoutException
 
 @Composable
@@ -49,13 +52,61 @@ fun AddTechnician(
     val coroutineScope = rememberCoroutineScope()
     val showDialog = remember { mutableStateOf(false) }
     var showProgressBar = remember { mutableStateOf(false) }
+    var showExpertiseArias by remember { mutableStateOf(false) }
 
-    var status = remember { mutableStateOf(Int) }
+    var status by remember { mutableStateOf(0) }
     var title by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
-    var data by remember { mutableStateOf(T) }
+    var expertiseAriasList by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(Unit) {
+        val response=loadExpertiseArias(viewModel,coroutineScope)
+        if (response != null) {
+            if(response?.status==200){
+
+                expertiseAriasList= response.data!!.toString()
+                showExpertiseArias=true
+
+            }else if(response.status==400){
+                title=response.status.toString()
+                message= response.message.toString()
+                buttonOneName="Ok"
+                showDialog.value=true
+
+            }else if(response.status==404){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showDialog.value=true
+
+            }else if(response.status==500){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showDialog.value=true
+            }else if(response.status==508){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showDialog.value=true
+            }else{
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                showDialog.value=true
+            }
+        }else{
+            status=401
+            message="Cannot call the sever"
+            buttonOneName="Ok"
+            showDialog.value=true
+            Log.d("response null","null")
+        }
+    }
+
 
     Column(
         modifier = defaultBackground,
@@ -132,18 +183,15 @@ fun AddTechnician(
                     val checkboxColor = if(isCheckedBreakSystem) Color(0xFF253555) else Color.White
 
                     val servicesList= ArrayList<CheckBoxDetailsModel>()
-                    servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
-                    servicesList.add(CheckBoxDetailsModel("Oil Change",false))
-                    servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
-                    servicesList.add(CheckBoxDetailsModel("Engine Repair",false))
 
+                    if (showExpertiseArias) {
+                        val jsonArray = JSONArray(expertiseAriasList)
+                        for (i in 0 until jsonArray.length()) {
+                            val jsonObject = jsonArray.getJSONObject(i)
+                            val techExpertise = jsonObject.getString("expertise")
+                            servicesList.add(CheckBoxDetailsModel(techExpertise, false))
+                        }
+                    }
 
 
                     servicesList.forEach{service->
@@ -279,5 +327,26 @@ fun AddTechnician(
         Spacer(modifier = Modifier.height(26.dp))
         Footer(navController,navyStatus)
     }
+}
+
+suspend fun loadExpertiseArias(viewModel: MainViewModel, coroutineScope: CoroutineScope): ResponseObject? {
+    var response: ResponseObject? =null
+
+    try {
+        viewModel.getExpertiseArias("","expertise"){responseObject ->
+            if (responseObject!=null){
+                response=responseObject
+            }else{
+                response= ResponseObject(400,"response is null",null)
+            }
+        }
+    }catch (e:SocketTimeoutException){
+        // handle
+        response=ResponseObject(508,"Request time out.\n Please try again.",e.localizedMessage)
+    }catch (e:Exception){
+        response=ResponseObject(404 ,"Exception error.",e.localizedMessage)
+    }
+
+    return response
 }
 

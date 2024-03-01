@@ -241,19 +241,22 @@ fun TechniciansList(
 
                 }
 
-                // load response message
-                if (showMessageDialog){
-                    sweetAlertDialog(
-                        title = title,
-                        message = message,
-                        buttonOneName = buttonOneName,
-                        buttonTwoName = buttonTwoName,
-                        onConfirm = {
-                            showMessageDialog=false
-                        }
-                    )
-                }
 
+
+
+            }
+
+            // load response message
+            if (showMessageDialog){
+                sweetAlertDialog(
+                    title = title,
+                    message = message,
+                    buttonOneName = buttonOneName,
+                    buttonTwoName = buttonTwoName,
+                    onConfirm = {
+                        showMessageDialog=false
+                    }
+                )
             }
 
         }
