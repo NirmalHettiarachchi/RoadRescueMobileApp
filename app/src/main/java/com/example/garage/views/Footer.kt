@@ -22,11 +22,10 @@ import com.example.garage.repository.Screen
 
 @Composable
 fun Footer(
+
     navController: NavController,
     navStatus:String
 ){
-
-
     Row (
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom,
@@ -46,6 +45,7 @@ fun Footer(
                 },
             tint = Color.White,
             contentDescription = "footer technician"
+
         )
 
         /*Icon(
