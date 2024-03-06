@@ -188,8 +188,9 @@ fun AddTechnician(
                         val jsonArray = JSONArray(expertiseAriasList)
                         for (i in 0 until jsonArray.length()) {
                             val jsonObject = jsonArray.getJSONObject(i)
+                            val techExpertiseId = jsonObject.getString("expertiseId")
                             val techExpertise = jsonObject.getString("expertise")
-                            servicesList.add(CheckBoxDetailsModel(techExpertise, false))
+                            servicesList.add(CheckBoxDetailsModel(techExpertiseId,techExpertise, false))
                         }
                     }
 
@@ -206,9 +207,9 @@ fun AddTechnician(
                                 checked = selectedServices.contains(service.getCheckBoxName()),
                                 onCheckedChange = { isChecked ->
                                     selectedServices = if (isChecked) {
-                                        selectedServices + service.getCheckBoxName()
+                                        selectedServices + service.getCheckBoxName()+"-"+service.getCheckBoxId()
                                     } else {
-                                        selectedServices - service.getCheckBoxName()
+                                        selectedServices - service.getCheckBoxName()+"-"+service.getCheckBoxId()
                                     }
                                 },
                                 modifier = Modifier
@@ -246,11 +247,9 @@ fun AddTechnician(
 //                                showProgressBar.value=true
                                 viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
 
-                                    Log.d("wada karpan hutta", responseObject.toString())
+
                                     if (responseObject != null) {
-                                        // Call your function here
-                                        Log.d("wada karpan hutta", "labbak maaha")
-                                        Log.d("sadhu sadhu", responseObject.message.toString())
+
 
                                         if(responseObject.status==201){
                                             title="Success"

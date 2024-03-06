@@ -103,7 +103,8 @@ fun sweetAlertDialog(
                             text = message,
                             style = textStyle2,
                             color = Color.Black,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }

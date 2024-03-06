@@ -17,7 +17,7 @@ import retrofit2.http.Query
 // bijja = 192.168.1.102
 
 
-private val ipV4Address="192.168.1.102"
+private val ipV4Address="10.22.162.54"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()

@@ -91,34 +91,40 @@ fun TechniciansList(
                 title=response.status.toString()
                 message= response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showMessageDialog=true
 
             }else if(response.status==404){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showMessageDialog=true
 
             }else if(response.status==500){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showMessageDialog=true
             }else if(response.status==508){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showMessageDialog=true
             }else{
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showMessageDialog=true
             }
         }else{
             status=401
             message="Cannot call the sever"
             buttonOneName="Ok"
+            buttonTwoName="null"
             showMessageDialog=true
             Log.d("response null","null")
         }
@@ -240,10 +246,6 @@ fun TechniciansList(
                     }
 
                 }
-
-
-
-
             }
 
             // load response message

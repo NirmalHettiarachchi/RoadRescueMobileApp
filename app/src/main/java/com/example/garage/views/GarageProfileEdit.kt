@@ -201,14 +201,10 @@ fun GarageProfileEdit(
                     if (isCheckedBraekSysytem) Color(0xFF253555) else Color.White
 
                 val servicesList = ArrayList<CheckBoxDetailsModel>()
-                servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
-                servicesList.add(CheckBoxDetailsModel("Oil Change", false))
-                servicesList.add(CheckBoxDetailsModel("Tire Replacement", false))
-                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
-                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
-                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
-                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
-                servicesList.add(CheckBoxDetailsModel("Engine Repair", false))
+                servicesList.add(CheckBoxDetailsModel("as","Break System Repair", false))
+                servicesList.add(CheckBoxDetailsModel("as","Oil Change", false))
+                servicesList.add(CheckBoxDetailsModel("as","Tire Replacement", false))
+
 
 
 

@@ -186,20 +186,9 @@ fun EditTechnician(
                         val checkboxColor = if(isCheckedBreakSystem) Color(0xFF253555) else Color.White
 
                         val servicesList= ArrayList<CheckBoxDetailsModel>()
-                        servicesList.add(CheckBoxDetailsModel("Break System Repair", false))
-                        servicesList.add(CheckBoxDetailsModel("Oil Change",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
-                        servicesList.add(CheckBoxDetailsModel("Tire Replacement",false))
+                        servicesList.add(CheckBoxDetailsModel("dasd","Break System Repair", false))
+
+
 
 
 
