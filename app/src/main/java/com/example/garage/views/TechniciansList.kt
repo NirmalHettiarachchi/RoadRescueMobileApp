@@ -110,7 +110,7 @@ fun TechniciansList(
             }else if(response.status==508){
                 title=response.status.toString()
                 message=response.message.toString()
-                buttonOneName="Ok"
+                buttonOneName="null"
                 buttonTwoName="null"
                 showMessageDialog=true
             }else{
@@ -229,11 +229,17 @@ fun TechniciansList(
                         val techLastName=jsonObject.getString("techLastName")
                         val techStatus=jsonObject.getString("techStatus")
                         val techContactNumber=jsonObject.getString("techContactNumb")
+                        val techExpertiseList=jsonObject.getString("expertiseList")
+
+                        val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
+                        val resultList = contentString.split(", ")
 
                         techDetails.setTechId(techId)
                         techDetails.setTechFirstName(techFirstName)
                         techDetails.setTechLastName(techLastName)
                         techDetails.setTechContactNumber(techContactNumber)
+                        techDetails.setTechExpertiseAreas(resultList)
+
 
                         if (techStatus.equals("Available")){
                             techDetails.setTechStatus(1)
@@ -459,7 +465,7 @@ fun TechniciansLoadStretcher(
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "close icon",
-                                    modifier = closerButtonStyles.clickable {  },
+                                    modifier = closerButtonStyles.clickable { showInfoDialog=false  },
                                     tint = Color.White
                                 )
                             }
@@ -593,8 +599,7 @@ fun TechniciansLoadStretcher(
                                     .weight(1f)
                             ){
                                 //Check ExpertiseAreas list isEmpty and list load
-
-                                technician.getTechExpertiseAreas()?.forEach {temp->
+                                technician.getTechExpertiseAreas().forEach { temp->
                                     Text(text = temp,color = Color.Black, textAlign = TextAlign.Center,modifier = Modifier)
                                 }
                             }
@@ -611,6 +616,7 @@ fun TechniciansLoadStretcher(
 
 suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
     var response: ResponseObject? =null
+
 
     try {
         viewModel.getTechnicians("","getAll"){responseObject ->
@@ -629,6 +635,8 @@ suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: Coroutin
 
     return response
 }
+
+
 
 
 //    var techList by remember { mutableStateOf(Any()) }

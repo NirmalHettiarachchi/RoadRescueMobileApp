@@ -68,7 +68,8 @@ fun sweetAlertDialog(
                             text = message,
                             style = textStyle2,
                             color = Color.Black,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
                 }
@@ -118,7 +119,9 @@ fun sweetAlertDialog(
                 ) {
 
                     if (buttonOneName.equals("null") || buttonTwoName.equals("null")){
+
                         Button(
+                            modifier = Modifier.width(8.dp),
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Gray)
                         ) {
@@ -128,7 +131,7 @@ fun sweetAlertDialog(
                         }
                     }else{
                         Button(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Green)
                         ) {
@@ -140,7 +143,9 @@ fun sweetAlertDialog(
                         Spacer(modifier = Modifier.width(5.dp))
 
                         Button(
-                            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+                            modifier = Modifier
+                                .weight(1f)
+                                .align(Alignment.CenterVertically),
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Green)
                         ) {

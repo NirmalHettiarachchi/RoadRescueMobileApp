@@ -90,7 +90,7 @@ class GarageTechnician {
     }
 
     fun setTechExpertiseAreas(techExpertiseAreas: List<String>) {
-        this._techExpertiseAreas
+        this._techExpertiseAreas=techExpertiseAreas
     }
 }
 

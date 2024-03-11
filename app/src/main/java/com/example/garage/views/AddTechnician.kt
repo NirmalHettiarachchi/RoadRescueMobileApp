@@ -74,34 +74,40 @@ fun AddTechnician(
                 title=response.status.toString()
                 message= response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
 
             }else if(response.status==404){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
 
             }else if(response.status==500){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
             }else if(response.status==508){
                 title=response.status.toString()
                 message=response.message.toString()
-                buttonOneName="Ok"
+                buttonOneName="null"
+                buttonTwoName="null"
                 showDialog.value=true
             }else{
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
             }
         }else{
             status=401
             message="Cannot call the sever"
             buttonOneName="Ok"
+            buttonTwoName="null"
             showDialog.value=true
             Log.d("response null","null")
         }
@@ -157,7 +163,7 @@ fun AddTechnician(
                     textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false,KeyboardType.Text)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false,KeyboardType.Number)
+                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),true,KeyboardType.Number)
                     Spacer(modifier = Modifier.height(16.dp))
 
                 }
