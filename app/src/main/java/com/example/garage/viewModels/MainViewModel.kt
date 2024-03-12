@@ -109,7 +109,7 @@ class MainViewModel : ViewModel() {
     }
 
 
-    suspend fun addTechnicianTest(
+    suspend fun addTechnician(
         technician: GarageTechnician,
         onResponseReceived: (ResponseObject?) -> Unit // Lambda parameter to execute after receiving the response
     ) {
@@ -154,6 +154,49 @@ class MainViewModel : ViewModel() {
                 })
             } catch (e: Exception) {
                 // Handle exception
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+
+    suspend fun delTechnician(
+        delId:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+               val call = garageService.deleteTechnician(delId)
+                call.enqueue(object :Callback<ResponseBody>{
+
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+            }catch (e:Exception){
                 deferred.completeExceptionally(e)
             }
         }

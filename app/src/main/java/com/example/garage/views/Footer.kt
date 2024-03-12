@@ -40,8 +40,8 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    navController.navigate(route = Screen.TechnicianList.route)
                     // loadAllTechnicians()
+                    navController.navigate(route = Screen.TechnicianList.route)
                 },
             tint = Color.White,
             contentDescription = "footer technician"

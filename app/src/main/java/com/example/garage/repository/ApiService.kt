@@ -6,6 +6,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -36,6 +37,9 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("technician")
     fun postTechnician(@Body technician: NewTechnician): Call<ResponseBody>
+    @Headers("Content-Type: application/json")
+    @DELETE("technician")
+    fun deleteTechnician(@Query("delId") delId: String):Call<ResponseBody>
 
 
 }

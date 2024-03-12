@@ -1,4 +1,4 @@
-package com.example.garage.viewModels
+package com.example.garage.models
 
 class CheckBoxDetailsModel (
     private var _checkBoxId:String,

@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.garage.R
-import com.example.garage.viewModels.CheckBoxDetailsModel
+import com.example.garage.models.CheckBoxDetailsModel
 
 @Composable
 fun EditTechnician(

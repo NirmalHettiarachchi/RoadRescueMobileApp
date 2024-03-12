@@ -34,10 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -251,7 +251,7 @@ fun AddTechnician(
                         coroutineScope.launch {
                             try {
 //                                showProgressBar.value=true
-                                viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
+                                viewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
 
 
                                     if (responseObject != null) {
@@ -260,8 +260,8 @@ fun AddTechnician(
                                         if(responseObject.status==201){
                                             title="Success"
                                             message= responseObject.message.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
 
@@ -273,15 +273,15 @@ fun AddTechnician(
 
                                             title="Failed"
                                             message= responseObject.message.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
                                         }else{
                                             title="Failed"
                                             message= responseObject.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName= "null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
                                         }
@@ -292,8 +292,8 @@ fun AddTechnician(
 //                                showProgressBar.value=false
                                 showDialog.value=true
                                 message= e.message.toString()
-                                buttonOneName= "Ok"
-                                buttonTwoName=null.toString()
+                                buttonOneName= "null"
+                                buttonTwoName="null"
                                 Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
                             }catch (e:Exception){
                                 // Handle other exceptions
@@ -301,7 +301,7 @@ fun AddTechnician(
                                 showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "Ok"
-                                buttonTwoName=null.toString()
+                                buttonTwoName="null"
                                 Log.e("NetworkRequest", "Exception: ${e.message}")
                             }
                         }

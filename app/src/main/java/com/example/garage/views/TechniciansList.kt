@@ -57,6 +57,7 @@ import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.net.SocketTimeoutException
 
@@ -69,6 +70,7 @@ fun TechniciansList(
     val coroutineScope = rememberCoroutineScope()
     var showLoadTechnicians by remember { mutableStateOf(false) }
     var showMessageDialog by remember { mutableStateOf(false) }
+//    var showProgressBar by remember { mutableStateOf(true) }
 
     var status by remember { mutableStateOf(0) }
     var title by remember { mutableStateOf("") }
@@ -80,11 +82,12 @@ fun TechniciansList(
 
     LaunchedEffect(Unit) {
 
-        val response=loadAllTechnicians(viewModel,coroutineScope)
+        val response=loadAllTechnicians(viewModel)
         if (response != null) {
             if(response?.status==200){
 
                 techList= response.data!!.toString()
+//                showProgressBar=false
                 showLoadTechnicians=true
 
             }else if(response.status==400){
@@ -247,12 +250,16 @@ fun TechniciansList(
                             techDetails.setTechStatus(0)
                         }
 
-                        TechniciansLoadStretcher(techDetails,navController,navyStatus)
+                        TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel)
                         Divider()
                     }
 
                 }
             }
+
+//            if (showProgressBar){
+//                circularIndicatorProgressBar()
+//            }
 
             // load response message
             if (showMessageDialog){
@@ -283,7 +290,9 @@ fun TechniciansList(
 fun TechniciansLoadStretcher(
     technician: GarageTechnician,
     navController: NavController,
-    navyStatus:String
+    navyStatus:String,
+    coroutineScope: CoroutineScope,
+    viewModel: MainViewModel
 ){
     Row (
         modifier = Modifier
@@ -291,9 +300,15 @@ fun TechniciansLoadStretcher(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
-
+        var showMessageDialog by remember { mutableStateOf(false) }
         var showDeleteDialog by remember { mutableStateOf(false) }
         var showInfoDialog by remember { mutableStateOf(false) }
+
+        var status by remember { mutableStateOf(0) }
+        var title by remember { mutableStateOf("") }
+        var message by remember { mutableStateOf("") }
+        var buttonOneName by remember { mutableStateOf("") }
+        var buttonTwoName by remember { mutableStateOf("") }
 
         Box (
             modifier = Modifier
@@ -405,7 +420,8 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Do you want to delete the user account with the name Thiran Sasanaka ? ",style = textStyleDefault)
+                            Text(text = "Do you want to delete the user account with the name " +
+                                    "${technician.getTechFirstName()+" "+technician.getTechLastName()} ? ",style = textStyleDefault)
                         }
 
                         Row(
@@ -418,7 +434,51 @@ fun TechniciansLoadStretcher(
 
                             CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDeleteDialog=false})
 
-                            CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {showDeleteDialog=false})
+                            CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
+                                // handle technician delete operation
+
+                                showDeleteDialog=false
+
+                                coroutineScope.launch {
+                                    try {
+                                        viewModel.delTechnician(technician.getTechId().substringAfter('-')){responseObject ->
+                                            if (responseObject != null){
+                                                if (responseObject.status==200){
+                                                    title = "Success"
+                                                    message = responseObject.message.toString()
+                                                    buttonOneName = "null"
+                                                    buttonTwoName = "null"
+                                                    showMessageDialog=true
+                                                }else if (responseObject.status==400){
+                                                    title = "Failed"
+                                                    message = responseObject.message.toString()
+                                                    buttonOneName = "null"
+                                                    buttonTwoName = "null"
+                                                    showMessageDialog=true
+                                                }else if (responseObject.status==500){
+                                                    title=responseObject.message.toString()
+                                                    message = responseObject.data.toString()
+                                                    buttonOneName = "null"
+                                                    buttonTwoName = "null"
+                                                }
+                                            }
+                                        }
+                                    }catch (e:SocketTimeoutException){
+                                        showMessageDialog=true
+                                        title="TimeOut"
+                                        message= e.message.toString()
+                                        buttonOneName= "null"
+                                        buttonTwoName="null"
+                                    }catch (e:Exception){
+                                        showMessageDialog=true
+                                        title="Failed"
+                                        message= e.message.toString()
+                                        buttonOneName= "Ok"
+                                        buttonTwoName="null"
+                                    }
+
+                                }
+                            })
 
                         }
 
@@ -610,13 +670,27 @@ fun TechniciansLoadStretcher(
             )
         }
 
+        // load response message
+        if (showMessageDialog){
+            sweetAlertDialog(
+                title = title,
+                message = message,
+                buttonOneName = buttonOneName,
+                buttonTwoName = buttonTwoName,
+                onConfirm = {
+                    showMessageDialog=false
+                    navController.navigate(route = Screen.TechnicianList.route)
+                }
+            )
+        }
+
+
     }
 }
 
 
-suspend fun loadAllTechnicians(viewModel: MainViewModel,coroutineScope: CoroutineScope): ResponseObject? {
+suspend fun loadAllTechnicians(viewModel: MainViewModel): ResponseObject? {
     var response: ResponseObject? =null
-
 
     try {
         viewModel.getTechnicians("","getAll"){responseObject ->

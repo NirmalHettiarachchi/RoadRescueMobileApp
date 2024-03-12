@@ -53,7 +53,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.garage.R
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.CheckBoxDetailsModel
+import com.example.garage.models.CheckBoxDetailsModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
