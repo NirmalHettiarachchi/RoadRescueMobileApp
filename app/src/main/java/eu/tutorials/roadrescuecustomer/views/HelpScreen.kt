@@ -1,6 +1,10 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.view.View
+import androidx.annotation.ReturnThis
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
@@ -38,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -99,15 +105,12 @@ fun HelpScreen(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Row (modifier = Modifier.align(Alignment.CenterHorizontally)){
-                        Icon(
-                            painter = painterResource(id = R.drawable.phone),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(top = 5.dp)
-                                .size(30.dp),
-                            tint = Color.Unspecified
-                        )
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        PhoneIconButton(LocalContext.current)
                         Text(
                             text = "Help",
                             style = textStyle1
@@ -118,6 +121,26 @@ fun HelpScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PhoneIconButton(context: Context) {
+    IconButton(
+        onClick = {
+            val intent = Intent(Intent.ACTION_DIAL)
+            intent.data = Uri.parse("tel:+94768879830")
+            context.startActivity(intent)
+        }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.phone),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = 5.dp)
+                .size(30.dp),
+            tint = Color.Unspecified
+        )
     }
 }
 
@@ -157,6 +180,7 @@ fun RequestHelpBox() {
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             CommonButton(btnName = "Request Help", modifier = Modifier.align(Alignment.CenterHorizontally)) {
