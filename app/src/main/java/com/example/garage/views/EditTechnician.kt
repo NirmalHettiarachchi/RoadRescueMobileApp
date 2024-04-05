@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -64,18 +65,26 @@ import com.example.garage.R
 import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.SharedViewModel
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import org.json.JSONArray
 import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
+
+
 
 @Composable
 fun EditTechnician(
-    navController: NavController, navyStatus:String
+    navController: NavController,
+    navyStatus:String,
+    sharedViewModel: SharedViewModel
 ){
 
-    var textTechFirstName by remember { mutableStateOf("") }
-    var textTechLastName by remember { mutableStateOf("") }
+    val technicianDetails= sharedViewModel.technician
+    val textTechFirstName by remember { mutableStateOf(technicianDetails?.techFirstName) }
+    val textTechLastName by remember { mutableStateOf(technicianDetails?.techLastName) }
 
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
@@ -258,25 +267,29 @@ fun EditTechnician(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    CommonTextField(
-                        value = textTechFirstName,
-                        isEditing = true,
-                        placeholderName = "First Name...",
-                        modifier = Modifier,
-                        prefixStatus = false,
-                        KeyboardType.Text
-                    )
+                    textTechFirstName?.let {
+                        CommonTextField(
+                            value = it,
+                            isEditing = true,
+                            placeholderName = "First Name...",
+                            modifier = Modifier,
+                            prefixStatus = false,
+                            KeyboardType.Text
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    CommonTextField(
-                        value = textTechLastName,
-                        isEditing = true,
-                        placeholderName = "Last Name...",
-                        modifier = Modifier.height(52.dp),
-                        prefixStatus = false,
-                        KeyboardType.Text
-                    )
+                    textTechLastName?.let {
+                        CommonTextField(
+                            value = it,
+                            isEditing = true,
+                            placeholderName = "Last Name...",
+                            modifier = Modifier.height(52.dp),
+                            prefixStatus = false,
+                            KeyboardType.Text
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -354,12 +367,22 @@ fun EditTechnician(
 
                         // technician update
                         CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {
+
+                            Log.d("before image save",bitmap.value.toString())
+
                            bitmap.value.let {tempBitmap ->
-                               uploadImageToFirebase(tempBitmap,context as ComponentActivity){success->
+                               uploadImageToFirebase(technicianDetails?.techId,tempBitmap,context as ComponentActivity){success->
+
                                    if (success){
+
+                                       getProfileRef(technicianDetails?.techId,tempBitmap)
+
                                        Toast.makeText(context,"Upload Successfully.",Toast.LENGTH_SHORT).show()
+
                                    }else{
+
                                        Toast.makeText(context,"Failed to Upload.",Toast.LENGTH_SHORT).show()
+
                                    }
                                }
 
@@ -402,7 +425,7 @@ fun EditTechnician(
                                     .background(Color.White)
                                     .clickable {
                                         launcher.launch()
-                                        showDialogSelectPic.value=false
+                                        showDialogSelectPic.value = false
                                     }
                             )
                             Text(
@@ -428,7 +451,7 @@ fun EditTechnician(
                                     .background(Color.White)
                                     .clickable {
                                         launcherImage.launch("image/*")
-                                        showDialogSelectPic.value=false
+                                        showDialogSelectPic.value = false
                                     }
                             )
                             Text(
@@ -463,9 +486,9 @@ fun EditTechnician(
     }
 }
 
-fun uploadImageToFirebase(bitmap: Bitmap,context:ComponentActivity,callback:(Boolean)-> Unit) {
+fun uploadImageToFirebase(techId:String?,bitmap: Bitmap,context:ComponentActivity,callback:(Boolean)-> Unit) {
     val storageRef=Firebase.storage.reference
-    val imageRef= storageRef.child("techniciansProfilePic/${bitmap}")
+    val imageRef= storageRef.child("techniciansProfilePic/$techId+$bitmap")
 
     val bass=ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG,100,bass)
@@ -478,3 +501,21 @@ fun uploadImageToFirebase(bitmap: Bitmap,context:ComponentActivity,callback:(Boo
     }
 }
 
+//  gs://garage-c6544.appspot.com/techniciansProfilePic/T-117+android.graphics.Bitmap@979115d
+
+fun getProfileRef(techId:String?,bitmap: Bitmap) {
+    val storageRef=FirebaseStorage.getInstance().reference.child("techniciansProfilePic/$techId+$bitmap")
+    val convertUrl= URLDecoder.decode(storageRef.toString(), "UTF-8")
+    Log.d("firebaseImageReference",convertUrl)
+
+    /*val localFile = File.createTempFile("tempImage","jpg")
+    storageRef.getFile(localFile).addOnSuccessListener {
+        val bitmap=BitmapFactory.decodeFile(localFile.absolutePath)
+        return@addOnSuccessListener
+    }.addOnFailureListener{
+        return@addOnFailureListener
+    }*/
+}
+
+//  android.graphics.Bitmap@6dd5c00
+//  techId%2Bandroid.graphics.Bitmap%406dd5c00

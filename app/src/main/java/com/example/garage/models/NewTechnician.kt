@@ -15,7 +15,3 @@ data class NewTechnician(
     val techStatus:Int,
 )
 
-data class SearchVarible(
-    @SerializedName("searchId")
-    val searchId:String
-)

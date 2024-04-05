@@ -55,7 +55,9 @@ import androidx.navigation.NavController
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
+import com.example.garage.repository.TechData
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -63,7 +65,8 @@ import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
-    navController: NavController, navyStatus:String
+    navController: NavController, navyStatus:String,
+    sharedViewModel: SharedViewModel
 ){
 
     val viewModel= viewModel<MainViewModel>()
@@ -250,7 +253,7 @@ fun TechniciansList(
                             techDetails.setTechStatus(0)
                         }
 
-                        TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel)
+                        TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel,sharedViewModel)
                         Divider()
                     }
 
@@ -292,7 +295,8 @@ fun TechniciansLoadStretcher(
     navController: NavController,
     navyStatus:String,
     coroutineScope: CoroutineScope,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    sharedViewModel: SharedViewModel
 ){
     Row (
         modifier = Modifier
@@ -356,8 +360,12 @@ fun TechniciansLoadStretcher(
                     )
                 }
 
+                // call to edit technician
+
                 IconButton(onClick = {
-                    navController.navigate(route = Screen.EditTechnician.route)
+                    val technicianData= TechData(techId=technician.getTechId(),techFirstName=technician.getTechFirstName(),techLastName=technician.getTechLastName())
+                    sharedViewModel.techData(technicianData)
+                     navController.navigate(route = Screen.EditTechnician.route)
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
