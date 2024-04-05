@@ -890,19 +890,3 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     Spacer(modifier = Modifier.height(16.dp))
 }
 
-@Composable
-fun FillDetailsButton(detailButtonName: String, onClickButton: () -> Unit) {
-    Button(
-        onClick = { onClickButton() },
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
-            .width(285.dp)
-            .padding(8.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-    ) {
-        Text(
-            text = detailButtonName,
-            color = Color(0xFF253555),
-            style = textStyle3.copy(textAlign = TextAlign.Center)
-        )
-    }
-}

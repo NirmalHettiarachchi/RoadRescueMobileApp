@@ -76,7 +76,6 @@ fun ActivitiesScreen(
                         style = textStyle1
                     )
                     NoActivityActivitiesScreen()
-                    HelpBox()
                 }
             }
         }

@@ -114,7 +114,6 @@ fun ProfileScreen(
                         )
                         utilFun()
                         ProfileBox(profileViewModel)
-                        HelpBox()
                     }
                 }
             }

@@ -96,10 +96,9 @@ fun TrackLocationScreen(
                         NoPendingActivityTrackLocationScreen()
                     } else {
                         PendingActivityTrackLocationScreen(
-                            locationViewModel,
+                            locationViewModel
                         )
                     }
-                    HelpBox()
                 }
             }
         }

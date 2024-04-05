@@ -57,7 +57,9 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
             SidebarButton(buttonName = "Help", verticalPadding = 8) {
                 navHostController.navigate("helpscreen")
             }
-            SidebarButton(buttonName = "Settings", verticalPadding = 8,{})
+            SidebarButton(buttonName = "Settings", verticalPadding = 8) {
+                navHostController.navigate("settingsscreen")
+            }
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
             AppPreferences(context).clearAllPreferences()
