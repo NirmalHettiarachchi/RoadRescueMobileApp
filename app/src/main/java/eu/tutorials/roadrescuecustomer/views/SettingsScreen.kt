@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -128,12 +129,21 @@ fun SettingsBox() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            FillDetailsButton(detailButtonName = "Change Phone Number") {
-                //todo
+
+            //Just for testing...
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ){
+                FillDetailsButton(detailButtonName = "Change Phone Number") {
+                    //todo
+                }
+                CircularProgressBar(isDisplayed = true)
             }
+            //----------------
             FillDetailsButton(detailButtonName = "Manage Payment Methods") {
                 showManagePaymentMethodsWindow = true
             }
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
