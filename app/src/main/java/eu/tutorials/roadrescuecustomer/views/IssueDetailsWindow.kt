@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,13 +22,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
 fun IssueDetailsWindow(
     serviceRequestViewModel: ServiceRequestViewModel,
-    onDismiss: () -> Unit) {
+    onDismiss: () -> Unit
+) {
 
     var checkEngineIndicator by remember { mutableStateOf(false) }
     var batteryIndicator by remember { mutableStateOf(false) }
@@ -34,7 +38,7 @@ fun IssueDetailsWindow(
     var transmissionIndicator by remember { mutableStateOf(false) }
     var oilPressureWarningIndicator by remember { mutableStateOf(false) }
     var brakeSystemIndicator by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     AlertDialog(
         onDismissRequest = { onDismiss() },
         tonalElevation = 16.dp,
@@ -58,18 +62,15 @@ fun IssueDetailsWindow(
                     style = textStyle2
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                DisposableEffect(key1 = Unit) {
+                    serviceRequestViewModel.fetchIssues()
+                    onDispose {
 
-                val issueList = listOf(
-                    "Mechanical Issues",
-                    "Electrical Issues",
-                    "Engine Problems",
-                    "Fuel Issues",
-                    "Exhaust Issues",
-                    "Cooling Problems",
-                    "Other"
-                )
+                    }
+                }
+                val issueList by serviceRequestViewModel.issues
 
-                var selectedIssue = dropDown("Issue", issueList)
+                val selectedIssue = dropDownIssues("Issue", issueList)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -162,8 +163,16 @@ fun IssueDetailsWindow(
                 Spacer(modifier = Modifier.height(16.dp))
                 CommonButton(btnName = "Save", modifier = Modifier) {
                     serviceRequestViewModel.issue.value = selectedIssue
-                    if(serviceRequestViewModel.issue.value.isNotEmpty()) {
+                    serviceRequestViewModel.indicator1.value=checkEngineIndicator
+                    serviceRequestViewModel.indicator2.value=batteryIndicator
+                    serviceRequestViewModel.indicator3.value=coolantTemperatureIndicator
+                    serviceRequestViewModel.indicator4.value=transmissionIndicator
+                    serviceRequestViewModel.indicator5.value=oilPressureWarningIndicator
+                    serviceRequestViewModel.indicator6.value=brakeSystemIndicator
+                    if (serviceRequestViewModel.issue.value.id.isNotEmpty()) {
                         onDismiss()
+                    } else {
+                        Toast.makeText(context, "Please Select Issue", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

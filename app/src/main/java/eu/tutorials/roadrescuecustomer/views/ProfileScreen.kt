@@ -43,7 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
@@ -107,16 +107,14 @@ fun ProfileScreen(
                 ) {
                     Column {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Column {
-                            Text(
-                                text = "Customer Profile",
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                                style = textStyle1
-                            )
-                            utilFun()
-                            ProfileBox(profileViewModel)
-                            HelpBox()
-                        }
+                        Text(
+                            text = "Customer Profile",
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            style = textStyle1
+                        )
+                        utilFun()
+                        ProfileBox(profileViewModel)
+                        HelpBox()
                     }
                 }
             }
@@ -221,7 +219,6 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    //Save Button
                     CommonButton("Save", Modifier) {
                         if (newName.isNotEmpty()) {
                             profileViewModel.updateProfile(
@@ -236,6 +233,10 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
                     Spacer(modifier = Modifier.width(8.dp))
                     //Cancel Button
                     CommonButton("Cancel", Modifier) {
+                        newName =
+                            AppPreferences(context).getStringPreference("NAME", "")
+                        newEmail =
+                            AppPreferences(context).getStringPreference("EMAIL", "")
                         isEditing = false
                     }
                 }

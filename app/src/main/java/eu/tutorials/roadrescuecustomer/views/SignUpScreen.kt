@@ -1,6 +1,5 @@
 package eu.tutorials.roadrescuecustomer.views
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -51,24 +50,29 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
 import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
-import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.models.Customer
+import eu.tutorials.roadrescuecustomer.viewmodels.SignUpViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.sql.Connection
-import java.sql.DriverManager
 import java.util.concurrent.TimeUnit
 
 
 @Composable
-fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivity) {
+fun SingupScreen(
+    navHostController: NavHostController,
+    mainActivity: MainActivity,
+    signUpViewModel: SignUpViewModel
+) {
     Scaffold (
         topBar = {
             AuthHeader()
         }
     ){
         Column(
-            backgroundModifier.padding(it).verticalScroll(rememberScrollState()),
+            backgroundModifier
+                .padding(it)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
@@ -82,92 +86,21 @@ fun SingupScreen(navHostController: NavHostController, mainActivity: MainActivit
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SignUpBox(navHostController, mainActivity)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    SignUpBox(navHostController, mainActivity, signUpViewModel)
                     HelpBox()
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
     }
 }
 
-interface AddUserCallback {
-    fun onUserAddedSuccessfully()
-    fun onUserAlreadyExists()
-    fun onError(errorMessage: String)
-}
-
-fun addUser(
-    context: Context,
-    firstName: String,
-    lastName: String,
-    phoneNumber: String,
-    email: String,
-    password: String,
-    callback: AddUserCallback
-) {
-    val DATABASE_NAME = "road_rescue"
-    val TABLE_NAME = "customer"
-    val url =
-        "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-    val username = "admin"
-    val databasePassword = "admin123"
-    Thread {
-        try {
-            // Load the JDBC driver
-            Class.forName("com.mysql.jdbc.Driver")
-            // Establish connection to the database
-            val connection: Connection =
-                DriverManager.getConnection(url, username, databasePassword)
-
-            // Prepare a statement to check if the phone number already exists
-            val checkStmt =
-                connection.prepareStatement("SELECT COUNT(*) FROM $TABLE_NAME WHERE phone_number = ?")
-            checkStmt.setString(1, phoneNumber)
-
-            // Execute the query
-            val resultSet = checkStmt.executeQuery()
-
-            // Check if the phone number exists
-            var phoneNumberExists = false
-            if (resultSet.next()) {
-                phoneNumberExists = resultSet.getInt(1) > 0
-            }
-
-            // Insert the new user if the phone number does not exist
-            if (!phoneNumberExists) {
-                val insertStmt =
-                    connection.prepareStatement("INSERT INTO $TABLE_NAME(phone_number, email, f_name, l_name) VALUES(?, ?, ?, ?)")
-                insertStmt.setString(1, phoneNumber)
-                insertStmt.setString(2, email)
-                insertStmt.setString(3, firstName)
-                insertStmt.setString(4, lastName)
-
-                insertStmt.executeUpdate()
-                MainScope().launch {
-                    callback.onUserAddedSuccessfully()
-                }
-            } else {
-                MainScope().launch {
-                    callback.onUserAlreadyExists()
-                }
-            }
-
-            // Close the connection
-            connection.close()
-        } catch (e: Exception) {
-            MainScope().launch {
-                callback.onError(e.message ?: "An error occurred.")
-            }
-            e.printStackTrace()
-        }
-    }.start()
-}
-
-
 @Composable
-fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
+fun SignUpBox(
+    navController: NavHostController,
+    mainActivity: MainActivity,
+    signUpViewModel: SignUpViewModel
+) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -257,51 +190,11 @@ fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
                             mainActivity
                         ) { task ->
                             if (task.isSuccessful) {
-                                addUser(
-                                    context,
-                                    firstName,
-                                    lastName,
-                                    phoneNumber,
-                                    "",
-                                    "123456",
-                                    object : AddUserCallback {
-                                        override fun onUserAddedSuccessfully() {
-                                            AppPreferences(context).setStringPreference(
-                                                "NAME",
-                                                "$firstName $lastName"
-                                            )
-                                            AppPreferences(context).setStringPreference(
-                                                "PHONE",
-                                                phoneNumber
-                                            )
-                                            AppPreferences(context).setStringPreference(
-                                                "EMAIL",
-                                                ""
-                                            )
-                                            navController.navigate("dashboardscreen") {
-                                                popUpTo("dashboardscreen") { inclusive = true }
-                                            }
-                                        }
-
-                                        override fun onUserAlreadyExists() {
-                                            MainScope().launch {
-                                                Toast.makeText(
-                                                    context,
-                                                    "User Already Exist",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
-                                            }
-                                        }
-
-                                        override fun onError(errorMessage: String) {
-                                            MainScope().launch {
-                                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT)
-                                                    .show()
-                                            }
-                                        }
-
-                                    })
+                                signUpViewModel.addUser(
+                                    Customer(firstName, lastName, "", phoneNumber),
+                                    navController,
+                                    context
+                                )
 
                             } else {
                                 MainScope().launch {
@@ -336,6 +229,7 @@ fun SignUpBox(navController: NavHostController, mainActivity: MainActivity) {
             navController.navigate("loginscreen")
         }
         Spacer(modifier = Modifier.height(8.dp))
+
     }
 }
 

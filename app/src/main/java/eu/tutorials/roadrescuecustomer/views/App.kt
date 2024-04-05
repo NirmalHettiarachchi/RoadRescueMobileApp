@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.SignUpViewModel
 
 @Composable
 fun App(
@@ -17,6 +19,8 @@ fun App(
     serviceRequestViewModel: ServiceRequestViewModel,
     locationViewModel: LocationViewModel,
     profileViewModel: ProfileViewModel,
+    signUpViewModel: SignUpViewModel,
+    loginViewModel: LoginViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()
@@ -48,10 +52,10 @@ fun App(
             )
         }
         composable("loginscreen") {
-            LoginScreen(navController, context)
+            LoginScreen(navController, context, loginViewModel)
         }
         composable("signupscreen") {
-            SingupScreen(navController, context)
+            SingupScreen(navController, context, signUpViewModel)
         }
         composable("profilescreen") {
             ProfileScreen(
@@ -67,13 +71,13 @@ fun App(
             TrackLocationScreen(
                 { navController.navigate("dashboardscreen") },
                 { navController.navigate("profilescreen") },
-                { navController.navigate("activitiesscreen")},
+                { navController.navigate("activitiesscreen") },
                 currentStateViewModel,
                 locationViewModel,
                 navController,
                 context
             )
-        } 
+        }
         composable("activitiesscreen") {
             ActivitiesScreen(
                 navigationToDashboardScreen = { navController.navigate("dashboardscreen") },

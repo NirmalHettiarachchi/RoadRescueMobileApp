@@ -1,11 +1,19 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.models.FuelType
+import eu.tutorials.roadrescuecustomer.models.Issues
+import eu.tutorials.roadrescuecustomer.models.RequestModel
 import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
+import eu.tutorials.roadrescuecustomer.models.VehicleMake
+import eu.tutorials.roadrescuecustomer.models.VehicleModel
+import eu.tutorials.roadrescuecustomer.models.VehicleType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,37 +24,61 @@ import java.sql.ResultSet
 class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
 
-    private val _issue = mutableStateOf(_repository.getServiceRequest().issue)
-    private val _vehicleType = mutableStateOf(_repository.getServiceRequest().vehicleType)
-    private val _fuelType = mutableStateOf(_repository.getServiceRequest().fuelType)
-    private val _vehicleMake = mutableStateOf(_repository.getServiceRequest().vehicleMake)
-    private val _vehicleModel = mutableStateOf(_repository.getServiceRequest().vehicleModel)
-    private val _approximatedCost = mutableDoubleStateOf(_repository.getServiceRequest().approximatedCost)
+    private val _issue = mutableStateOf(Issues("", "", ""))
+    private val indicator = mutableStateOf(false)
+    private val _vehicleType = mutableStateOf(VehicleType("", ""))
+    private val _fuelType = mutableStateOf(FuelType("", ""))
+    private val _vehicleMake = mutableStateOf(VehicleMake("", ""))
+    private val _vehicleModel = mutableStateOf(VehicleModel("", ""))
     private val _description = mutableStateOf(_repository.getServiceRequest().description)
 
-    val issue: MutableState<String> = _issue
-    val vehicleType: MutableState<String> = _vehicleType
-    val fuelType: MutableState<String> = _fuelType
-    val vehicleMake: MutableState<String> = _vehicleMake
-    val vehicleModel: MutableState<String> = _vehicleModel
-    val approximatedCost: MutableState<Double> = _approximatedCost
+    val issue: MutableState<Issues> = _issue
+    val indicator1: MutableState<Boolean> = indicator
+    val indicator2: MutableState<Boolean> = indicator
+    val indicator3: MutableState<Boolean> = indicator
+    val indicator4: MutableState<Boolean> = indicator
+    val indicator5: MutableState<Boolean> = indicator
+    val indicator6: MutableState<Boolean> = indicator
+    val vehicleType: MutableState<VehicleType> = _vehicleType
+    val fuelType: MutableState<FuelType> = _fuelType
+    val vehicleMake: MutableState<VehicleMake> = _vehicleMake
+    val vehicleModel: MutableState<VehicleModel> = _vehicleModel
     val description: MutableState<String> = _description
 
-    fun setServiceRequest(issue: String, vehicleType: String, fuelType: String, vehicleMake: String, vehicleModel: String, approximatedCost: Double, description: String) {
-        _repository.setServiceRequest(issue, vehicleType, fuelType, vehicleMake, vehicleModel, approximatedCost, description)
-        _issue.value = _repository.getServiceRequest().issue
-        _vehicleType.value = _repository.getServiceRequest().vehicleType
-        _fuelType.value = _repository.getServiceRequest().fuelType
-        _vehicleMake.value = _repository.getServiceRequest().vehicleMake
-        _vehicleModel.value = _repository.getServiceRequest().vehicleModel
-        _approximatedCost.doubleValue = _repository.getServiceRequest().approximatedCost
-        _description.value = _repository.getServiceRequest().description
+    fun setServiceRequest(
+        context: Context,
+        requestModel: RequestModel, requestCallback: ServiceRequestRepository.RequestCallback
+    ) {
+        _repository.requestService(
+            context,
+            requestModel,
+            requestCallback
+        )
+    }
+    fun checkRequest(
+        context: Context,
+        requestCallback: ServiceRequestRepository.RequestCallback
+    ) {
+        _repository.checkRequest(
+            context,
+            requestCallback
+        )
+    }
+    fun deleteRequest(
+        context: Context,
+        requestCallback: ServiceRequestRepository.RequestCallback
+    ) {
+        _repository.deleteRequest(
+            context,
+            requestCallback
+        )
     }
 
-    val vehicleTypes = mutableStateOf(listOf<String>())
-    val fuelTypes = mutableStateOf(listOf<String>())
-    val vehicleMakes = mutableStateOf(listOf<String>())
-    val vehicleModels = mutableStateOf(listOf<String>())
+    val vehicleTypes = mutableStateOf(listOf<VehicleType>())
+    val fuelTypes = mutableStateOf(listOf<FuelType>())
+    val vehicleMakes = mutableStateOf(listOf<VehicleMake>())
+    val vehicleModels = mutableStateOf(listOf<VehicleModel>())
+    val issues = mutableStateOf(listOf<Issues>())
 
     fun fetchVehicleTypes() {
         viewModelScope.launch {
@@ -55,6 +87,16 @@ class ServiceRequestViewModel : ViewModel() {
                 getVehicleTypesFromDatabase()
             }
             vehicleTypes.value = fetchedVehicleTypes
+        }
+    }
+
+    fun fetchIssues() {
+        viewModelScope.launch {
+            val fetchedIssues = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                getIssuesFromDatabase()
+            }
+            issues.value = fetchedIssues
         }
     }
 
@@ -88,12 +130,12 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
-    private fun getVehicleTypesFromDatabase(): List<String> {
-        val vehicleTypeList = mutableListOf<String>()
+    private fun getIssuesFromDatabase(): List<Issues> {
+        val issueList = mutableListOf<Issues>()
         try {
             val DATABASE_NAME = "road_rescue"
-            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
-                    DATABASE_NAME
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
             val username = "admin"
             val databasePassword = "admin123"
 
@@ -101,11 +143,40 @@ class ServiceRequestViewModel : ViewModel() {
             val connection: Connection =
                 DriverManager.getConnection(url, username, databasePassword)
             val statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT vehicle_type FROM vehicle_type")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM issue_category")
+
+            while (resultSet.next()) {
+                val category = resultSet.getString("category")
+                val id = resultSet.getString("id")
+                val cost = resultSet.getString("approximated_cost")
+                issueList.add(Issues(id, category, cost))
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return issueList
+    }
+
+    private fun getVehicleTypesFromDatabase(): List<VehicleType> {
+        val vehicleTypeList = mutableListOf<VehicleType>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM vehicle_type")
 
             while (resultSet.next()) {
                 val vehicleType = resultSet.getString("vehicle_type")
-                vehicleTypeList.add(vehicleType)
+                val id = resultSet.getString("id")
+                vehicleTypeList.add(VehicleType(id, vehicleType))
             }
             connection.close()
         } catch (e: Exception) {
@@ -114,8 +185,8 @@ class ServiceRequestViewModel : ViewModel() {
         return vehicleTypeList
     }
 
-    private fun getFuelTypesFromDatabase(): List<String> {
-        val fuelTypeList = mutableListOf<String>()
+    private fun getFuelTypesFromDatabase(): List<FuelType> {
+        val fuelTypeList = mutableListOf<FuelType>()
         try {
             val DATABASE_NAME = "road_rescue"
             val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
@@ -127,11 +198,12 @@ class ServiceRequestViewModel : ViewModel() {
             val connection: Connection =
                 DriverManager.getConnection(url, username, databasePassword)
             val statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT fuel_type FROM fuel_type")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM fuel_type")
 
             while (resultSet.next()) {
                 val fuelType = resultSet.getString("fuel_type")
-                fuelTypeList.add(fuelType)
+                val id = resultSet.getString("id")
+                fuelTypeList.add(FuelType(id, fuelType))
             }
             connection.close()
         } catch (e: Exception) {
@@ -140,8 +212,8 @@ class ServiceRequestViewModel : ViewModel() {
         return fuelTypeList
     }
 
-    private fun getVehicleMakesFromDatabase(): List<String> {
-        val vehicleMakeList = mutableListOf<String>()
+    private fun getVehicleMakesFromDatabase(): List<VehicleMake> {
+        val vehicleMakeList = mutableListOf<VehicleMake>()
         try {
             val DATABASE_NAME = "road_rescue"
             val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
@@ -153,11 +225,12 @@ class ServiceRequestViewModel : ViewModel() {
             val connection: Connection =
                 DriverManager.getConnection(url, username, databasePassword)
             val statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT make FROM vehicle_make")
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM vehicle_make")
 
             while (resultSet.next()) {
                 val vehicleMake = resultSet.getString("make")
-                vehicleMakeList.add(vehicleMake)
+                val id = resultSet.getString("id")
+                vehicleMakeList.add(VehicleMake(id, vehicleMake))
             }
             connection.close()
         } catch (e: Exception) {
@@ -166,8 +239,8 @@ class ServiceRequestViewModel : ViewModel() {
         return vehicleMakeList
     }
 
-    private fun getVehicleModelsFromDatabase(): List<String> {
-        val vehicleModelList = mutableListOf<String>()
+    private fun getVehicleModelsFromDatabase(): List<VehicleModel> {
+        val vehicleModelList = mutableListOf<VehicleModel>()
         try {
             val DATABASE_NAME = "road_rescue"
             val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
@@ -180,12 +253,13 @@ class ServiceRequestViewModel : ViewModel() {
                 DriverManager.getConnection(url, username, databasePassword)
             val statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery(
-                "SELECT model " +
-                        "FROM vehicle_model;")
-
+                "SELECT * " +
+                        "FROM vehicle_model"
+            )
             while (resultSet.next()) {
                 val vehicleModel = resultSet.getString("model")
-                vehicleModelList.add(vehicleModel)
+                val id = resultSet.getString("id")
+                vehicleModelList.add(VehicleModel(id, vehicleModel))
             }
             connection.close()
         } catch (e: Exception) {

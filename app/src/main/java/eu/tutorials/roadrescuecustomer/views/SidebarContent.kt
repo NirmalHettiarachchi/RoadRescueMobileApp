@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 
 @Composable
 fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,context: Context){

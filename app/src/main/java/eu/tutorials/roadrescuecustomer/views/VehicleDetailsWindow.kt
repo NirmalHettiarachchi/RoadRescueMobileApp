@@ -1,6 +1,5 @@
 package eu.tutorials.roadrescuecustomer.views
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,11 +20,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.Statement
+
 
 @Composable
 fun VehicleDetailsWindow(
@@ -34,9 +29,13 @@ fun VehicleDetailsWindow(
 ) {
 
     var vehicleType by remember { mutableStateOf("") }
+    var vehicleTypeId by remember { mutableStateOf("") }
     var fuelType by remember { mutableStateOf("") }
+    var fuelTypeId by remember { mutableStateOf("") }
     var vehicleMake by remember { mutableStateOf("") }
+    var vehicleMakeId by remember { mutableStateOf("") }
     var vehicleModel by remember { mutableStateOf("") }
+    var vehicleModelId by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -50,11 +49,11 @@ fun VehicleDetailsWindow(
             ),
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     text = "Fill your vehicle details here...",
@@ -75,20 +74,41 @@ fun VehicleDetailsWindow(
                 val vehicleMakeList by serviceRequestViewModel.vehicleMakes
                 val vehicleModelList by serviceRequestViewModel.vehicleModels
 
-
-                vehicleType = dropDown("Vehicle Type", vehicleTypeList)
-                fuelType = dropDown("Fuel Type", fuelTypeList)
-                vehicleMake = dropDown("Vehicle Make", vehicleMakeList)
-                vehicleModel = dropDown("Vehicle Model",  vehicleModelList)
-
+                val (getVehicleType, getVehicleTypeId) = dropDownVehicleType(
+                    "Vehicle Type",
+                    vehicleTypeList
+                )
+                vehicleType = getVehicleType
+                vehicleTypeId = getVehicleTypeId
+                val (getFuelType, getFuelTypeId) = dropDownFuel("Fuel Type", fuelTypeList)
+                fuelType = getFuelType
+                fuelTypeId = getFuelTypeId
+                val (getVehicleMake, getVehicleMakeId) = dropDownVehicleMake(
+                    "Vehicle Make",
+                    vehicleMakeList
+                )
+                vehicleMake = getVehicleMake
+                vehicleMakeId = getVehicleMakeId
+                val (getVehicleModel, getVehicleModelId) = dropDownVehicleModel(
+                    "Vehicle Model",
+                    vehicleModelList.filter { it.vehicleModel.contains(vehicleMake) })
+                vehicleModel = getVehicleModel
+                vehicleModelId = getVehicleModelId
 
                 Spacer(modifier = Modifier.height(8.dp))
-                CommonButton(btnName = "Save", modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    if(vehicleModel.isNotEmpty()) {
-                        serviceRequestViewModel.vehicleType.value = vehicleType
-                        serviceRequestViewModel.fuelType.value = fuelType
-                        serviceRequestViewModel.vehicleMake.value = vehicleMake
-                        serviceRequestViewModel.vehicleModel.value = vehicleModel
+                CommonButton(
+                    btnName = "Save",
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    if (vehicleModel.isNotEmpty()) {
+                        serviceRequestViewModel.vehicleType.value.vehicleType = vehicleType
+                        serviceRequestViewModel.vehicleType.value.id = getVehicleTypeId
+                        serviceRequestViewModel.fuelType.value.id = getFuelTypeId
+                        serviceRequestViewModel.fuelType.value.fuelType = fuelType
+                        serviceRequestViewModel.vehicleMake.value.id = getVehicleMakeId
+                        serviceRequestViewModel.vehicleMake.value.vehicleMake = vehicleMake
+                        serviceRequestViewModel.vehicleModel.value.id = getVehicleModelId
+                        serviceRequestViewModel.vehicleModel.value.vehicleModel = vehicleModel
                         onDismiss()
                     }
                 }

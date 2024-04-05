@@ -8,13 +8,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.google.firebase.FirebaseApp
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.SignUpViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +25,8 @@ class MainActivity : ComponentActivity() {
             val serviceRequestViewModel: ServiceRequestViewModel = viewModel()
             val locationViewModel: LocationViewModel = viewModel()
             val profileViewModel: ProfileViewModel = viewModel()
+            val signUpViewModel: SignUpViewModel = viewModel()
+            val loginViewModel: LoginViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -34,7 +37,9 @@ class MainActivity : ComponentActivity() {
                         currentStateViewModel,
                         serviceRequestViewModel,
                         locationViewModel,
-                        profileViewModel,this
+                        profileViewModel,
+                        signUpViewModel,
+                        loginViewModel, this
                     )
                 }
             }

@@ -9,8 +9,7 @@ import eu.tutorials.roadrescuecustomer.models.ProfileRepository
 
 class ProfileViewModel : ViewModel() {
     private val _repository: ProfileRepository = ProfileRepository()
-    private val _numOfServiceRequests =
-        mutableIntStateOf(_repository.getProfile().numOfServiceRequests)
+    private val _numOfServiceRequests = mutableIntStateOf(_repository.getProfile().numOfServiceRequests)
     val numOfServiceRequests: MutableState<Int> = _numOfServiceRequests
 
     fun updateProfile(phoneNumber: String, name: String, email: String, context: Context) {

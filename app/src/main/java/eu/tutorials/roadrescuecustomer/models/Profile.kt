@@ -2,7 +2,7 @@ package eu.tutorials.roadrescuecustomer.models
 
 import android.content.Context
 import android.widget.Toast
-import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.sql.Connection
@@ -42,8 +42,7 @@ class ProfileRepository() {
                 val names = name.split(" ")
                 val firstName = names.firstOrNull() ?: ""
                 val lastName = names.drop(1).joinToString(" ")
-                val updateStmt =
-                    connection.prepareStatement("UPDATE $TABLE_NAME SET f_name = ?, l_name = ?, email = ? WHERE phone_number = ?")
+                val updateStmt = connection.prepareStatement("UPDATE $TABLE_NAME SET f_name = ?, l_name = ?, email = ? WHERE phone_number = ?")
                 updateStmt.setString(1, firstName)
                 updateStmt.setString(2, lastName)
                 updateStmt.setString(3, email)
@@ -54,11 +53,9 @@ class ProfileRepository() {
                 // Check if any rows were affected to determine if the update was successful
                 val success = rowsAffected > 0
                 AppPreferences(context).setStringPreference("NAME", name)
-                AppPreferences(context).setStringPreference(
-                    "EMAIL",
-                    email
-                )
+                AppPreferences(context).setStringPreference("EMAIL", email)
                 // Use the callback to return the result
+
                 MainScope().launch {
                     Toast.makeText(context, "Profile Updated Successfully", Toast.LENGTH_SHORT)
                         .show()
@@ -71,6 +68,5 @@ class ProfileRepository() {
                 }
             }
         }.start()
-
     }
 }

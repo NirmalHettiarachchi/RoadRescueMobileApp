@@ -59,14 +59,12 @@ fun ActivitiesScreen(
                 }
             },
             bottomBar = {
-                Footer(
-                    navigationToDashboardScreen,
-                    navigationToProfileScreen,
-                    navigationToTrackLocationScreen) {}
+                Footer(navigationToDashboardScreen, navigationToProfileScreen, navigationToTrackLocationScreen) {}
             }
-        ){
+        ) {
             Column(
-                backgroundModifier.padding(it)
+                backgroundModifier
+                    .padding(it)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {

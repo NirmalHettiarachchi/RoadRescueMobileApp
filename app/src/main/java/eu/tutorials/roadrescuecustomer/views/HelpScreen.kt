@@ -191,7 +191,7 @@ fun RequestHelpWindow(onDismiss: () -> Unit) {
 
                 var issueList by remember { mutableStateOf(listOf<String>()) }
 
-                issue = dropDown("Issue", issueList)
+                issue = dropDownCommon("Issue", issueList)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(

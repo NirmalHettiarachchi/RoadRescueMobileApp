@@ -76,16 +76,13 @@ fun TrackLocationScreen(
                 }
             },
             bottomBar = {
-                Footer(
-                    navigationToDashboardScreen,
-                    navigationToProfileScreen,
-                    {},
-                    navigationToActivitiesScreen
-                )
+                Footer(navigationToDashboardScreen, navigationToProfileScreen, {}, navigationToActivitiesScreen)
             }
         ){
             Column(
-                backgroundModifier.padding(it).verticalScroll(rememberScrollState()),
+                backgroundModifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {

@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -54,13 +56,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
-import eu.tutorials.roadrescuecustomer.AppPreferences
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.models.RequestModel
+import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -83,17 +88,17 @@ fun DashboardScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-                        ModalDrawerSheet(
-                            content = {
-                                SidebarContent({
-                                    scope.launch {
-                                        drawerState.close()
-                                    }
-                                }, navController, context)
-                            }
-                        )
-                    }
-                ) {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent({
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }, navController, context)
+                }
+            )
+        }
+    ) {
         Scaffold (
             topBar = {
                 Header {
@@ -119,14 +124,16 @@ fun DashboardScreen(
                     //Welcome text
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome ${AppPreferences(context).getStringPreference("NAME","")}",
+                        text = "Welcome ${AppPreferences(context).getStringPreference("NAME", "")}",
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         style = textStyle1
                     )
-                    if(!currentStateViewModel.isServiceRequested.value) {
-                        if(currentStateViewModel.isReqServiceWindowOpened.value) {
+                    if (!currentStateViewModel.isServiceRequested.value) {
+                        if (currentStateViewModel.isReqServiceWindowOpened.value) {
                             RequestServiceScreen(
-                                onDismiss = { currentStateViewModel.isReqServiceWindowOpened.value = false },
+                                onDismiss = {
+                                    currentStateViewModel.isReqServiceWindowOpened.value = false
+                                },
                                 currentStateViewModel = currentStateViewModel,
                                 serviceRequestViewModel = serviceRequestViewModel,
                                 locationUtils = locationUtils,
@@ -163,8 +170,20 @@ fun NoPendingActivityDashboard(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    RequestServiceBox(currentStateViewModel, serviceRequestViewModel, locationUtils, locationViewModel, context)
-    CommonIssuesBox(currentStateViewModel, serviceRequestViewModel, locationUtils, locationViewModel, context)
+    RequestServiceBox(
+        currentStateViewModel,
+        serviceRequestViewModel,
+        locationUtils,
+        locationViewModel,
+        context
+    )
+    CommonIssuesBox(
+        currentStateViewModel,
+        serviceRequestViewModel,
+        locationUtils,
+        locationViewModel,
+        context
+    )
 }
 
 @Composable
@@ -172,8 +191,9 @@ fun PendingActivityDashboard(
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
 ) {
+    val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
-
+    var pendingRequest by remember { mutableStateOf("Requesting Service") }
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -181,36 +201,60 @@ fun PendingActivityDashboard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
+        val endTimeMillis =
+            System.currentTimeMillis() + 3 * 60 * 1000
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+            LaunchedEffect(key1 = "periodicCheck") {
+                // 3 minutes in milliseconds
+                while (System.currentTimeMillis() < endTimeMillis) {
+                    serviceRequestViewModel.checkRequest(
+                        context,
+                        object : ServiceRequestRepository.RequestCallback {
+                            override fun success(id: String) {
+                                if (id == "1") {
+
+                                } else {
+                                    pendingRequest = "Service Requested"
+                                }
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
+                            }
+                        })
+
+                    delay(15000L) // Wait for 15 seconds before the next call
+                }
+            }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Requesting Service . . . ",
+                text = "$pendingRequest . . . ",
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             DashboardFieldButton(
                 fieldName = "Issue",
-                fieldValue = serviceRequestViewModel.issue.value,
+                fieldValue = AppPreferences(context).getStringPreference("ISSUE"),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(250.dp)
             )
             DashboardFieldButton(
                 fieldName = "Vehicle",
-                fieldValue = serviceRequestViewModel.vehicleType.value,
+                fieldValue = serviceRequestViewModel.vehicleType.value.vehicleType,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(250.dp)
             )
             DashboardFieldButton(
                 fieldName = "Request ID",
-                fieldValue = serviceRequestViewModel.fuelType.value,
+                fieldValue = AppPreferences(context).getStringPreference("REQUEST_ID"),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(250.dp)
@@ -232,7 +276,9 @@ fun PendingActivityDashboard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
+                        text = "Cost: LKR ${
+                            AppPreferences(context).getStringPreference("COST")
+                        }",
                         style = textStyle2,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -247,7 +293,9 @@ fun PendingActivityDashboard(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = serviceRequestViewModel.description.value,
+                value = AppPreferences(context).getStringPreference(
+                    "DESCRIPTION"
+                ),
                 onValueChange = { },
                 modifier = Modifier
                     .height(100.dp)
@@ -270,16 +318,37 @@ fun PendingActivityDashboard(
             )
             Spacer(modifier = Modifier.height(16.dp))
             //Cancel btn
-            CommonButton(btnName = "Cancel Request", modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+            CommonButton(
+                btnName = "Cancel Request",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                if (System.currentTimeMillis() < endTimeMillis) {
+                    serviceRequestViewModel.deleteRequest(
+                        context,
+                        object : ServiceRequestRepository.RequestCallback {
+                            override fun success(id: String) {
+                                if (id == "1") {
+                                    Toast.makeText(context,"Request Deleted",Toast.LENGTH_SHORT).show()
+                                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                                }
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                Toast.makeText(context,"Can't able to cancel",Toast.LENGTH_SHORT).show()
+                                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                            }
+                        })
+                }else{
+                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-    if(showCostDetailWindow) {
-        MoreInfoWindow (
+    if (showCostDetailWindow) {
+        MoreInfoWindow(
             "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
-            onDismiss = {showCostDetailWindow = false}
+            onDismiss = { showCostDetailWindow = false }
         )
     }
 }
@@ -320,7 +389,6 @@ fun RequestServiceBox(
             RequestServiceButton(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 currentStateViewModel.isReqServiceWindowOpened.value = true
             }
-
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -335,10 +403,6 @@ fun RequestServiceScreen(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-    var vehicleType by remember { mutableStateOf("") }
-    var fuelType by remember { mutableStateOf("") }
-    var vehicleMake by remember { mutableStateOf("") }
-    var vehicleModel by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
     var showCostDetailWindow by remember { mutableStateOf(false) }
@@ -346,11 +410,12 @@ fun RequestServiceScreen(
     var showVehicleDetailsWindow by remember { mutableStateOf(false) }
     var showIssueDetailsWindow by remember { mutableStateOf(false) }
 
-    showLoadingLocationWindow =
-        locationViewModel.location.value == null
+    showLoadingLocationWindow = locationViewModel.location.value == null
 
-    if(showLoadingLocationWindow) {
-        MoreInfoWindow(message = "Getting the current location . . . ") {}
+    if (showLoadingLocationWindow) {
+        MoreInfoWindow(message = "Getting the current location . . . ") {
+
+        }
     }
 
     //Get the current location
@@ -367,11 +432,11 @@ fun RequestServiceScreen(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -398,21 +463,23 @@ fun RequestServiceScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            FillDetailsButton(detailButtonName = "Issue Details" +
-                    if (serviceRequestViewModel.issue.value.isEmpty()) ""
-                    else ": ${serviceRequestViewModel.issue.value}"
+            FillDetailsButton(
+                detailButtonName = "Issue Details" +
+                        if (serviceRequestViewModel.issue.value.category.isEmpty()) ""
+                        else ": ${serviceRequestViewModel.issue.value.category}"
             ) {
                 showIssueDetailsWindow = true
             }
-            FillDetailsButton(detailButtonName = "Vehicle Details" +
-                    if (serviceRequestViewModel.vehicleModel.value.isEmpty()) ""
-                    else ": ${serviceRequestViewModel.vehicleMake.value + 
-                            " " + 
-                            serviceRequestViewModel.vehicleModel.value + 
-                            " (" +
-                            serviceRequestViewModel.fuelType.value +
-                            ")"
-                    } ") {
+            FillDetailsButton(
+                detailButtonName = "Vehicle Details" +
+                        if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) ""
+                        else ": ${
+                                    serviceRequestViewModel.vehicleModel.value.vehicleModel +
+                                    " (" +
+                                    serviceRequestViewModel.fuelType.value.fuelType +
+                                    ")"
+                        } "
+            ) {
                 showVehicleDetailsWindow = true
             }
 
@@ -431,7 +498,7 @@ fun RequestServiceScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Cost: LKR ${String.format("%.2f", serviceRequestViewModel.approximatedCost.value)}",
+                        text = "Cost: LKR ${serviceRequestViewModel.issue.value.approximatedCost}",
                         style = textStyle2,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -469,20 +536,58 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             RequestServiceButton(modifier = Modifier) {
-                if(serviceRequestViewModel.issue.value != ""
-                    && serviceRequestViewModel.vehicleModel.value != ""
-                    ) {
-                    currentStateViewModel.setCurrentState(true,
-                        isReqServiceWindowOpened = false
+                if (serviceRequestViewModel.issue.value.id != ""
+                    && serviceRequestViewModel.vehicleModel.value.vehicleModel != ""
+                ) {
+                    AppPreferences(context).setStringPreference(
+                        "ISSUE",
+                        serviceRequestViewModel.issue.value.category
+                    )
+                    AppPreferences(context).setStringPreference(
+                        "COST",
+                        serviceRequestViewModel.issue.value.approximatedCost
+                    )
+                    AppPreferences(context).setStringPreference(
+                        "DESCRIPTION",
+                        description
                     )
                     serviceRequestViewModel.setServiceRequest(
-                        serviceRequestViewModel.issue.value,
-                        vehicleType,
-                        fuelType,
-                        vehicleMake,
-                        vehicleModel,
-                        0.00,
-                        description
+                        context,
+                        RequestModel(
+                            "0",
+                            AppPreferences(context).getStringPreference("CUSTOMER_ID", ""),
+                            serviceRequestViewModel.issue.value.id,
+                            serviceRequestViewModel.indicator1.value,
+                            serviceRequestViewModel.indicator2.value,
+                            serviceRequestViewModel.indicator3.value,
+                            serviceRequestViewModel.indicator4.value,
+                            serviceRequestViewModel.indicator5.value,
+                            serviceRequestViewModel.indicator6.value,
+                            serviceRequestViewModel.vehicleType.value.id,
+                            serviceRequestViewModel.vehicleMake.value.id,
+                            serviceRequestViewModel.vehicleModel.value.id,
+                            serviceRequestViewModel.fuelType.value.id,
+                            description,
+                            "",
+                            locationViewModel.location.value.toString(),
+                            "", ""
+                        ), object : ServiceRequestRepository.RequestCallback {
+                            override fun success(message: String) {
+                                Toast.makeText(
+                                    context,
+                                    "Request Added Successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                currentStateViewModel.setCurrentState(
+                                    true,
+                                    isReqServiceWindowOpened = false
+                                )
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                Toast.makeText(context, "Error Occurred", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     )
                 } else {
                     Toast.makeText(
@@ -496,21 +601,21 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-    if(showCostDetailWindow) {
-        MoreInfoWindow (
+    if (showCostDetailWindow) {
+        MoreInfoWindow(
             "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
-            onDismiss = {showCostDetailWindow = false}
+            onDismiss = { showCostDetailWindow = false }
         )
     }
 
-    if(showVehicleDetailsWindow) {
-        VehicleDetailsWindow (serviceRequestViewModel) {
+    if (showVehicleDetailsWindow) {
+        VehicleDetailsWindow(serviceRequestViewModel) {
             showVehicleDetailsWindow = false
         }
     }
 
-    if(showIssueDetailsWindow) {
-        IssueDetailsWindow (serviceRequestViewModel) {
+    if (showIssueDetailsWindow) {
+        IssueDetailsWindow(serviceRequestViewModel) {
             showIssueDetailsWindow = false
         }
     }
@@ -525,8 +630,9 @@ fun TrackLocation(
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
-            if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+            if (permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+            ) {
                 //Have access to location
                 locationUtils.requestLocationUpdates(locationViewModel = locationViewModel)
             } else {
@@ -540,7 +646,7 @@ fun TrackLocation(
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     )
 
-                if(rationalRequired) {
+                if (rationalRequired) {
                     Toast.makeText(
                         context,
                         "Location permission is required for this feature to work.",
@@ -550,14 +656,15 @@ fun TrackLocation(
                     Toast.makeText(
                         context,
                         "Location permission is required. Please enable it from the system settings.",
-                        Toast.LENGTH_SHORT)
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
         }
     )
 
-    if(locationUtils.hasLocationPermission(context)) {
+    if (locationUtils.hasLocationPermission(context)) {
         locationUtils.requestLocationUpdates(locationViewModel)
     } else {
         requestPermissionLauncher.launch(
@@ -577,7 +684,6 @@ fun CommonIssuesBox(
     locationViewModel: LocationViewModel,
     context: Context
 ) {
-
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White), shape = RoundedCornerShape(20.dp),
@@ -616,7 +722,8 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Mechanical Issues"}
+                            serviceRequestViewModel.issue.value.category = "Mechanical Issues"
+                        }
                     )
                     // First row, second button
                     CommonIssueButton(
@@ -627,7 +734,7 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Electrical Issues"
+                            serviceRequestViewModel.issue.value.category = "Electrical Issues"
                         }
                     )
                 }
@@ -648,7 +755,7 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Engine Problems"
+                            serviceRequestViewModel.issue.value.category = "Engine Problems"
                         }
                     )
 
@@ -661,7 +768,7 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Fuel Issues"
+                            serviceRequestViewModel.issue.value.category = "Fuel Issues"
                         }
                     )
                 }
@@ -682,7 +789,7 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Exhaust Issues"
+                            serviceRequestViewModel.issue.value.category = "Exhaust Issues"
                         }
                     )
 
@@ -695,16 +802,21 @@ fun CommonIssuesBox(
                             .padding(8.dp),
                         onClickButton = {
                             currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value = "Cooling Problems"
+                            serviceRequestViewModel.issue.value.category = "Cooling Problems"
                         }
                     )
                 }
-                Button(onClick = {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value = "Other" },
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
+                Button(
+                    onClick = {
+                        currentStateViewModel.isReqServiceWindowOpened.value = true
+                        serviceRequestViewModel.issue.value.category = "Other"
+                    },
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+                        .padding(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                ) {
                     Text(
                         text = "Other",
                         color = Color(0xFF253555),
@@ -765,7 +877,7 @@ fun RequestServiceButton(modifier: Modifier, onClickButton: () -> Unit) {
 @Composable
 fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifier) {
     Button(
-        onClick = {  },
+        onClick = { },
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = Color.White)
@@ -780,10 +892,13 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
 
 @Composable
 fun FillDetailsButton(detailButtonName: String, onClickButton: () -> Unit) {
-    Button(onClick = { onClickButton() },
+    Button(
+        onClick = { onClickButton() },
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp), modifier = Modifier
             .width(285.dp)
-            .padding(8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.White)) {
+            .padding(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+    ) {
         Text(
             text = detailButtonName,
             color = Color(0xFF253555),
