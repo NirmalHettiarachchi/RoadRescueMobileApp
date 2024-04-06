@@ -44,62 +44,27 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TrackLocationScreen(
-    navigationToDashboardScreen: () -> Unit,
-    navigationToProfileScreen: () -> Unit,
-    navigationToActivitiesScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
     locationViewModel: LocationViewModel,
-    navHostController: NavHostController,
-    context: MainActivity
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                content = {
-                    SidebarContent({
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }, navHostController, context)
-                }
-            )
-        }
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Scaffold (
-            topBar = {
-                Header {
-                    scope.launch { drawerState.open() }
-                }
-            },
-            bottomBar = {
-                Footer(navigationToDashboardScreen, navigationToProfileScreen, {}, navigationToActivitiesScreen)
-            }
-        ){
-            Column(
-                backgroundModifier
-                    .padding(it)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Track Location",
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
-                    if (!currentStateViewModel.isServiceRequested.value) {
-                        NoPendingActivityTrackLocationScreen()
-                    } else {
-                        PendingActivityTrackLocationScreen(
-                            locationViewModel
-                        )
-                    }
-                }
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Track Location",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle1
+            )
+            if (!currentStateViewModel.isServiceRequested.value) {
+                NoPendingActivityTrackLocationScreen()
+            } else {
+                PendingActivityTrackLocationScreen(
+                    locationViewModel
+                )
             }
         }
     }

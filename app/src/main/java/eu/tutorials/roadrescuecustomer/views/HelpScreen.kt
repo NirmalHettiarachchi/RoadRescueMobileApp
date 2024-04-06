@@ -57,69 +57,27 @@ import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun HelpScreen(
-    navigationToDashboardScreen: () -> Unit,
-    navigationToProfileScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit,
-    navigationToActivitiesScreen: () -> Unit,
-    context: Context,
-    navController: NavHostController,
-) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                content = {
-                    SidebarContent({
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }, navController, context)
-                }
-            )
-        }
+fun HelpScreen() {
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Scaffold (
-            topBar = {
-                Header {
-                    scope.launch { drawerState.open() }
-                }
-            },
-            bottomBar = {
-                Footer(
-                    navigationToDashboardScreen,
-                    navigationToProfileScreen,
-                    navigationToTrackLocationScreen,
-                    navigationToActivitiesScreen
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                PhoneIconButton(LocalContext.current)
+                Text(
+                    text = "Help",
+                    style = textStyle1
                 )
             }
-        ){
-            Column(
-                backgroundModifier
-                    .padding(it)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ){
-                        PhoneIconButton(LocalContext.current)
-                        Text(
-                            text = "Help",
-                            style = textStyle1
-                        )
-                    }
-                    RequestHelpBox()
-                    HelpRequestedList()
-                }
-            }
+            RequestHelpBox()
+            HelpRequestedList()
         }
     }
 }
@@ -210,7 +168,8 @@ fun RequestHelpWindow(onDismiss: () -> Unit) {
                 elevation = 8.dp,
                 shape = RoundedCornerShape(16.dp),
                 ambientColor = Color(0xFFDCE4EC)
-            ),
+            )
+            .verticalScroll(rememberScrollState()),
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {
             Column (

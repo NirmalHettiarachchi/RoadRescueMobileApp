@@ -3,7 +3,9 @@ package eu.tutorials.roadrescuecustomer.views
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +25,8 @@ fun MoreInfoWindow(message: String, onDismiss: () -> Unit) {
             .border(2.dp, Color.White, shape = RoundedCornerShape(20))
             .shadow(
             elevation = 8.dp,
-            shape = RoundedCornerShape(16.dp)
-        ),
+            shape = RoundedCornerShape(16.dp))
+            .verticalScroll(rememberScrollState()),
         tonalElevation = 16.dp,
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {

@@ -28,56 +28,20 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @Composable
-fun ActivitiesScreen(
-    navigationToDashboardScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit,
-    navigationToProfileScreen: () -> Unit,
-    navHostController: NavHostController,
-    context: MainActivity
-) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                content = {
-                    SidebarContent({
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }, navHostController, context)
-                }
-            )
-        }
+fun ActivitiesScreen() {
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Scaffold (
-            topBar = {
-                Header {
-                    scope.launch { drawerState.open() }
-                }
-            },
-            bottomBar = {
-                Footer(navigationToDashboardScreen, navigationToProfileScreen, navigationToTrackLocationScreen) {}
-            }
-        ) {
-            Column(
-                backgroundModifier
-                    .padding(it)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Activities",
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
-                    NoActivityActivitiesScreen()
-                }
-            }
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Activities",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle1
+            )
+            NoActivityActivitiesScreen()
         }
     }
 }

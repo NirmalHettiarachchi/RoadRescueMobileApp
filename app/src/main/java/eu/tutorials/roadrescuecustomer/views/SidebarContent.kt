@@ -56,9 +56,11 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
             }
             SidebarButton(buttonName = "Help", verticalPadding = 8) {
                 navHostController.navigate("helpscreen")
+                menuClicked()
             }
             SidebarButton(buttonName = "Settings", verticalPadding = 8) {
                 navHostController.navigate("settingsscreen")
+                menuClicked()
             }
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {

@@ -70,94 +70,53 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
-    navigationToProfileScreen: () -> Unit,
-    navigationToTrackLocationScreen: () -> Unit,
-    navigationToActivitiesScreen: () -> Unit,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     context: Context,
-    profileViewModel: ProfileViewModel,
-    navController: NavHostController,
-    context1: MainActivity
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                content = {
-                    SidebarContent({
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }, navController, context)
-                }
-            )
-        }
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Scaffold (
-            topBar = {
-                Header {
-                    scope.launch { drawerState.open() }
+        Column {
+            //Welcome text
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Welcome ${AppPreferences(context).getStringPreference("NAME", "")}",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle1
+            )
+            if (!currentStateViewModel.isServiceRequested.value) {
+                if (currentStateViewModel.isReqServiceWindowOpened.value) {
+                    RequestServiceScreen(
+                        onDismiss = {
+                            currentStateViewModel.isReqServiceWindowOpened.value = false
+                        },
+                        currentStateViewModel = currentStateViewModel,
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        locationUtils = locationUtils,
+                        locationViewModel = locationViewModel,
+                        context = context
+                    )
+                } else {
+                    NoPendingActivityDashboard(
+                        currentStateViewModel = currentStateViewModel,
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        locationUtils = locationUtils,
+                        locationViewModel = locationViewModel,
+                        context = context
+                    )
                 }
-            },
-            bottomBar = {
-                Footer(
-                    {},
-                    navigationToProfileScreen,
-                    navigationToTrackLocationScreen,
-                    navigationToActivitiesScreen
+            } else {
+                PendingActivityDashboard(
+                    serviceRequestViewModel = serviceRequestViewModel,
+                    currentStateViewModel = currentStateViewModel
                 )
             }
-        ){
-            Column(
-                backgroundModifier
-                    .padding(it)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    //Welcome text
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Welcome ${AppPreferences(context).getStringPreference("NAME", "")}",
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
-                    if (!currentStateViewModel.isServiceRequested.value) {
-                        if (currentStateViewModel.isReqServiceWindowOpened.value) {
-                            RequestServiceScreen(
-                                onDismiss = {
-                                    currentStateViewModel.isReqServiceWindowOpened.value = false
-                                },
-                                currentStateViewModel = currentStateViewModel,
-                                serviceRequestViewModel = serviceRequestViewModel,
-                                locationUtils = locationUtils,
-                                locationViewModel = locationViewModel,
-                                context = context
-                            )
-                        } else {
-                            NoPendingActivityDashboard(
-                                currentStateViewModel = currentStateViewModel,
-                                serviceRequestViewModel = serviceRequestViewModel,
-                                locationUtils = locationUtils,
-                                locationViewModel = locationViewModel,
-                                context = context
-                            )
-                        }
-                    } else {
-                        PendingActivityDashboard(
-                            serviceRequestViewModel = serviceRequestViewModel,
-                            currentStateViewModel = currentStateViewModel
-                        )
-                    }
-                    HelpBox()
-                }
-            }
+            HelpBox()
         }
     }
 }

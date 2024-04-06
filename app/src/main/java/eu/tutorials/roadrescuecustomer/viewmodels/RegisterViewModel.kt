@@ -11,7 +11,7 @@ import eu.tutorials.roadrescuecustomer.models.SingUpRepository
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class SignUpViewModel : ViewModel() {
+class RegisterViewModel : ViewModel() {
     private val _repository: SingUpRepository = SingUpRepository()
 
     fun addUser(

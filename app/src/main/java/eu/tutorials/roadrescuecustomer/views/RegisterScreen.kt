@@ -52,17 +52,17 @@ import com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
 import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.models.Customer
-import eu.tutorials.roadrescuecustomer.viewmodels.SignUpViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
 @Composable
-fun SingupScreen(
+fun RegisterScreen(
     navHostController: NavHostController,
     mainActivity: MainActivity,
-    signUpViewModel: SignUpViewModel
+    registerViewModel: RegisterViewModel
 ) {
     Scaffold (
         topBar = {
@@ -87,7 +87,7 @@ fun SingupScreen(
                         style = textStyle1
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    SignUpBox(navHostController, mainActivity, signUpViewModel)
+                    SignUpBox(navHostController, mainActivity, registerViewModel)
                     HelpBox()
                 }
             }
@@ -99,7 +99,7 @@ fun SingupScreen(
 fun SignUpBox(
     navController: NavHostController,
     mainActivity: MainActivity,
-    signUpViewModel: SignUpViewModel
+    registerViewModel: RegisterViewModel
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -190,7 +190,7 @@ fun SignUpBox(
                             mainActivity
                         ) { task ->
                             if (task.isSuccessful) {
-                                signUpViewModel.addUser(
+                                registerViewModel.addUser(
                                     Customer(firstName, lastName, "", phoneNumber),
                                     navController,
                                     context
