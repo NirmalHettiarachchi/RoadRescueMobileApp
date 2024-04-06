@@ -202,4 +202,54 @@ class MainViewModel : ViewModel() {
         }
         deferred.await()
     }
+
+    suspend fun updateTechnician(
+        technician: GarageTechnician,
+        onResponseReceived: (ResponseObject?) -> Unit // Lambda parameter to execute after receiving the response
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try{
+                val call = garageService.updateTechnician(
+                    com.example.garage.models.UpdateTechnician(
+                        technician.getTechId(),
+                        technician.getTechFirstName(),
+                        technician.getTechLastName(),
+                        technician.getTechImageRef(),
+                        technician.getTechExpertiseAreas()
+                    )
+                )
+
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string()
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+
+                                onResponseReceived(responseObject) // Execute the function passed as lambda parameter
+                                deferred.complete(responseObject)
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        // Handle failure
+                        deferred.completeExceptionally(t)
+                    }
+                })
+            }catch (e:Exception) {
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
 }

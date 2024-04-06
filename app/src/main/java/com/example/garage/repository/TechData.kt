@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 class TechData (
     val techId:String,
     val techFirstName:String,
-    val techLastName:String
+    val techLastName:String,
+    val techProfileRef:String
 ): Parcelable

@@ -1,14 +1,15 @@
 package com.example.garage.views
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -63,16 +64,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.R
 import com.example.garage.models.CheckBoxDetailsModel
+import com.example.garage.models.GarageTechnician
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.SharedViewModel
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.launch
 import org.json.JSONArray
-import java.io.ByteArrayOutputStream
-import java.net.URLDecoder
-
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.net.SocketTimeoutException
 
 
 @Composable
@@ -83,8 +84,9 @@ fun EditTechnician(
 ){
 
     val technicianDetails= sharedViewModel.technician
-    val textTechFirstName by remember { mutableStateOf(technicianDetails?.techFirstName) }
-    val textTechLastName by remember { mutableStateOf(technicianDetails?.techLastName) }
+    var textTechFirstName by remember { mutableStateOf(technicianDetails?.techFirstName) }
+    var textTechLastName by remember { mutableStateOf(technicianDetails?.techLastName) }
+
 
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
@@ -102,10 +104,13 @@ fun EditTechnician(
     var expertiseAriasList by remember { mutableStateOf("") }
 
 
-    val context= LocalContext.current
-    val img:Bitmap=BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
-    val bitmap= remember { mutableStateOf(img) }
 
+    val context= LocalContext.current
+    var img:Bitmap=BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
+    var bitmap= remember { mutableStateOf(img) }
+
+
+    // image loader and picker
 
     val launcher= rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview(),
@@ -132,6 +137,8 @@ fun EditTechnician(
 
 
     LaunchedEffect(Unit) {
+        bitmap.value=getSaveImage(context,technicianDetails?.techProfileRef)
+        Log.d("image",img.toString())
         val response=loadExpertiseArias(viewModel,coroutineScope)
         if (response != null) {
             if(response?.status==200){
@@ -371,18 +378,76 @@ fun EditTechnician(
                             Log.d("before image save",bitmap.value.toString())
 
                            bitmap.value.let {tempBitmap ->
-                               uploadImageToFirebase(technicianDetails?.techId,tempBitmap,context as ComponentActivity){success->
 
-                                   if (success){
+                               val saveLocation=saveImage(context,tempBitmap,technicianDetails?.techId)
+                               Log.e("saveLoaation","$saveLocation")
+                               if (saveLocation!=null){
 
-                                       getProfileRef(technicianDetails?.techId,tempBitmap)
+                                   coroutineScope.launch{
+                                       try {
+                                           if (technicianDetails != null) {
+                                               textTechLastName?.let {
+                                                   textTechFirstName?.let { it1 ->
+                                                       GarageTechnician(
+                                                           technicianDetails.techId.substringAfter('-'),
+                                                           it1,
+                                                           it,
+                                                           saveLocation,
+                                                           selectedServices
+                                                       )
+                                                   }
+                                               }?.let {
+                                                   viewModel.updateTechnician(
+                                                       it
+                                                   ){responseObject ->
 
-                                       Toast.makeText(context,"Upload Successfully.",Toast.LENGTH_SHORT).show()
+                                                       if (responseObject != null){
+                                                           if (responseObject.status==200) {
+                                                               showDialog.value = true
+                                                               title = "Updated"
+                                                               message = responseObject.message.toString()
+                                                               buttonOneName = "nul"
+                                                               buttonTwoName = "null"
 
-                                   }else{
+                                                               showDialog.value=true
+                                                               textTechFirstName=textTechFirstName?.trim()
+                                                               textTechLastName=textTechLastName?.trim()
+                                                           } else if (responseObject.status == 500) {
+                                                               title = "Failed"
+                                                               message =
+                                                                   responseObject.message.toString()
+                                                               buttonOneName = "null"
+                                                               buttonTwoName = "null"
+//                                                                showProgressBar.value=false
+                                                               showDialog.value = true
+                                                           } else {
+                                                               title = "Failed"
+                                                               message = responseObject.toString()
+                                                               buttonOneName = "null"
+                                                               buttonTwoName = "null"
+//                                                                    showProgressBar.value=false
+                                                               showDialog.value = true
+                                                           }
+                                                       }
 
-                                       Toast.makeText(context,"Failed to Upload.",Toast.LENGTH_SHORT).show()
-
+                                                   }
+                                               }
+                                           }
+                                       }catch (e: SocketTimeoutException){
+                                           // Handle timeout exception
+//                                showProgressBar.value=false
+                                           showDialog.value=true
+                                           message= e.message.toString()
+                                           buttonOneName= "null"
+                                           buttonTwoName="null"
+                                           Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
+                                       }catch (e:Exception) {
+                                           showDialog.value=true
+                                           message= e.message.toString()
+                                           buttonOneName= "Ok"
+                                           buttonTwoName="null"
+                                           Log.e("NetworkRequest", "Exception: ${e.message}")
+                                       }
                                    }
                                }
 
@@ -486,35 +551,41 @@ fun EditTechnician(
     }
 }
 
-fun uploadImageToFirebase(techId:String?,bitmap: Bitmap,context:ComponentActivity,callback:(Boolean)-> Unit) {
-    val storageRef=Firebase.storage.reference
-    val imageRef= storageRef.child("techniciansProfilePic/$techId+$bitmap")
+fun getSaveImage(context: Context,techImageRef:String?):Bitmap{
+    var bitmap:Bitmap=BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
+    Log.d("img 2 ","$bitmap")
+    val directory=File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        .toString()+File.separator+"RodaRescue")
 
-    val bass=ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG,100,bass)
-    val imageData=bass.toByteArray()
-
-    imageRef.putBytes(imageData).addOnSuccessListener {
-        callback(true)
-    }.addOnFailureListener{
-        callback(false)
+    if (directory.exists() && directory.isDirectory){
+        val file =File(directory,techImageRef)
+        if(file.exists()){
+         bitmap=BitmapFactory.decodeFile(file.absolutePath)
+        }
     }
+    return bitmap
 }
 
-//  gs://garage-c6544.appspot.com/techniciansProfilePic/T-117+android.graphics.Bitmap@979115d
+fun saveImage(context: Context, tempBitmap: Bitmap, techId: String?):String? {
+    val fileName="image_$techId ${System.currentTimeMillis()}.jpg"
+    val directory=File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        .toString()+File.separator+"RodaRescue")
 
-fun getProfileRef(techId:String?,bitmap: Bitmap) {
-    val storageRef=FirebaseStorage.getInstance().reference.child("techniciansProfilePic/$techId+$bitmap")
-    val convertUrl= URLDecoder.decode(storageRef.toString(), "UTF-8")
-    Log.d("firebaseImageReference",convertUrl)
-
-    /*val localFile = File.createTempFile("tempImage","jpg")
-    storageRef.getFile(localFile).addOnSuccessListener {
-        val bitmap=BitmapFactory.decodeFile(localFile.absolutePath)
-        return@addOnSuccessListener
-    }.addOnFailureListener{
-        return@addOnFailureListener
-    }*/
+    if (!directory.exists()){
+        directory.mkdirs()
+    }
+    val file =File(directory,fileName)
+    try {
+        val stream:OutputStream=FileOutputStream(file)
+        tempBitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)
+        stream.flush()
+        stream.close()
+        Toast.makeText(context, "Image saved successfully", Toast.LENGTH_SHORT).show()
+    }catch (e:Exception){
+        e.printStackTrace()
+        Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+    }
+    return fileName
 }
 
 //  android.graphics.Bitmap@6dd5c00

@@ -4,14 +4,27 @@ import com.google.gson.annotations.SerializedName
 
 data class NewTechnician(
     @SerializedName("techFirstName")
-    val techFirstName:String,
+    val techFirstName: String,
     @SerializedName("techLastName")
-    val techLastName:String,
+    val techLastName: String,
     @SerializedName("techContactNumber")
-    val techContactNumber:String,
+    val techContactNumber: String,
     @SerializedName("techExpertiseAreas")
-    val techExpertiseAreas:List<String>,
+    val techExpertiseAreas: List<String>,
     @SerializedName("techStatus")
-    val techStatus:Int,
+    val techStatus: Int,
 )
+
+data class UpdateTechnician(
+    @SerializedName("techId")
+    val techId: String,
+    @SerializedName("techFirstName")
+    val techFirstName: String,
+    @SerializedName("techLastName")
+    val techLastName: String,
+    @SerializedName("imageRef")
+    val techImageRef:String,
+    @SerializedName("techExpertiseAreas")
+    val techExpertiseAreas: List<String>,
+    )
 

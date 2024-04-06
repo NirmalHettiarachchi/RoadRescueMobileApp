@@ -235,15 +235,19 @@ fun TechniciansList(
                         val techLastName=jsonObject.getString("techLastName")
                         val techStatus=jsonObject.getString("techStatus")
                         val techContactNumber=jsonObject.getString("techContactNumb")
+                        val techProfileRef=jsonObject.getString("techProfilePicRef")
                         val techExpertiseList=jsonObject.getString("expertiseList")
 
                         val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
                         val resultList = contentString.split(", ")
 
+                        Log.d("techimgRef-1",techProfileRef)
+
                         techDetails.setTechId(techId)
                         techDetails.setTechFirstName(techFirstName)
                         techDetails.setTechLastName(techLastName)
                         techDetails.setTechContactNumber(techContactNumber)
+                        techDetails.setTechImageRef(techProfileRef)
                         techDetails.setTechExpertiseAreas(resultList)
 
 
@@ -363,7 +367,7 @@ fun TechniciansLoadStretcher(
                 // call to edit technician
 
                 IconButton(onClick = {
-                    val technicianData= TechData(techId=technician.getTechId(),techFirstName=technician.getTechFirstName(),techLastName=technician.getTechLastName())
+                    val technicianData= TechData(techId=technician.getTechId(),techFirstName=technician.getTechFirstName(),techLastName=technician.getTechLastName(),techProfileRef=technician.getTechImageRef())
                     sharedViewModel.techData(technicianData)
                      navController.navigate(route = Screen.EditTechnician.route)
                 }) {
