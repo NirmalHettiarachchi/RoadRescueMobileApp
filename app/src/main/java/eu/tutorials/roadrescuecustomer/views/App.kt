@@ -71,6 +71,8 @@ fun App(
             topBar = {
                 if(shouldShowAppBarAndFooter(currentRoute)) {
                     Header { scope.launch { drawerState.open() } }
+                } else {
+                    AuthHeader()
                 }
             },
             bottomBar = {

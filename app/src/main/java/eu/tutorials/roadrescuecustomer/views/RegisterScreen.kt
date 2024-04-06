@@ -64,32 +64,24 @@ fun RegisterScreen(
     mainActivity: MainActivity,
     registerViewModel: RegisterViewModel
 ) {
-    Scaffold (
-        topBar = {
-            AuthHeader()
-        }
-    ){
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
         Column(
-            backgroundModifier
-                .padding(it)
-                .verticalScroll(rememberScrollState()),
+            backgroundModifier,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                backgroundModifier,
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.register_in_to_road_rescue),
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    SignUpBox(navHostController, mainActivity, registerViewModel)
-                    HelpBox()
-                }
+            Column {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.register_in_to_road_rescue),
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = textStyle1
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                SignUpBox(navHostController, mainActivity, registerViewModel)
             }
         }
     }

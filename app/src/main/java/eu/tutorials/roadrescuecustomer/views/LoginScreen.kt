@@ -48,32 +48,24 @@ fun LoginScreen(
     context: MainActivity,
     loginViewModel: LoginViewModel
 ) {
-    Scaffold (
-        topBar = {
-            AuthHeader()
-        }
-    ){
+    Column(
+        backgroundModifier
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
         Column(
-            backgroundModifier
-                .padding(it)
-                .verticalScroll(rememberScrollState()),
+            backgroundModifier,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                backgroundModifier,
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.log_in_to_road_rescue),
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    LoginBox(navController, context, loginViewModel)
-                    HelpBox()
-                }
+            Column {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.log_in_to_road_rescue),
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = textStyle1
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                LoginBox(navController, context, loginViewModel)
             }
         }
     }
