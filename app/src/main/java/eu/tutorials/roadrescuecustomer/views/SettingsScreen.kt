@@ -130,7 +130,6 @@ fun SettingsBox() {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            CircularProgressBar(isDisplayed = true)
             FillDetailsButton(detailButtonName = "Change Phone Number") {
                 //todo
             }
