@@ -78,10 +78,7 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    val screen = Screen.Activities.route
-                    if (screen != navStatus) {
-                        navController.navigate(route = screen)
-                    }
+                    navController.navigate(route = Screen.Activities.route)
                 }
             ,
             tint = Color.Unspecified,

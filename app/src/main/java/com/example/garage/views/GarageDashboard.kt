@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -50,9 +51,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.Garage
+import com.example.garage.models.ResponseObject
 import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import java.net.SocketTimeoutException
 
 @Composable
 fun GarageDashboard(
@@ -64,6 +69,69 @@ fun GarageDashboard(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val viewModel= viewModel<MainViewModel>()
+
+    var showLoadGarageDetails by remember { mutableStateOf(false) }
+
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var garage by remember { mutableStateOf("") }
+    var garageDetailsBackend=Garage()
+
+    LaunchedEffect(Unit){
+        val response=loadGarageDetails(viewModel)
+        if (response != null) {
+            if(response?.status==200){
+
+                garage= response.data!!.toString()
+//                showProgressBar=false
+                showLoadGarageDetails=true
+
+            }else if(response.status==400){
+                title=response.status.toString()
+                message= response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showLoadGarageDetails=true
+
+            }else if(response.status==404){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showLoadGarageDetails=true
+
+            }else if(response.status==500){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showLoadGarageDetails=true
+            }else if(response.status==508){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="null"
+                buttonTwoName="null"
+                showLoadGarageDetails=true
+            }else{
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showLoadGarageDetails=true
+            }
+        }else{
+            title="401"
+            message="Cannot call the sever"
+            buttonOneName="Ok"
+            buttonTwoName="null"
+            showLoadGarageDetails=true
+            Log.d("response null","null")
+        }
+    }
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -92,12 +160,38 @@ fun GarageDashboard(
 
                 ){
 
+                if (showLoadGarageDetails){
+                    val jsonArray= JSONArray(garage)
+
+                    for (i in 0 until jsonArray.length()){
+                        val jsonObject=jsonArray.getJSONObject(i)
+                        val garageId=jsonObject.getString("garageId")
+                        val garageFirstName=jsonObject.getString("garageFirstName")
+                        val garageLastName=jsonObject.getString("garageLastName")
+                        val garageContactNumber=jsonObject.getString("garageContactNumber")
+                        val garageStatus=jsonObject.getInt("garageStatus")
+                        val garageEmail=jsonObject.getString("garageEmail")
+                        val garageRating=jsonObject.getDouble("garageRating")
+                        val garageType=jsonObject.getString("garageType")
+
+
+                        garageDetailsBackend.setGarageId(garageId)
+                        garageDetailsBackend.setGarageFirstName(garageFirstName)
+                        garageDetailsBackend.setGarageLastName(garageLastName)
+                        garageDetailsBackend.setGarageContactNumber(garageContactNumber)
+                        garageDetailsBackend.setGarageStatus(garageStatus)
+                        garageDetailsBackend.setGarageEmail(garageEmail)
+                        garageDetailsBackend.setGarageRating(garageRating)
+                        garageDetailsBackend.setGarageType(garageType)
+                    }
+
+                }
 
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Welcome, ${garageDetails.getGarageName()}",
+                    text = "Welcome, ${garageDetailsBackend.getGarageFirstName()+" "+garageDetailsBackend.getGarageLastName()}",
                     color = Color(0xFF253555),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
@@ -134,7 +228,26 @@ fun GarageDashboard(
         }
     }
 }
-//GarageApiClient.getGarage()
+
+suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
+    var response: ResponseObject? =null
+
+    try {
+        viewModel.getGarageDetails("","getAll"){responseObject ->
+            if (responseObject!=null) {
+                response=responseObject
+            }else{
+                response= ResponseObject(400,"response is null",null)
+            }
+        }
+    }catch (e:SocketTimeoutException){
+        response=ResponseObject(508,"Request time out.\n Please try again.",e.localizedMessage)
+    }catch (e:Exception){
+        response=ResponseObject(404 ,"Exception error.",e.localizedMessage)
+    }
+    return  response
+}
+
 
 
 

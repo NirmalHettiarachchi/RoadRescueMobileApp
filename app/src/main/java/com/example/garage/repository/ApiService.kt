@@ -29,9 +29,9 @@ private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/ro
 val garageService = retrofit.create(ApiService::class.java)
 
 interface ApiService {
-
+    @Headers("Content-Type: application/json")
     @GET("garage")
-    fun getData(): Call<ResponseBody>
+    fun getGarageData(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
 
     @Headers("Content-Type: application/json")
     @GET("technician")

@@ -75,7 +75,6 @@ fun TechniciansList(
     var showMessageDialog by remember { mutableStateOf(false) }
 //    var showProgressBar by remember { mutableStateOf(true) }
 
-    var status by remember { mutableStateOf(0) }
     var title by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var buttonOneName by remember { mutableStateOf("") }
@@ -127,7 +126,7 @@ fun TechniciansList(
                 showMessageDialog=true
             }
         }else{
-            status=401
+            title="401"
             message="Cannot call the sever"
             buttonOneName="Ok"
             buttonTwoName="null"
@@ -241,7 +240,6 @@ fun TechniciansList(
                         val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
                         val resultList = contentString.split(", ")
 
-                        Log.d("techimgRef-1",techProfileRef)
 
                         techDetails.setTechId(techId)
                         techDetails.setTechFirstName(techFirstName)

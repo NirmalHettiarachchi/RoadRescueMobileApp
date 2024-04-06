@@ -463,7 +463,7 @@ fun EditTechnician(
         //-------
         if (showDialogSelectPic.value) {
             Dialog(
-                onDismissRequest = { /*TODO*/ },
+                onDismissRequest = { showDialogSelectPic.value = false },
                 content = {
                     Row(
                         verticalAlignment = Alignment.Bottom,
@@ -551,16 +551,19 @@ fun EditTechnician(
     }
 }
 
-fun getSaveImage(context: Context,techImageRef:String?):Bitmap{
-    var bitmap:Bitmap=BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
+fun getSaveImage(context: Context, techImageRef:String?): Bitmap {
+    var bitmap: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
     Log.d("img 2 ","$bitmap")
-    val directory=File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        .toString()+File.separator+"RodaRescue")
+    val directory= File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString()+ File.separator+"RodaRescue")
 
     if (directory.exists() && directory.isDirectory){
-        val file =File(directory,techImageRef)
-        if(file.exists()){
-         bitmap=BitmapFactory.decodeFile(file.absolutePath)
+        val file = techImageRef?.let { File(directory, it) }
+        if (file != null) {
+            if(file.exists()){
+                bitmap= BitmapFactory.decodeFile(file.absolutePath)
+            }
         }
     }
     return bitmap
@@ -568,15 +571,16 @@ fun getSaveImage(context: Context,techImageRef:String?):Bitmap{
 
 fun saveImage(context: Context, tempBitmap: Bitmap, techId: String?):String? {
     val fileName="image_$techId ${System.currentTimeMillis()}.jpg"
-    val directory=File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        .toString()+File.separator+"RodaRescue")
+    val directory= File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString()+ File.separator+"RodaRescue")
 
     if (!directory.exists()){
         directory.mkdirs()
     }
-    val file =File(directory,fileName)
+    val file = File(directory,fileName)
     try {
-        val stream:OutputStream=FileOutputStream(file)
+        val stream: OutputStream = FileOutputStream(file)
         tempBitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)
         stream.flush()
         stream.close()
@@ -587,6 +591,8 @@ fun saveImage(context: Context, tempBitmap: Bitmap, techId: String?):String? {
     }
     return fileName
 }
+
+
 
 //  android.graphics.Bitmap@6dd5c00
 //  techId%2Bandroid.graphics.Bitmap%406dd5c00
