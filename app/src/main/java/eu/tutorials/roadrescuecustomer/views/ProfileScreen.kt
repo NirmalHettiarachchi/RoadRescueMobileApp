@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -120,6 +121,10 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
     var newEmail by remember { mutableStateOf("") }
     var showPhoneNumDetailWindow by remember { mutableStateOf(false) }
     var showNumOfReqServiceWindow by remember { mutableStateOf(false) }
+
+    val loading by profileViewModel.loading.collectAsState()
+    CircularProgressBar(isDisplayed = loading)
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -209,7 +214,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
         }
     }
     if (showNumOfReqServiceWindow) {
-        MoreInfoWindow(message = "This number shows only the completed service requests that have been accepted by a service provider and completed.") {
+        MoreInfoWindow(message = "Shows the number of completed service requests that have been completed.") {
             showNumOfReqServiceWindow = false
         }
     }

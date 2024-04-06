@@ -70,3 +70,13 @@ class ProfileRepository() {
         }.start()
     }
 }
+
+//class ProfileViewModel : ViewModel() {
+//    private val _repository: ProfileRepository = ProfileRepository()
+//    private val _numOfServiceRequests = mutableIntStateOf(_repository.getProfile().numOfServiceRequests)
+//    val numOfServiceRequests: MutableState<Int> = _numOfServiceRequests
+//
+//    fun updateProfile(phoneNumber: String, name: String, email: String, context: Context) {
+//        _repository.updateProfile(phoneNumber, name, email, context)
+//    }
+//}
