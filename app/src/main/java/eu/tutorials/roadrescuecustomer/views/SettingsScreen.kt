@@ -130,16 +130,10 @@ fun SettingsBox() {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Just for testing...
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ){
-                FillDetailsButton(detailButtonName = "Change Phone Number") {
-                    //todo
-                }
-                CircularProgressBar(isDisplayed = true)
+            CircularProgressBar(isDisplayed = true)
+            FillDetailsButton(detailButtonName = "Change Phone Number") {
+                //todo
             }
-            //----------------
             FillDetailsButton(detailButtonName = "Manage Payment Methods") {
                 showManagePaymentMethodsWindow = true
             }

@@ -1,26 +1,45 @@
 package eu.tutorials.roadrescuecustomer.views
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import eu.tutorials.roadrescuecustomer.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun CircularProgressBar(isDisplayed: Boolean) {
-    if(isDisplayed) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.Center
+    if (isDisplayed) {
+        var rotationState by remember { mutableFloatStateOf(0f) }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(20)
+                rotationState += 5f
+            }
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
-            CircularProgressIndicator(
-                color = Color.Black
+            Image(
+                painter = painterResource(id = R.drawable.loading_icon),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(50.dp)
+                    .rotate(rotationState)
             )
         }
     }
