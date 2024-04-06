@@ -413,9 +413,10 @@ fun RequestServiceScreen(
     showLoadingLocationWindow = locationViewModel.location.value == null
 
     if (showLoadingLocationWindow) {
-        MoreInfoWindow(message = "Getting the current location . . . ") {
-
-        }
+//        MoreInfoWindow(message = "Getting the current location . . . ") {
+//
+//        }
+        CircularProgressBar(isDisplayed = true)
     }
 
     //Get the current location
