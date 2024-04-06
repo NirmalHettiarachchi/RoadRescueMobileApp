@@ -5,6 +5,8 @@ import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,6 +67,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -807,12 +810,28 @@ fun CommonIssueButton(issueCategory: String, modifier: Modifier, onClickButton: 
 
 @Composable
 fun RequestServiceButton(modifier: Modifier, onClickButton: () -> Unit) {
+    val clicked = remember { mutableStateOf(false) }
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (clicked.value) Color(0xFF3C4962) else Color(0xFF253555),
+        animationSpec = tween(durationMillis = 300), label = ""
+    )
+
+    val onButtonClick = {
+        clicked.value = true
+        onClickButton()
+        GlobalScope.launch {
+            delay(300)
+            clicked.value = false
+        }
+    }
+
     Button(
         modifier = modifier,
-        onClick = { onClickButton() },
+        onClick = { onButtonClick() },
         border = BorderStroke(width = 2.dp, color = Color.White),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
