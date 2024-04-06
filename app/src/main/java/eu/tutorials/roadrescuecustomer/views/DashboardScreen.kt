@@ -155,7 +155,14 @@ fun PendingActivityDashboard(
 ) {
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
-    var pendingRequest by remember { mutableStateOf("Requesting Service") }
+
+    var pendingRequest by remember { mutableStateOf("Requesting Service . . .") }
+
+    val loading = remember {
+        mutableStateOf(false)
+    }
+    CircularProgressBar(isDisplayed = loading.value)
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -192,10 +199,28 @@ fun PendingActivityDashboard(
 
                     delay(15000L) // Wait for 15 seconds before the next call
                 }
+                if(System.currentTimeMillis() >= endTimeMillis) {
+                    serviceRequestViewModel.deleteRequest(
+                        context,
+                        object : ServiceRequestRepository.RequestCallback {
+                            override fun success(id: String) {
+                                if (id == "1") {
+                                    Toast.makeText(context,"Request Deleted",Toast.LENGTH_SHORT).show()
+                                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                                }
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                Toast.makeText(context,"Can't able to cancel",Toast.LENGTH_SHORT).show()
+                                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                            }
+                        }
+                    )
+                }
             }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "$pendingRequest . . . ",
+                text = "$pendingRequest",
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -284,7 +309,10 @@ fun PendingActivityDashboard(
                 btnName = "Cancel Request",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
+
                 if (System.currentTimeMillis() < endTimeMillis) {
+                    loading.value = true
+
                     serviceRequestViewModel.deleteRequest(
                         context,
                         object : ServiceRequestRepository.RequestCallback {
@@ -292,12 +320,14 @@ fun PendingActivityDashboard(
                                 if (id == "1") {
                                     Toast.makeText(context,"Request Deleted",Toast.LENGTH_SHORT).show()
                                     currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                                    loading.value = false
                                 }
                             }
 
                             override fun onError(errorMessage: String) {
                                 Toast.makeText(context,"Can't able to cancel",Toast.LENGTH_SHORT).show()
                                 currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                                loading.value = false
                             }
                         })
                 }else{
@@ -374,6 +404,12 @@ fun RequestServiceScreen(
 
     showLoadingLocationWindow = locationViewModel.location.value == null
 
+    val loading = remember {
+        mutableStateOf(false)
+    }
+
+    CircularProgressBar(isDisplayed = loading.value)
+    
     if (showLoadingLocationWindow) {
 //        MoreInfoWindow(message = "Getting the current location . . . ") {
 //
@@ -502,6 +538,7 @@ fun RequestServiceScreen(
                 if (serviceRequestViewModel.issue.value.id != ""
                     && serviceRequestViewModel.vehicleModel.value.vehicleModel != ""
                 ) {
+                    loading.value = true
                     AppPreferences(context).setStringPreference(
                         "ISSUE",
                         serviceRequestViewModel.issue.value.category
@@ -545,10 +582,12 @@ fun RequestServiceScreen(
                                     true,
                                     isReqServiceWindowOpened = false
                                 )
+                                loading.value = false
                             }
 
                             override fun onError(errorMessage: String) {
                                 Toast.makeText(context, "Error Occurred", Toast.LENGTH_SHORT).show()
+                                loading.value = false
                             }
                         }
                     )
