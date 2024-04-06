@@ -39,6 +39,11 @@ fun IssueDetailsWindow(
     var oilPressureWarningIndicator by remember { mutableStateOf(false) }
     var brakeSystemIndicator by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    val loading = serviceRequestViewModel.loading.value
+    
+    CircularProgressBar(isDisplayed = loading)
+
     AlertDialog(
         onDismissRequest = { onDismiss() },
         tonalElevation = 16.dp,

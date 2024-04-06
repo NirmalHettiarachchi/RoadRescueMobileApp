@@ -2,6 +2,7 @@ package eu.tutorials.roadrescuecustomer.viewmodels
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import eu.tutorials.roadrescuecustomer.models.VehicleMake
 import eu.tutorials.roadrescuecustomer.models.VehicleModel
 import eu.tutorials.roadrescuecustomer.models.VehicleType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -80,53 +82,66 @@ class ServiceRequestViewModel : ViewModel() {
     val vehicleModels = mutableStateOf(listOf<VehicleModel>())
     val issues = mutableStateOf(listOf<Issues>())
 
+    val loading = mutableStateOf(false)
+
     fun fetchVehicleTypes() {
+
         viewModelScope.launch {
+            loading.value = true
             val fetchedVehicleTypes = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 getVehicleTypesFromDatabase()
             }
             vehicleTypes.value = fetchedVehicleTypes
+            loading.value = false
         }
     }
 
     fun fetchIssues() {
         viewModelScope.launch {
+            loading.value = true
             val fetchedIssues = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 getIssuesFromDatabase()
             }
             issues.value = fetchedIssues
+            loading.value = false
         }
     }
 
     fun fetchFuelTypes() {
         viewModelScope.launch {
+            loading.value = true
             val fetchedFuelTypes = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 getFuelTypesFromDatabase()
             }
             fuelTypes.value = fetchedFuelTypes
+            loading.value = false
         }
     }
 
     fun fetchVehicleMakes() {
         viewModelScope.launch {
+            loading.value = true
             val fetchedVehicleMakes = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 getVehicleMakesFromDatabase()
             }
             vehicleMakes.value = fetchedVehicleMakes
+            loading.value = false
         }
     }
 
     fun fetchVehicleModels() {
         viewModelScope.launch {
+            loading.value = true
             val fetchedVehicleModels = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 getVehicleModelsFromDatabase()
             }
             vehicleModels.value = fetchedVehicleModels
+            loading.value = false
         }
     }
 

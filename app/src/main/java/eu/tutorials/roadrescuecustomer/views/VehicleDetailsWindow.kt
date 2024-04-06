@@ -37,6 +37,10 @@ fun VehicleDetailsWindow(
     var vehicleModel by remember { mutableStateOf("") }
     var vehicleModelId by remember { mutableStateOf("") }
 
+    val loading = serviceRequestViewModel.loading.value
+    
+    CircularProgressBar(isDisplayed = loading)
+
     AlertDialog(
         onDismissRequest = { onDismiss() },
         tonalElevation = 16.dp,
