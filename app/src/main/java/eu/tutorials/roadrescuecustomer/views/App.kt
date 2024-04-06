@@ -54,15 +54,19 @@ fun App(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { ModalDrawerSheet(
-            content = {
-                SidebarContent({
-                    scope.launch {
-                        drawerState.close()
+        drawerContent = {
+            if(shouldShowAppBarAndFooter(currentRoute)) {
+                ModalDrawerSheet(
+                    content = {
+                        SidebarContent({
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        }, navController, context)
                     }
-                }, navController, context)
+                )
             }
-        ) }) {
+        }) {
         Scaffold(
             topBar = {
                 if(shouldShowAppBarAndFooter(currentRoute)) {

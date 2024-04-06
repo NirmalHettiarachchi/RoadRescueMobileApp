@@ -68,6 +68,7 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
             navHostController.navigate("loginscreen") {
                 popUpTo("loginscreen") { inclusive = true }
             }
+            menuClicked()
         }
     }
 }
