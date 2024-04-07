@@ -67,8 +67,3 @@ fun HelpBox() {
         }
     }
 }
-@Preview
-@Composable
-fun HelpBoxPreview(){
-    HelpBox()
-}

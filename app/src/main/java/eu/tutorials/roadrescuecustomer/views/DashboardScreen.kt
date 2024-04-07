@@ -205,7 +205,7 @@ fun PendingActivityDashboard(
                         object : ServiceRequestRepository.RequestCallback {
                             override fun success(id: String) {
                                 if (id == "1") {
-                                    Toast.makeText(context,"Request Deleted",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context,"Service request canceled successfully",Toast.LENGTH_SHORT).show()
                                     currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
                                 }
                             }
@@ -318,7 +318,7 @@ fun PendingActivityDashboard(
                         object : ServiceRequestRepository.RequestCallback {
                             override fun success(id: String) {
                                 if (id == "1") {
-                                    Toast.makeText(context,"Request Deleted",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context,"Service request canceled successfully",Toast.LENGTH_SHORT).show()
                                     currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
                                     loading.value = false
                                 }
@@ -575,7 +575,7 @@ fun RequestServiceScreen(
                             override fun success(message: String) {
                                 Toast.makeText(
                                     context,
-                                    "Request Added Successfully",
+                                    "Service requested successfully",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 currentStateViewModel.setCurrentState(
@@ -586,7 +586,7 @@ fun RequestServiceScreen(
                             }
 
                             override fun onError(errorMessage: String) {
-                                Toast.makeText(context, "Error Occurred", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
                                 loading.value = false
                             }
                         }
@@ -594,7 +594,7 @@ fun RequestServiceScreen(
                 } else {
                     Toast.makeText(
                         context,
-                        "Invalid request! Please fill all the required fields to continue . . . ",
+                        "Fill all the required fields to continue",
                         Toast.LENGTH_LONG
                     ).show()
                 }
