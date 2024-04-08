@@ -65,7 +65,7 @@ fun HelpScreen(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
                     style = textStyle1
                 )
             }
-            RequestHelpBox()
+            RequestHelpBox(customerSupportTicketViewModel)
             HelpRequestedList(customerSupportTicketViewModel)
         }
     }
@@ -109,8 +109,11 @@ fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewM
 }
 
 @Composable
-fun RequestHelpBox() {
+fun RequestHelpBox(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
     var showContactSupportWindow by remember { mutableStateOf(false) }
+
+    val customerId = AppPreferences(LocalContext.current).getStringPreference("CUSTOMER_ID", "")
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -144,14 +147,20 @@ fun RequestHelpBox() {
             Spacer(modifier = Modifier.height(16.dp))
 
             if(showContactSupportWindow) {
-                RequestHelpWindow { showContactSupportWindow = false }
+                RequestHelpWindow (customerSupportTicketViewModel, customerId.toInt()){
+                    showContactSupportWindow = false
+                }
             }
         }
     }
 }
 
 @Composable
-fun RequestHelpWindow(onDismiss: () -> Unit) {
+fun RequestHelpWindow(
+    customerSupportTicketViewModel: CustomerSupportTicketViewModel,
+    customerId: Int,
+    onDismiss: () -> Unit)
+{
     var issue by remember { mutableStateOf("") }
     var issueDetails by remember { mutableStateOf("") }
 
@@ -180,7 +189,7 @@ fun RequestHelpWindow(onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                var issueList by remember { mutableStateOf(listOf<String>()) }
+                val issueList = listOf("Login Issue", "Payment Issue", "Technical Glitch", "Feedback", "Other")
 
                 issue = dropDownCommon("Issue", issueList)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -207,6 +216,8 @@ fun RequestHelpWindow(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
                 CommonButton(btnName = "Submit", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    customerSupportTicketViewModel.writeCustomerSupportTicket(customerId, issue, issueDetails)
+                    onDismiss()
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
