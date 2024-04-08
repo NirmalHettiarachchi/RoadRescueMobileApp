@@ -243,8 +243,6 @@ fun ServiceRequestCard() {
 
 @Composable
 fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
-    var issue by remember { mutableStateOf("") }
-    var issueDetails by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },

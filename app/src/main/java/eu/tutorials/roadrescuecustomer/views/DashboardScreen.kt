@@ -473,10 +473,7 @@ fun RequestServiceScreen(
                 detailButtonName = "Vehicle Details" +
                         if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) ""
                         else ": ${
-                                    serviceRequestViewModel.vehicleModel.value.vehicleModel +
-                                    " (" +
-                                    serviceRequestViewModel.fuelType.value.fuelType +
-                                    ")"
+                                    serviceRequestViewModel.vehicleModel.value.vehicleModel
                         } "
             ) {
                 showVehicleDetailsWindow = true

@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.HelpRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
@@ -32,6 +33,7 @@ fun App(
     profileViewModel: ProfileViewModel,
     registerViewModel: RegisterViewModel,
     loginViewModel: LoginViewModel,
+    helpRequestViewModel: HelpRequestViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()

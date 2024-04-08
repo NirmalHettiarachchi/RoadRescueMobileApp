@@ -98,7 +98,7 @@ fun VehicleDetailsWindow(
                 vehicleMakeId = getVehicleMakeId
                 val (getVehicleModel, getVehicleModelId) = dropDownVehicleModel(
                     "Vehicle Model",
-                    vehicleModelList.filter { it.vehicleModel.contains(vehicleMake) })
+                    vehicleModelList.filter { it.vehicleModel.contains(vehicleMake) && it.vehicleModel.contains(fuelType) })
                 vehicleModel = getVehicleModel
                 vehicleModelId = getVehicleModelId
 
