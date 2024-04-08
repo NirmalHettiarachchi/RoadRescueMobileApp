@@ -1,12 +1,10 @@
 package com.example.garage.viewModels
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.NewTechnician
 import com.example.garage.models.ResponseObject
-import com.example.garage.models.ResponseState
 import com.example.garage.repository.garageService
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
@@ -19,7 +17,7 @@ import retrofit2.Response
 class MainViewModel : ViewModel() {
 
 
-    val backendState = MutableLiveData(ResponseState())
+//    val backendState = MutableLiveData(ResponseState())
 
     suspend fun getExpertiseArias(
         searchId:String,
@@ -258,12 +256,13 @@ class MainViewModel : ViewModel() {
         searchId:String,
         option:String,
         onResponseReceived: (ResponseObject?) -> Unit
-    ){
+    ) {
+
         val deferred = CompletableDeferred<ResponseObject>()
 
         viewModelScope.launch {
             try {
-                val call = garageService.getTechnician(searchId,option)
+                val call = garageService.getGarageData(searchId,option)
                 call.enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                         if (response.isSuccessful) {

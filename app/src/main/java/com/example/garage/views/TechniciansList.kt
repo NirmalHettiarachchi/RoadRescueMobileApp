@@ -86,7 +86,7 @@ fun TechniciansList(
 
         val response=loadAllTechnicians(viewModel)
         if (response != null) {
-            if(response?.status==200){
+            if(response.status ==200){
 
                 techList= response.data!!.toString()
 //                showProgressBar=false

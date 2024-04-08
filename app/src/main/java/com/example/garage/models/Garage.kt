@@ -2,28 +2,28 @@ package com.example.garage.models
 
 class Garage {
     private var _garageId:String=""
-    private var _garageFirstName:String=""
-    private var _garageLastName:String=""
+    private var _garageName:String=""
+    private var _ownerName:String=""
     private var _garageContactNumber:String=""
-    private var _garageStatus=0
+    private var _garageStatus=""
     private var _garageEmail:String=""
-    private var _garageRating:Double=0.0
+    private var _garageRating:Float=0F
     private var _type:String=""
 
     constructor()
     constructor(
         _garageId: String,
-        _garageFirstName: String,
-        _garageLastName: String,
+        _garageName: String,
+        _ownerName: String,
         _garageContactNumber: String,
-        _garageStatus: Int,
+        _garageStatus: String,
         _garageEmail: String,
-        _garageRating: Double,
+        _garageRating: Float,
         _type: String,
     ) {
         this._garageId = _garageId
-        this._garageFirstName = _garageFirstName
-        this._garageLastName = _garageLastName
+        this._garageName = _garageName
+        this._ownerName = _ownerName
         this._garageContactNumber = _garageContactNumber
         this._garageStatus = _garageStatus
         this._garageEmail = _garageEmail
@@ -40,20 +40,20 @@ class Garage {
         this._garageId=garageId
     }
 
-    fun getGarageFirstName():String{
-        return this._garageFirstName
+    fun getGarageName():String{
+        return this._garageName
     }
 
-    fun setGarageFirstName (garageFirstName:String){
-        this._garageFirstName =garageFirstName
+    fun setGarageName (garageName:String){
+        this._garageName =garageName
     }
 
-    fun getGarageLastName():String{
-        return this._garageLastName
+    fun getOwnerName():String{
+        return this._ownerName
     }
 
-    fun setGarageLastName(garageLastName:String){
-        this._garageLastName=garageLastName
+    fun setOwnerName(ownerName:String){
+        this._ownerName=ownerName
     }
 
     fun getGarageContactNumber():String{
@@ -64,11 +64,11 @@ class Garage {
         this._garageContactNumber=contactNumber
     }
 
-    fun getGarageStatus():Int{
+    fun getGarageStatus():String{
         return this._garageStatus
     }
 
-    fun setGarageStatus(status:Int){
+    fun setGarageStatus(status:String){
         this._garageStatus=status
     }
 
@@ -80,11 +80,11 @@ class Garage {
         this._garageEmail=email
     }
 
-    fun getGarageRating():Double{
+    fun getGarageRating():Float{
         return this._garageRating
     }
 
-    fun setGarageRating(garageRate:Double){
+    fun setGarageRating(garageRate:Float){
         this._garageRating=garageRate
     }
 

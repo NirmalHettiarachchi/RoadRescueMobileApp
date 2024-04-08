@@ -33,7 +33,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,7 +55,8 @@ import com.example.garage.models.ResponseObject
 import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
-import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.net.SocketTimeoutException
 
 @Composable
@@ -72,6 +72,7 @@ fun GarageDashboard(
     val viewModel= viewModel<MainViewModel>()
 
     var showLoadGarageDetails by remember { mutableStateOf(false) }
+    var showMessageDialog by remember { mutableStateOf(false) }
 
     var title by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
@@ -82,8 +83,9 @@ fun GarageDashboard(
 
     LaunchedEffect(Unit){
         val response=loadGarageDetails(viewModel)
+        Log.d("response hutta",response.toString())
         if (response != null) {
-            if(response?.status==200){
+            if(response.status ==200){
 
                 garage= response.data!!.toString()
 //                showProgressBar=false
@@ -94,40 +96,40 @@ fun GarageDashboard(
                 message= response.message.toString()
                 buttonOneName="Ok"
                 buttonTwoName="null"
-                showLoadGarageDetails=true
+                showMessageDialog=true
 
             }else if(response.status==404){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
                 buttonTwoName="null"
-                showLoadGarageDetails=true
+                showMessageDialog=true
 
             }else if(response.status==500){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
                 buttonTwoName="null"
-                showLoadGarageDetails=true
+                showMessageDialog=true
             }else if(response.status==508){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="null"
                 buttonTwoName="null"
-                showLoadGarageDetails=true
+                showMessageDialog=true
             }else{
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
                 buttonTwoName="null"
-                showLoadGarageDetails=true
+                showMessageDialog=true
             }
         }else{
             title="401"
             message="Cannot call the sever"
             buttonOneName="Ok"
             buttonTwoName="null"
-            showLoadGarageDetails=true
+            showMessageDialog=true
             Log.d("response null","null")
         }
     }
@@ -160,30 +162,36 @@ fun GarageDashboard(
 
                 ){
 
-                if (showLoadGarageDetails){
-                    val jsonArray= JSONArray(garage)
+                if (showLoadGarageDetails) {
 
-                    for (i in 0 until jsonArray.length()){
-                        val jsonObject=jsonArray.getJSONObject(i)
-                        val garageId=jsonObject.getString("garageId")
-                        val garageFirstName=jsonObject.getString("garageFirstName")
-                        val garageLastName=jsonObject.getString("garageLastName")
-                        val garageContactNumber=jsonObject.getString("garageContactNumber")
-                        val garageStatus=jsonObject.getInt("garageStatus")
-                        val garageEmail=jsonObject.getString("garageEmail")
-                        val garageRating=jsonObject.getDouble("garageRating")
-                        val garageType=jsonObject.getString("garageType")
+                    Log.d("garage",garage)
+
+                    try {
+                        val jsonObject = JSONObject(garage)
+
+                        val garageName = jsonObject.getString("garageName")
+                        val ownerName = jsonObject.getString("OwnerName")
+                        val garageContactNumber = jsonObject.getString("contactNumber")
+                        val garageStatus = jsonObject.getString("garageStatus")
+                        val garageEmail = jsonObject.getString("email")
+                        val garageRating = jsonObject.getString("garageRating").toFloat()
+                        val garageType = jsonObject.getString("garageType")
 
 
-                        garageDetailsBackend.setGarageId(garageId)
-                        garageDetailsBackend.setGarageFirstName(garageFirstName)
-                        garageDetailsBackend.setGarageLastName(garageLastName)
+                        garageDetailsBackend.setGarageName(garageName)
+                        garageDetailsBackend.setOwnerName(ownerName)
                         garageDetailsBackend.setGarageContactNumber(garageContactNumber)
                         garageDetailsBackend.setGarageStatus(garageStatus)
                         garageDetailsBackend.setGarageEmail(garageEmail)
                         garageDetailsBackend.setGarageRating(garageRating)
                         garageDetailsBackend.setGarageType(garageType)
+
+
+                    }catch (e: JSONException){
+                        e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
                     }
+
+
 
                 }
 
@@ -191,7 +199,7 @@ fun GarageDashboard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Welcome, ${garageDetailsBackend.getGarageFirstName()+" "+garageDetailsBackend.getGarageLastName()}",
+                    text = "Welcome, ${garageDetailsBackend.getGarageName()}",
                     color = Color(0xFF253555),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
@@ -225,6 +233,18 @@ fun GarageDashboard(
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
+
+            if (showMessageDialog){
+                sweetAlertDialog(
+                    title = title,
+                    message = message,
+                    buttonOneName = buttonOneName,
+                    buttonTwoName = buttonTwoName,
+                    onConfirm = {
+                        showMessageDialog=false
+                    }
+                )
+            }
         }
     }
 }
@@ -233,8 +253,9 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
     var response: ResponseObject? =null
 
     try {
-        viewModel.getGarageDetails("","getAll"){responseObject ->
+        viewModel.getGarageDetails("","garageDetail"){responseObject ->
             if (responseObject!=null) {
+                Log.d("responseBody",responseObject.toString())
                 response=responseObject
             }else{
                 response= ResponseObject(400,"response is null",null)
@@ -257,8 +278,6 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
 @Composable
 fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
 
-    val garageViewModel: MainViewModel = viewModel()
-    val viewState by garageViewModel.backendState.observeAsState()
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -416,7 +435,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
 
-
+/*
 //                                    garageViewModel.fetchBackend()
                                     Log.d("rsp","request is ok ")
 
@@ -436,7 +455,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                         viewState?.response !=null -> {
                                             Log.d("data final","${viewState?.response!!.data}")
                                         }
-                                    }
+                                    }*/
 
                                 }
                             )
