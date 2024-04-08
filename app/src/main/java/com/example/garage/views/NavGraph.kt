@@ -14,11 +14,8 @@ import androidx.navigation.compose.composable
 import com.example.garage.models.GarageTechnician
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageActivityDetails
-import com.example.garage.viewModels.GarageDashboardViewModel
-import com.example.garage.viewModels.GarageProfileViewModel
 import com.example.garage.viewModels.SharedViewModel
 import java.text.SimpleDateFormat
-import java.time.Period
 import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -49,20 +46,13 @@ fun SetupNavGraph(
         val currentTime = time.format(Date())
 
 
-        val technicians = listOf<String>("Saman Kumara","Tharindu Dakshina","Ajith Muthukumara","Namal Rajapakasha")
+
 
         composable(
             route=Screen.GarageDashboard.route
         ){
 
-
-            val garageDashboardViewModel = GarageDashboardViewModel(
-                "Nirmal Dakshina", Period.of(1, 2, 3),
-                "Tire Punch", "Need help as soon as possible", 25000.00
-            )
-
-
-            GarageDashboard(garageDetails = garageDashboardViewModel, technicianList = technicians,navController,navStatus="garageProfile")
+            GarageDashboard(navController=navController,navStatus="garageProfile",sharedViewModel=SharedViewModel())
         }
         
         composable(
@@ -89,9 +79,9 @@ fun SetupNavGraph(
             route=Screen.GarageProfile.route
         ){
             GarageProfile(
-                garageProfileDetails = GarageProfileViewModel("Nirmal","C-001","Thiran Sasanka", "+94761339805", "tharindudakshina@gmail.com"),
                 navController = navController,
-                navyStatus = "garageProfile"
+                navyStatus = "garageProfile",
+                sharedViewModel = sharedViewModel
             )
         }
 

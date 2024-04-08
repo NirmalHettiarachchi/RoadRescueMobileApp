@@ -365,9 +365,14 @@ fun TechniciansLoadStretcher(
                 // call to edit technician
 
                 IconButton(onClick = {
-                    val technicianData= TechData(techId=technician.getTechId(),techFirstName=technician.getTechFirstName(),techLastName=technician.getTechLastName(),techProfileRef=technician.getTechImageRef())
+                    val technicianData = TechData(
+                        techId = technician.getTechId(),
+                        techFirstName = technician.getTechFirstName(),
+                        techLastName = technician.getTechLastName(),
+                        techProfileRef = technician.getTechImageRef()
+                    )
                     sharedViewModel.techData(technicianData)
-                     navController.navigate(route = Screen.EditTechnician.route)
+                    navController.navigate(route = Screen.EditTechnician.route)
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,

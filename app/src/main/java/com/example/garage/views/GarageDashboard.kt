@@ -2,7 +2,9 @@ package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,20 +54,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.models.Garage
 import com.example.garage.models.ResponseObject
+import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.SocketTimeoutException
+import java.time.Period
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GarageDashboard(
-    garageDetails:GarageDashboardViewModel,
-    technicianList:List<String>,
     navController: NavController,
     navStatus:String,
-
+    sharedViewModel: SharedViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -81,9 +85,11 @@ fun GarageDashboard(
     var garage by remember { mutableStateOf("") }
     var garageDetailsBackend=Garage()
 
+
+    val technicians = listOf<String>("Saman Kumara","Tharindu Dakshina","Ajith Muthukumara","Namal Rajapakasha")
+
     LaunchedEffect(Unit){
         val response=loadGarageDetails(viewModel)
-        Log.d("response hutta",response.toString())
         if (response != null) {
             if(response.status ==200){
 
@@ -163,9 +169,6 @@ fun GarageDashboard(
                 ){
 
                 if (showLoadGarageDetails) {
-
-                    Log.d("garage",garage)
-
                     try {
                         val jsonObject = JSONObject(garage)
 
@@ -178,6 +181,7 @@ fun GarageDashboard(
                         val garageType = jsonObject.getString("garageType")
 
 
+
                         garageDetailsBackend.setGarageName(garageName)
                         garageDetailsBackend.setOwnerName(ownerName)
                         garageDetailsBackend.setGarageContactNumber(garageContactNumber)
@@ -187,11 +191,39 @@ fun GarageDashboard(
                         garageDetailsBackend.setGarageType(garageType)
 
 
+                        // Garage Details load to shared view mode
+
+
+                        val garageCommonDetails=GarageCommonDetails(
+                            "1",
+                            garageDetailsBackend.getGarageName(),
+                            garageDetailsBackend.getGarageContactNumber(),
+                            garageDetailsBackend.getGarageStatus(),
+                            garageDetailsBackend.getGarageEmail(),
+                            garageDetailsBackend.getGarageRating(),
+                            garageDetailsBackend.getGarageType(),
+                            garageDetailsBackend.getOwnerName()
+                        )
+
+                        Log.d("gaargePaka 1",garageCommonDetails.toString())
+
+                        Log.d("puka 1",garageDetailsBackend.getGarageName())
+                        Log.d("puka 1",garageDetailsBackend.getGarageContactNumber())
+                        Log.d("puka 1",garageDetailsBackend.getGarageStatus())
+                        Log.d("puka 1",garageDetailsBackend.getGarageEmail())
+                        Log.d("puka 1",garageDetailsBackend.getGarageRating().toString())
+                        Log.d("puka 1",garageDetailsBackend.getGarageType())
+                        Log.d("puka 1",garageDetailsBackend.getOwnerName())
+
+
+
+                        sharedViewModel.garageCommonDetails(garageCommonDetails)
+
+                        ////////////////////
+
                     }catch (e: JSONException){
                         e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
                     }
-
-
 
                 }
 
@@ -222,12 +254,12 @@ fun GarageDashboard(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Load are service requests
-
-                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+                    // custommer request load karanna one
+                    ServiceRequest(garageDetailsBackend,technicians,Modifier.align(Alignment.CenterHorizontally))
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+                    ServiceRequest(garageDetailsBackend,technicians,Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -253,7 +285,7 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
     var response: ResponseObject? =null
 
     try {
-        viewModel.getGarageDetails("","garageDetail"){responseObject ->
+        viewModel.getGarageDetails("1","search"){responseObject ->
             if (responseObject!=null) {
                 Log.d("responseBody",responseObject.toString())
                 response=responseObject
@@ -273,10 +305,17 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
 
 
 
+// meke data tika load karanna one custommerge trigger eka dala
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
+fun ServiceRequest(garageDetails:Garage, technicianList:List<String>,modifier: Modifier){
+
+    val garageDetails = GarageDashboardViewModel(
+        "Nirmal Dakshina", Period.of(1, 2, 3),
+        "Tire Punch", "Need help as soon as possible", 25000.00
+    )
+
 
     Card(
         modifier = modifier
