@@ -41,6 +41,13 @@ val textStyle4 = TextStyle(
     color = Color(0xFF253555),
 )
 
+val textStyle5 = TextStyle(
+    fontWeight = FontWeight.Bold,
+    fontSize = 14.sp,
+    letterSpacing = 0.15.sp,
+    color = Color(0xFF253555),
+)
+
 val cardModifier = Modifier
     .fillMaxWidth()
     .padding(horizontal = 16.dp, vertical = 8.dp)

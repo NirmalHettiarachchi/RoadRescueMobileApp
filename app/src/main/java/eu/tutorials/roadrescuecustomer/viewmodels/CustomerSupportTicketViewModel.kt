@@ -1,9 +1,12 @@
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.DriverManager
@@ -58,7 +61,7 @@ class CustomerSupportTicketViewModel : ViewModel() {
         )
     }
 
-    fun writeCustomerSupportTicket(customerId: Int, issue: String, description: String) {
+    fun writeCustomerSupportTicket(customerId: Int, issue: String, description: String, context: Context) {
         viewModelScope.launch {
             loading.value = true
             withContext(Dispatchers.IO) {
@@ -71,13 +74,17 @@ class CustomerSupportTicketViewModel : ViewModel() {
                     Class.forName("com.mysql.jdbc.Driver")
                     DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
                         val preparedStatement = connection.prepareStatement(
-                            "INSERT INTO customer_support_ticket (customer_id, title, description, status, solution) VALUES (?, ?, ?, 'pending', '')"
+                            "INSERT INTO customer_support_ticket (customer_id, title, description, status, solution) VALUES (?, ?, ?, 'Pending', '')"
                         ).apply {
                             setInt(1, customerId)
                             setString(2, issue)
                             setString(3, description)
                         }
                         preparedStatement.executeUpdate()
+                    }
+                    MainScope().launch {
+                        Toast.makeText(context, "Support ticket created successfully", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

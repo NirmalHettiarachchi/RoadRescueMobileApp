@@ -4,6 +4,9 @@ import CustomerSupportTicketViewModel
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,6 +47,10 @@ import androidx.compose.ui.unit.sp
 import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HelpScreen(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
@@ -65,7 +72,7 @@ fun HelpScreen(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
                     style = textStyle1
                 )
             }
-            RequestHelpBox(customerSupportTicketViewModel)
+            RequestHelpBox(customerSupportTicketViewModel, LocalContext.current)
             HelpRequestedList(customerSupportTicketViewModel)
         }
     }
@@ -106,10 +113,11 @@ fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewM
     customerSupportTicketViewModel.tickets.forEach { ticket ->
         HelpRequested(ticket)
     }
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable
-fun RequestHelpBox(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
+fun RequestHelpBox(customerSupportTicketViewModel: CustomerSupportTicketViewModel, context: Context) {
     var showContactSupportWindow by remember { mutableStateOf(false) }
 
     val customerId = AppPreferences(LocalContext.current).getStringPreference("CUSTOMER_ID", "")
@@ -147,7 +155,7 @@ fun RequestHelpBox(customerSupportTicketViewModel: CustomerSupportTicketViewMode
             Spacer(modifier = Modifier.height(16.dp))
 
             if(showContactSupportWindow) {
-                RequestHelpWindow (customerSupportTicketViewModel, customerId.toInt()){
+                RequestHelpWindow (customerSupportTicketViewModel, customerId.toInt(), context){
                     showContactSupportWindow = false
                 }
             }
@@ -159,7 +167,9 @@ fun RequestHelpBox(customerSupportTicketViewModel: CustomerSupportTicketViewMode
 fun RequestHelpWindow(
     customerSupportTicketViewModel: CustomerSupportTicketViewModel,
     customerId: Int,
-    onDismiss: () -> Unit)
+    context: Context,
+    onDismiss: () -> Unit,
+)
 {
     var issue by remember { mutableStateOf("") }
     var issueDetails by remember { mutableStateOf("") }
@@ -216,8 +226,20 @@ fun RequestHelpWindow(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 CommonButton(btnName = "Submit", modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    customerSupportTicketViewModel.writeCustomerSupportTicket(customerId, issue, issueDetails)
-                    onDismiss()
+                    if (issue.isNotEmpty()) {
+                        customerSupportTicketViewModel.writeCustomerSupportTicket(
+                            customerId,
+                            issue,
+                            issueDetails,
+                            context
+                        )
+                        onDismiss()
+                    } else {
+                        MainScope().launch {
+                            Toast.makeText(context, "Select an issue", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -225,10 +247,16 @@ fun RequestHelpWindow(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
     var showMoreDetailsWindow by remember {  mutableStateOf(false) }
+
+    val dateTime = LocalDateTime.parse(customerSupportTicket.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"))
+    val formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val formattedTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -237,21 +265,23 @@ fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
         colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
         onClick = { showMoreDetailsWindow = true }
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = "${customerSupportTicket.issue}: ${customerSupportTicket.date} ",
+                text = "${customerSupportTicket.issue}: $formattedDate $formattedTime ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle2
+                style = textStyle5
             )
             Text(
                 text = "Status: ${customerSupportTicket.status} ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle2
+                style = textStyle5
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -260,7 +290,7 @@ fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
         MoreInfoWindow(message =
         "Support Ticket ID: T${customerSupportTicket.id}" +
                 "\nCategory: ${customerSupportTicket.issue}" +
-                "\nDate: ${customerSupportTicket.date}" +
+                "\nCreated on: $formattedDate at $formattedTime"+
                 "\nStatus: ${customerSupportTicket.status}" +
                 "\nDescription: ${customerSupportTicket.description}" +
                 "\nSolution: ${customerSupportTicket.solution}"

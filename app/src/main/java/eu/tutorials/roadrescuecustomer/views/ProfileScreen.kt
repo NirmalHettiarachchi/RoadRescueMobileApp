@@ -209,12 +209,12 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
         }
     }
     if (showPhoneNumDetailWindow) {
-        MoreInfoWindow(message = "You can change the registered phone number by accessing the settings...") {
+        MoreInfoWindow(message = "You can change the registered phone number by accessing the settings.") {
             showPhoneNumDetailWindow = false
         }
     }
     if (showNumOfReqServiceWindow) {
-        MoreInfoWindow(message = "Shows the number of completed service requests that have been completed.") {
+        MoreInfoWindow(message = "Shows the number of completed service requests.") {
             showNumOfReqServiceWindow = false
         }
     }
