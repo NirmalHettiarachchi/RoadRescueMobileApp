@@ -26,11 +26,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -218,37 +220,21 @@ fun PendingActivityDashboard(
                     )
                 }
             }
+
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = "$pendingRequest",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            DashboardFieldButton(
-                fieldName = "Issue",
-                fieldValue = AppPreferences(context).getStringPreference("ISSUE"),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .width(250.dp)
-            )
-            DashboardFieldButton(
-                fieldName = "Vehicle",
-                fieldValue = serviceRequestViewModel.vehicleType.value.vehicleType,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .width(250.dp)
-            )
-            DashboardFieldButton(
-                fieldName = "Request ID",
-                fieldValue = AppPreferences(context).getStringPreference("REQUEST_ID"),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .width(250.dp)
-            )
+            //todo
+            AnimatedCircle(isDisplayed = true)
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
-                onClick = { },
+                onClick = { showCostDetailWindow = true },
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 modifier = Modifier
@@ -279,31 +265,21 @@ fun PendingActivityDashboard(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = AppPreferences(context).getStringPreference(
-                    "DESCRIPTION"
-                ),
-                onValueChange = { },
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(250.dp)
-                    .border(2.dp, Color.White, shape = RoundedCornerShape(20))
-                    .shadow(2.dp, shape = RoundedCornerShape(20))
-                    .background(Color.White)
-                    .align(Alignment.CenterHorizontally),
-                enabled = false,
-                placeholder = {
-                    Text(
-                        text = "No description provided!",
-                        fontSize = 12.sp,
-                        color = Color(0xFF253555)
-                    )
-                },
-                textStyle = TextStyle(
-                    color = Color(0xFF253555)
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            var showRequestDetailsWindow by remember {
+                mutableStateOf(false)
+            }
+
+            CommonButton(btnName = "Show Details", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                showRequestDetailsWindow = true
+            }
+
+            if(showRequestDetailsWindow) {
+                RequestDetails(serviceRequestViewModel = serviceRequestViewModel, context = context) {
+                    showRequestDetailsWindow = false
+                }
+            }
+
+            //----------------------------------------------------------------------------
             //Cancel btn
             CommonButton(
                 btnName = "Cancel Request",
@@ -905,3 +881,78 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     Spacer(modifier = Modifier.height(16.dp))
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Context, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        shape = RoundedCornerShape(10),
+        modifier = Modifier
+            .border(2.dp, Color.White, shape = RoundedCornerShape(10))
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .verticalScroll(rememberScrollState()),
+        tonalElevation = 16.dp,
+        containerColor = Color(0xFFDCE4EC),
+        confirmButton = {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Service Request Details",
+                    style = textStyle2
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                DashboardFieldButton(
+                    fieldName = "Issue",
+                    fieldValue = AppPreferences(context).getStringPreference("ISSUE"),
+                    modifier = Modifier
+                        .width(250.dp)
+                )
+                DashboardFieldButton(
+                    fieldName = "Vehicle",
+                    fieldValue = serviceRequestViewModel.vehicleModel.value.vehicleModel,
+                    modifier = Modifier
+                        .width(250.dp)
+                )
+                DashboardFieldButton(
+                    fieldName = "Request ID",
+                    fieldValue = AppPreferences(context).getStringPreference("REQUEST_ID"),
+                    modifier = Modifier
+                        .width(250.dp)
+                )
+
+                OutlinedTextField(
+                    value = AppPreferences(context).getStringPreference(
+                        "DESCRIPTION"
+                    ),
+                    onValueChange = { },
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(250.dp)
+                        .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+                        .shadow(2.dp, shape = RoundedCornerShape(20))
+                        .background(Color.White)
+                    ,
+                    enabled = false,
+                    placeholder = {
+                        Text(
+                            text = serviceRequestViewModel.description.value.ifEmpty { "No Description Provided" },
+                            fontSize = 12.sp,
+                            color = Color(0xFF253555)
+                        )
+                    },
+                    textStyle = TextStyle(
+                        color = Color(0xFF253555)
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    )
+}
