@@ -187,7 +187,11 @@ fun SignUpBox(
                                     navController,
                                     context
                                 )
-
+                                navController.navigate("loginscreen") {
+                                    popUpTo("loginscreen") {
+                                        inclusive = true
+                                    }
+                                }
                             } else {
                                 MainScope().launch {
                                     Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()

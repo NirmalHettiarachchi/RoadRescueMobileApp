@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import CustomerSupportTicketViewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
@@ -17,7 +18,6 @@ import androidx.navigation.compose.rememberNavController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
-import eu.tutorials.roadrescuecustomer.viewmodels.HelpRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
@@ -33,7 +33,7 @@ fun App(
     profileViewModel: ProfileViewModel,
     registerViewModel: RegisterViewModel,
     loginViewModel: LoginViewModel,
-    helpRequestViewModel: HelpRequestViewModel,
+    customerSupportTicketViewModel: CustomerSupportTicketViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()
@@ -128,7 +128,7 @@ fun App(
                     ActivitiesScreen()
                 }
                 composable("helpscreen") {
-                    HelpScreen()
+                    HelpScreen(customerSupportTicketViewModel)
                 }
                 composable("settingsscreen") {
                     SettingsScreen()

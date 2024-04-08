@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import CustomerSupportTicketViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
-import eu.tutorials.roadrescuecustomer.viewmodels.HelpRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
             val profileViewModel: ProfileViewModel = viewModel()
             val registerViewModel: RegisterViewModel = viewModel()
             val loginViewModel: LoginViewModel = viewModel()
-            val helpRequestViewModel: HelpRequestViewModel = viewModel()
+            val customerSupportTicketViewModel: CustomerSupportTicketViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         profileViewModel,
                         registerViewModel,
                         loginViewModel,
-                        helpRequestViewModel,
+                        customerSupportTicketViewModel,
                         this
                     )
                 }
