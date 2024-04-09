@@ -439,16 +439,16 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             FillDetailsButton(
-                detailButtonName = "Issue" +
-                        if (serviceRequestViewModel.issue.value.category.isEmpty()) ""
-                        else ": ${serviceRequestViewModel.issue.value.category}"
+                detailButtonName =
+                        if (serviceRequestViewModel.issue.value.category.isEmpty()) "Issue Details (required)"
+                        else "Issue: ${serviceRequestViewModel.issue.value.category}"
             ) {
                 showIssueDetailsWindow = true
             }
             FillDetailsButton(
-                detailButtonName = "Vehicle" +
-                        if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) ""
-                        else ": ${
+                detailButtonName =
+                        if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) "Vehicle Details (required)"
+                        else "Vehicle: ${
                                     serviceRequestViewModel.vehicleModel.value.vehicleModel
                         } "
             ) {
