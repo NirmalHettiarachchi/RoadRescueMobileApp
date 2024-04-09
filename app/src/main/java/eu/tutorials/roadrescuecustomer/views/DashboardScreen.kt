@@ -439,14 +439,14 @@ fun RequestServiceScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             FillDetailsButton(
-                detailButtonName = "Issue Details" +
+                detailButtonName = "Issue" +
                         if (serviceRequestViewModel.issue.value.category.isEmpty()) ""
                         else ": ${serviceRequestViewModel.issue.value.category}"
             ) {
                 showIssueDetailsWindow = true
             }
             FillDetailsButton(
-                detailButtonName = "Vehicle Details" +
+                detailButtonName = "Vehicle" +
                         if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) ""
                         else ": ${
                                     serviceRequestViewModel.vehicleModel.value.vehicleModel
@@ -471,7 +471,7 @@ fun RequestServiceScreen(
                 ) {
                     Text(
                         text = "Cost: LKR ${serviceRequestViewModel.issue.value.approximatedCost}",
-                        style = textStyle2,
+                        style = textStyle5,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
@@ -490,6 +490,7 @@ fun RequestServiceScreen(
                 onValueChange = { description = it },
                 modifier = Modifier
                     .height(100.dp)
+                    .width(265.dp)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(20))
                     .shadow(2.dp, shape = RoundedCornerShape(20))
                     .background(Color.White),
@@ -681,122 +682,33 @@ fun CommonIssuesBox(
                 modifier = Modifier
                     .padding(vertical = 8.dp, horizontal = 24.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // First row, first button
-                    CommonIssueButton(
-                        issueCategory = "Mechanical Issues",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Mechanical Issues"
-                        }
-                    )
-                    // First row, second button
-                    CommonIssueButton(
-                        issueCategory = "Electrical Issues",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Electrical Issues"
-                        }
-                    )
+                CommonIssueButton(issueCategory = "Mechanical Issues") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Mechanical Issues"
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Second row, first button
-                    CommonIssueButton(
-                        issueCategory = "Engine Problems",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Engine Problems"
-                        }
-                    )
-
-                    // Second row, second button
-                    CommonIssueButton(
-                        issueCategory = "Fuel Issues",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Fuel Issues"
-                        }
-                    )
+                CommonIssueButton(issueCategory = "Electrical Issues") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Electrical Issues"
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Third row, first button
-                    CommonIssueButton(
-                        issueCategory = "Exhaust Issues",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Exhaust Issues"
-                        }
-                    )
-
-                    // Third row, second button
-                    CommonIssueButton(
-                        issueCategory = "Cooling Problems",
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        onClickButton = {
-                            currentStateViewModel.isReqServiceWindowOpened.value = true
-                            serviceRequestViewModel.issue.value.category = "Cooling Problems"
-                        }
-                    )
+                CommonIssueButton(issueCategory = "Engine Problems") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Engine Problems"
                 }
-                Button(
-                    onClick = {
-                        currentStateViewModel.isReqServiceWindowOpened.value = true
-                        serviceRequestViewModel.issue.value.category = "Other"
-                    },
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                ) {
-                    Text(
-                        text = "Other",
-                        color = Color(0xFF253555),
-                        style = textStyle3.copy(textAlign = TextAlign.Center)
-                    )
+                CommonIssueButton(issueCategory = "Fuel Issues") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Fuel Issues"
+                }
+                CommonIssueButton(issueCategory = "Exhaust Issues") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Exhaust Issues"
+                }
+                CommonIssueButton(issueCategory = "Cooling Problems") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Cooling Problems"
+                }
+                CommonIssueButton(issueCategory = "Other") {
+                    currentStateViewModel.isReqServiceWindowOpened.value = true
+                    serviceRequestViewModel.issue.value.category = "Other"
                 }
             }
         }
@@ -804,17 +716,20 @@ fun CommonIssuesBox(
 }
 
 @Composable
-fun CommonIssueButton(issueCategory: String, modifier: Modifier, onClickButton: () -> Unit) {
+fun CommonIssueButton(issueCategory: String, onClickButton: () -> Unit) {
     Button(
-        modifier = modifier,
-        onClick = { onClickButton() },
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(width = 2.dp, color = Color.White),
+        onClick = {
+            onClickButton()
+        },
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
     ) {
         Text(
             text = issueCategory,
+            color = Color(0xFF253555),
             style = textStyle3.copy(textAlign = TextAlign.Center)
         )
     }

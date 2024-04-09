@@ -23,7 +23,8 @@ fun FillDetailsButton(detailButtonName: String, onClickButton: () -> Unit) {
         Text(
             text = detailButtonName,
             color = Color(0xFF253555),
-            style = textStyle3.copy(textAlign = TextAlign.Center)
+            style = textStyle5.copy(textAlign = TextAlign.Center),
+            maxLines = 1
         )
     }
 }
