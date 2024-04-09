@@ -10,11 +10,13 @@ class GarageProfileViewModel {
     private var _garageEmail: String = ""
     private var _iconPath: Int = 0
     private var _IconName: String = ""
+    private var _routPath: String = ""
 
 
-    constructor(iconPath: Int, iconName: String) {
+    constructor(iconPath: Int, iconName: String,path:String) {
         this._IconName = iconName
         this._iconPath = iconPath
+        this._routPath =path
     }
 
     constructor(
@@ -29,6 +31,11 @@ class GarageProfileViewModel {
         this._ownerName = ownerName
         this._garageContactNumber = garageContactNumber
         this._garageEmail = garageEmail
+    }
+
+    constructor(_iconPath: Int, _IconName: String) {
+        this._iconPath = _iconPath
+        this._IconName = _IconName
     }
 
     fun getIconPath(): Int {

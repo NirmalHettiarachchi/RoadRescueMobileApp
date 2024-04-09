@@ -30,7 +30,6 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,16 +53,24 @@ import coil.compose.AsyncImage
 import com.example.garage.R
 import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.viewModels.GarageSharedViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun GarageProfileEdit(
     navController: NavHostController,
     navStatus: String,
-    sharedViewModel: SharedViewModel
+    garageSharedViewModel: GarageSharedViewModel
 ) {
+
+    val garageData= garageSharedViewModel.garage
+    val partsOfName=garageData?.garageOwner?.split(" ")
+    val textFirstName by remember { mutableStateOf(partsOfName!![0]) }
+    val textLastName by remember { mutableStateOf(partsOfName!![1]) }
+    val garageName by remember { mutableStateOf(garageData?.garageName) }
+    val contactNumber by remember { mutableStateOf(garageData?.garageContactNumber)}
+    val email by remember { mutableStateOf(garageData?.garageEmail) }
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -94,13 +101,6 @@ fun GarageProfileEdit(
                         selectedImageUri = it
                     }
                 )
-
-                val textFirstName by remember { mutableStateOf("") }
-                val textLastName by remember { mutableStateOf("") }
-                val garageName by remember { mutableStateOf("") }
-                val contactNumber by remember { mutableStateOf("") }
-                val email by remember { mutableStateOf("") }
-
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -167,17 +167,17 @@ fun GarageProfileEdit(
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(garageName, true, "Garage Name", Modifier.height(46.dp), false,KeyboardType.Text)
+                garageName?.let { CommonTextField(it, true, "Garage Name", Modifier.height(46.dp), false,KeyboardType.Text) }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(contactNumber, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number)
+                contactNumber?.let { CommonTextField(it, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number) }
 
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                CommonTextField(email, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email)
+                email?.let { CommonTextField(it, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email) }
 
 
                 //-----------------------------------------------------------------

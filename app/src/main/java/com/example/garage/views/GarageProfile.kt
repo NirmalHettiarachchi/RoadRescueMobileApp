@@ -1,10 +1,10 @@
-
-
 package com.example.garage.views
 
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,9 +33,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,36 +55,132 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.garage.R
+import com.example.garage.models.Garage
+import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageProfileViewModel
-import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.MainViewModel
+import org.json.JSONArray
 
+@SuppressLint("QueryPermissionsNeeded")
 @Composable
 fun GarageProfile(
-    garageId:String?,
-    garageName:String?,
-    garageContactNumber:String?,
-    garageStatus:String?,
-    garageRating:String?,
-    garageType:String?,
-    garageEmail:String?,
-    garageOwner:String?,
+    garageId: String?,
+    garageName: String?,
+    garageContactNumber: String?,
+    garageStatus: String?,
+    garageRating: String?,
+    garageType: String?,
+    garageEmail: String?,
+    garageOwner: String?,
     navController: NavController,
-    navyStatus:String,
-    sharedViewModel: SharedViewModel
+    navyStatus: String,
+    garageSharedViewModel: GarageSharedViewModel,
 ) {
+
+    val processGarage= Garage(
+                garageId!!,
+                garageName!!,
+                garageOwner!!,garageContactNumber!!,garageStatus!!,garageEmail!!,garageRating?.toFloat()!!,garageType!!
+    )
+
+
+
+    val viewModel= viewModel<MainViewModel>()
+
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val listOfServices = ArrayList<GarageProfileViewModel>()
+    val coroutineScope = rememberCoroutineScope()
+    var expertiseAriasList by remember { mutableStateOf("") }
+    var showExpertiseArias by remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
+
+    var status by remember { mutableStateOf(0) }
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val response=loadExpertiseArias(viewModel,coroutineScope)
+        if (response != null) {
+            if(response?.status==200){
+
+                expertiseAriasList= response.data!!.toString()
+                showExpertiseArias=true
+
+            }else if(response.status==400){
+                title=response.status.toString()
+                message= response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showDialog.value=true
+
+            }else if(response.status==404){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showDialog.value=true
+
+            }else if(response.status==500){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showDialog.value=true
+            }else if(response.status==508){
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="null"
+                buttonTwoName="null"
+                showDialog.value=true
+            }else{
+                title=response.status.toString()
+                message=response.message.toString()
+                buttonOneName="Ok"
+                buttonTwoName="null"
+                showDialog.value=true
+            }
+        }else{
+            status=401
+            message="Cannot call the sever"
+            buttonOneName="Ok"
+            buttonTwoName="null"
+            showDialog.value=true
+            Log.d("response null","null")
+        }
+    }
+
+
+
+    if (showExpertiseArias) {
+        val jsonArray = JSONArray(expertiseAriasList)
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val techExpertiseId = jsonObject.getString("expertiseId")
+            val techExpertise = jsonObject.getString("expertise")
+
+            listOfServices.add(
+                GarageProfileViewModel(
+                    R.drawable.new_servises,
+                    techExpertise
+                )
+            )
+        }
+    }
 
 
     Column(
         modifier = defaultBackground,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
 
         Header(menuClicked = {})
 
@@ -98,8 +196,6 @@ fun GarageProfile(
                 // create profile pic and garage name
 
                 val context = LocalContext.current
-
-
 
                 Row(
                     modifier = Modifier
@@ -126,10 +222,9 @@ fun GarageProfile(
                                 .clip(CircleShape)
                                 .clickable { }
                                 .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                            model = if(selectedImageUri==null)
-                            {
+                            model = if (selectedImageUri == null) {
                                 R.drawable.user_fill
-                            }else{
+                            } else {
                                 selectedImageUri
                             },
                             contentDescription = "Technician Pitcher",
@@ -147,6 +242,18 @@ fun GarageProfile(
                             .align(Alignment.Bottom)
                             .background(Color(0xFF253555), shape = RoundedCornerShape(4.dp))
                             .clickable {
+                                val garageData=GarageCommonDetails(
+                                    processGarage.getGarageId(),
+                                    processGarage.getGarageName(),
+                                    processGarage.getGarageContactNumber(),
+                                    processGarage.getGarageStatus(),
+                                    processGarage.getGarageEmail(),
+                                    processGarage.getGarageRating().toString(),
+                                    processGarage.getGarageType(),
+                                    processGarage.getOwnerName()
+
+                                )
+                                garageSharedViewModel.garageCommonDetails(garageData)
                                 navController.navigate(route = Screen.GarageProfileEdit.route)
                             }
                     )
@@ -247,22 +354,31 @@ fun GarageProfile(
                             tint = Color.White
                         )
 
-                            if (garageContactNumber != null) {
-                                Text(
-                                    text = garageContactNumber,
-                                    color = Color(0xB3000000),
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(36.dp, 0.dp)
-                                )
-                            }
+                        if (garageContactNumber != null) {
+                            Text(
+                                text = garageContactNumber,
+                                color = Color(0xB3000000),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(36.dp, 0.dp)
+                            )
+                        }
                     }
 
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .clickable { }
-                        ,
+                            .clickable {
+                                garageEmail?.let { email ->
+                                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                        data = Uri.parse("mailto:$email")
+                                    }
+                                    if (intent.resolveActivity(context.packageManager) != null) {
+                                        startActivity(context, intent, null)
+                                    }
+                                }
+
+                            },
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Icon(
@@ -291,8 +407,9 @@ fun GarageProfile(
 
                 val listOfArray = ArrayList<GarageProfileViewModel>()
 
-                listOfArray.add(GarageProfileViewModel(R.drawable.technicians, "Technician"))
-                listOfArray.add(GarageProfileViewModel(R.drawable.did_job, "Other"))
+                listOfArray.add(GarageProfileViewModel(R.drawable.technicians, "Technician","TechnicianList"))
+                listOfArray.add(GarageProfileViewModel(R.drawable.did_job, "Other"," "))
+
 
 
                 // load icons
@@ -317,7 +434,9 @@ fun GarageProfile(
                                     BorderStroke(2.dp, Color.Black),
                                     shape = RoundedCornerShape(20)
                                 )
-                                .clickable { /*call need navigation*/ }
+                                .clickable {
+                                    navController.navigate(route = Screen.TechnicianList.route)
+                                }
                         ) {
                             Icon(
                                 painter = painterResource(id = icon.getIconPath()),
@@ -371,16 +490,10 @@ fun GarageProfile(
 
                 // create a services list
 
-                val listOfServices = ArrayList<GarageProfileViewModel>()
 
-                listOfServices.add(GarageProfileViewModel(R.drawable.break_system_repair, "$selectedImageUri"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.oill_change, "Oil Change"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.engine_repeir, "Engine Repair"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
-                listOfServices.add(GarageProfileViewModel(R.drawable.tire_replacement, "Tire Replace"))
+
+
+
 
                 // import services
 
@@ -427,6 +540,6 @@ fun GarageProfile(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        Footer(navController,navyStatus)
+        Footer(navController, navyStatus)
     }
 }

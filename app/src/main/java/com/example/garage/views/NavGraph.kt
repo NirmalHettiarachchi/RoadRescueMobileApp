@@ -15,6 +15,7 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageActivityDetails
+import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,6 +27,7 @@ fun SetupNavGraph(
 ){
 
     val sharedViewModel: SharedViewModel = viewModel()
+    val garageSharedViewModel:GarageSharedViewModel= viewModel()
 
     NavHost(
         navController = navController,
@@ -95,14 +97,14 @@ fun SetupNavGraph(
                 garageOwner=result?.garageOwner,
                 navController = navController,
                 navyStatus = "dasdewa",
-                sharedViewModel = sharedViewModel
+                garageSharedViewModel = garageSharedViewModel
             )
         }
 
         composable(
             route=Screen.GarageProfileEdit.route
         ){
-            GarageProfileEdit(navController = navController,"garageProfileEdit",sharedViewModel = sharedViewModel)
+            GarageProfileEdit(navController = navController,"garageProfileEdit",garageSharedViewModel = garageSharedViewModel)
         }
 
         composable(
