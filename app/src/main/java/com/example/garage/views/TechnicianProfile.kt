@@ -42,10 +42,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.garage.R
+import com.example.garage.viewModels.SharedViewModel
 
 @Composable
 fun TechnicianProfile(
-    navController: NavController, navyStatus:String
+    navController: NavController,
+    navyStatus:String,
+    sharedViewModel: SharedViewModel
 ){
 
     Column(

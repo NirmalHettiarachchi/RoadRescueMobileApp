@@ -84,6 +84,7 @@ fun EditTechnician(
 ){
 
     val technicianDetails= sharedViewModel.technician
+
     var textTechFirstName by remember { mutableStateOf(technicianDetails?.techFirstName) }
     var textTechLastName by remember { mutableStateOf(technicianDetails?.techLastName) }
 

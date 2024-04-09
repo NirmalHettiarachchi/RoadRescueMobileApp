@@ -52,8 +52,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.garage.R
-import com.example.garage.repository.Screen
 import com.example.garage.models.CheckBoxDetailsModel
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.SharedViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +62,7 @@ import com.example.garage.models.CheckBoxDetailsModel
 fun GarageProfileEdit(
     navController: NavHostController,
     navStatus: String,
+    sharedViewModel: SharedViewModel
 ) {
 
     var showDialog by remember { mutableStateOf(false) }

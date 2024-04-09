@@ -9,6 +9,7 @@ import com.example.garage.repository.garageService
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -290,6 +291,8 @@ class MainViewModel : ViewModel() {
                 })
 
             } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
                 deferred.completeExceptionally(e)
             }
         }

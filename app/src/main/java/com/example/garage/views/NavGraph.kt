@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.garage.models.GarageTechnician
+import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.SharedViewModel
@@ -52,7 +53,7 @@ fun SetupNavGraph(
             route=Screen.GarageDashboard.route
         ){
 
-            GarageDashboard(navController=navController,navStatus="garageProfile",sharedViewModel=SharedViewModel())
+            GarageDashboard(navController=navController,navStatus="tempData",sharedViewModel=SharedViewModel())
         }
         
         composable(
@@ -60,7 +61,7 @@ fun SetupNavGraph(
                     "${GarageTechnician().getTechFirstName()}/${GarageTechnician().getTechLastName()}"
         ){
             Activities(activityDetails = GarageActivityDetails(currentTime,currentDate, "Gayan","Axio 2017",
-                "T-002",3000f,"I need to replace a tire on my car","Thiran Sasanka") ,navController, "activities")
+                "T-002",3000f,"I need to replace a tire on my car","Thiran Sasanka") ,navController, "activities",sharedViewModel = sharedViewModel)
         }
 
         composable(
@@ -78,9 +79,22 @@ fun SetupNavGraph(
         composable(
             route=Screen.GarageProfile.route
         ){
+
+            val result=navController.previousBackStackEntry?.savedStateHandle?.get<GarageCommonDetails>("garageDetails")
+
+
+
             GarageProfile(
+                garageId=result?.garageId,
+                garageName=result?.garageName,
+                garageContactNumber=result?.garageContactNumber,
+                garageStatus=result?.garageStatus,
+                garageEmail=result?.garageEmail,
+                garageRating=result?.garageRating,
+                garageType=result?.garageType,
+                garageOwner=result?.garageOwner,
                 navController = navController,
-                navyStatus = "garageProfile",
+                navyStatus = "dasdewa",
                 sharedViewModel = sharedViewModel
             )
         }
@@ -88,7 +102,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.GarageProfileEdit.route
         ){
-            GarageProfileEdit(navController = navController,"garageProfileEdit")
+            GarageProfileEdit(navController = navController,"garageProfileEdit",sharedViewModel = sharedViewModel)
         }
 
         composable(
@@ -100,7 +114,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianProfile.route
         ){
-            TechnicianProfile(navController = navController, navyStatus = "technicianProfile")
+            TechnicianProfile(navController = navController, navyStatus = "technicianProfile",sharedViewModel = sharedViewModel)
         }
     }
 }

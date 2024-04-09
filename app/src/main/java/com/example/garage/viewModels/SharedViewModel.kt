@@ -11,14 +11,16 @@ class SharedViewModel: ViewModel(){
     var technician by mutableStateOf<TechData?>(null)
         private set
 
-    var garage by mutableStateOf<GarageCommonDetails?>(null)
-        private set
-
     fun techData(techData: TechData){
         technician = techData
     }
 
+    var garage by mutableStateOf<GarageCommonDetails?>(null)
+        private set
+
     fun garageCommonDetails(garageCommonDetails: GarageCommonDetails){
         garage = garageCommonDetails
     }
+
+
 }

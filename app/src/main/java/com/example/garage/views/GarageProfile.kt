@@ -5,7 +5,6 @@ package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,14 +62,19 @@ import com.example.garage.viewModels.SharedViewModel
 
 @Composable
 fun GarageProfile(
+    garageId:String?,
+    garageName:String?,
+    garageContactNumber:String?,
+    garageStatus:String?,
+    garageRating:String?,
+    garageType:String?,
+    garageEmail:String?,
+    garageOwner:String?,
     navController: NavController,
     navyStatus:String,
     sharedViewModel: SharedViewModel
 ) {
 
-    val garageProfileDetails=sharedViewModel.garage
-
-    Log.d("gaargePaka",garageProfileDetails.toString())
 
     Column(
         modifier = defaultBackground,
@@ -158,16 +162,16 @@ fun GarageProfile(
                         Column {
                             Text(
                                 text = buildAnnotatedString {
-                                    if (garageProfileDetails != null) {
-                                        withStyle(
-                                            style = SpanStyle(
-                                                fontSize = 50.sp
-                                            )
-                                        ) {
-                                            append(garageProfileDetails.garageName[0])
-                                        }
+
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 50.sp
+                                        )
+                                    ) {
+                                        append(garageName?.get(0).toString())
                                     }
-                                    append(garageProfileDetails?.garageName?.substring(1))
+
+                                    append(garageName?.substring(1))
 
                                     withStyle(
                                         style = SpanStyle(
@@ -190,18 +194,20 @@ fun GarageProfile(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            garageProfileDetails?.garageId?.let {
+
+                            if (garageId != null) {
                                 Text(
-                                    text = it,
+                                    text = garageId,
                                     color = Color(0xB3000000),
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = 20.sp,
                                 )
                             }
 
-                            if (garageProfileDetails != null) {
+
+                            if (garageOwner != null) {
                                 Text(
-                                    text = garageProfileDetails.garageOwner,
+                                    text = garageOwner,
                                     color = Color(0xB3000000),
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = 20.sp
@@ -228,7 +234,7 @@ fun GarageProfile(
                             .clickable {
                                 val intent = Intent(
                                     Intent.ACTION_DIAL,
-                                    Uri.parse("tel:${garageProfileDetails?.garageContactNumber}")
+                                    Uri.parse("tel:${garageContactNumber}")
                                 )
                                 context.startActivity(intent)
                             },
@@ -241,14 +247,14 @@ fun GarageProfile(
                             tint = Color.White
                         )
 
-                        if (garageProfileDetails != null) {
-                            Text(
-                                text = garageProfileDetails.garageContactNumber,
-                                color = Color(0xB3000000),
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(36.dp, 0.dp)
-                            )
-                        }
+                            if (garageContactNumber != null) {
+                                Text(
+                                    text = garageContactNumber,
+                                    color = Color(0xB3000000),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(36.dp, 0.dp)
+                                )
+                            }
                     }
 
                     Box(
@@ -266,15 +272,16 @@ fun GarageProfile(
                             tint = Color.White
                         )
 
-                        if (garageProfileDetails != null) {
+                        if (garageEmail != null) {
                             Text(
-                                text = garageProfileDetails.garageEmail,
+                                text = garageEmail,
                                 color = Color(0xB3000000),
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(36.dp, 0.dp),
                                 maxLines = 1
                             )
                         }
+
                     }
                 }
 

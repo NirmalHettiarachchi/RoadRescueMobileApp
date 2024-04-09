@@ -65,9 +65,8 @@ import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
-    navController: NavController, navyStatus:String,
-    sharedViewModel: SharedViewModel
-){
+    navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel,
+) {
 
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()

@@ -85,7 +85,6 @@ fun GarageDashboard(
     var garage by remember { mutableStateOf("") }
     var garageDetailsBackend=Garage()
 
-
     val technicians = listOf<String>("Saman Kumara","Tharindu Dakshina","Ajith Muthukumara","Namal Rajapakasha")
 
     LaunchedEffect(Unit){
@@ -138,7 +137,54 @@ fun GarageDashboard(
             showMessageDialog=true
             Log.d("response null","null")
         }
+
+
     }
+
+
+    if (showLoadGarageDetails) {
+        try {
+            val jsonObject = JSONObject(garage)
+
+            val garageName = jsonObject.getString("garageName")
+            val ownerName = jsonObject.getString("OwnerName")
+            val garageContactNumber = jsonObject.getString("contactNumber")
+            val garageStatus = jsonObject.getString("garageStatus")
+            val garageEmail = jsonObject.getString("email")
+            val garageRating = jsonObject.getString("garageRating").toFloat()
+            val garageType = jsonObject.getString("garageType")
+
+            garageDetailsBackend.setGarageName(garageName)
+            garageDetailsBackend.setOwnerName(ownerName)
+            garageDetailsBackend.setGarageContactNumber(garageContactNumber)
+            garageDetailsBackend.setGarageStatus(garageStatus)
+            garageDetailsBackend.setGarageEmail(garageEmail)
+            garageDetailsBackend.setGarageRating(garageRating)
+            garageDetailsBackend.setGarageType(garageType)
+
+
+        }catch (e: JSONException){
+            e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
+        }
+
+    }
+
+    val garageCommonDetails= GarageCommonDetails(
+        "1",
+        garageDetailsBackend.getGarageName(),
+        garageDetailsBackend.getGarageContactNumber(),
+        garageDetailsBackend.getGarageStatus(),
+        garageDetailsBackend.getGarageEmail(),
+        garageDetailsBackend.getGarageRating().toString(),
+        garageDetailsBackend.getGarageType(),
+        garageDetailsBackend.getOwnerName()
+    )
+
+
+    navController.currentBackStackEntry?.savedStateHandle?.set(
+        key = "garageDetails",
+        value = garageCommonDetails
+    )
 
 
     ModalNavigationDrawer(
@@ -159,7 +205,8 @@ fun GarageDashboard(
             topBar = {Header {
                 scope.launch { drawerState.open() }
             }},
-            bottomBar = { Footer(navController,navStatus)
+            bottomBar = {
+                Footer(navController,navStatus)
             }
         ){
             Column (
@@ -168,64 +215,7 @@ fun GarageDashboard(
 
                 ){
 
-                if (showLoadGarageDetails) {
-                    try {
-                        val jsonObject = JSONObject(garage)
 
-                        val garageName = jsonObject.getString("garageName")
-                        val ownerName = jsonObject.getString("OwnerName")
-                        val garageContactNumber = jsonObject.getString("contactNumber")
-                        val garageStatus = jsonObject.getString("garageStatus")
-                        val garageEmail = jsonObject.getString("email")
-                        val garageRating = jsonObject.getString("garageRating").toFloat()
-                        val garageType = jsonObject.getString("garageType")
-
-
-
-                        garageDetailsBackend.setGarageName(garageName)
-                        garageDetailsBackend.setOwnerName(ownerName)
-                        garageDetailsBackend.setGarageContactNumber(garageContactNumber)
-                        garageDetailsBackend.setGarageStatus(garageStatus)
-                        garageDetailsBackend.setGarageEmail(garageEmail)
-                        garageDetailsBackend.setGarageRating(garageRating)
-                        garageDetailsBackend.setGarageType(garageType)
-
-
-                        // Garage Details load to shared view mode
-
-
-                        val garageCommonDetails=GarageCommonDetails(
-                            "1",
-                            garageDetailsBackend.getGarageName(),
-                            garageDetailsBackend.getGarageContactNumber(),
-                            garageDetailsBackend.getGarageStatus(),
-                            garageDetailsBackend.getGarageEmail(),
-                            garageDetailsBackend.getGarageRating(),
-                            garageDetailsBackend.getGarageType(),
-                            garageDetailsBackend.getOwnerName()
-                        )
-
-                        Log.d("gaargePaka 1",garageCommonDetails.toString())
-
-                        Log.d("puka 1",garageDetailsBackend.getGarageName())
-                        Log.d("puka 1",garageDetailsBackend.getGarageContactNumber())
-                        Log.d("puka 1",garageDetailsBackend.getGarageStatus())
-                        Log.d("puka 1",garageDetailsBackend.getGarageEmail())
-                        Log.d("puka 1",garageDetailsBackend.getGarageRating().toString())
-                        Log.d("puka 1",garageDetailsBackend.getGarageType())
-                        Log.d("puka 1",garageDetailsBackend.getOwnerName())
-
-
-
-                        sharedViewModel.garageCommonDetails(garageCommonDetails)
-
-                        ////////////////////
-
-                    }catch (e: JSONException){
-                        e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
-                    }
-
-                }
 
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -385,7 +375,7 @@ fun ServiceRequest(garageDetails:Garage, technicianList:List<String>,modifier: M
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val phoneNumber="+94716788537"
+        val phoneNumber="0716788537"
         val context = LocalContext.current
 
 
