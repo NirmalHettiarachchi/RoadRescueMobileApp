@@ -28,7 +28,10 @@ data class ServiceRequest(
     var location: String,
     var paidAmount: String,
     var rating: String,
-    var date: String = ""
+    var date: String = "",
+    var vehicleModelName: String = "",
+    var serviceProviderName: String = "",
+    var issueCategoryName: String = ""
 )
 
 class ServiceRequestRepository {

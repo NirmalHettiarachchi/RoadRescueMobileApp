@@ -161,15 +161,22 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
         mutableStateOf(false)
     }
 
-    if(showMoreInfoWindow) {
-        MoreInfoActivityWindow {
-            showMoreInfoWindow = false
-        }
-    }
-
     val dateTime = LocalDateTime.parse(serviceRequest.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"))
     val formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     val formattedTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+    val statusText = when (serviceRequest.status.toInt()) {
+        1, 2 -> "Pending"
+        3 -> "Completed"
+        4 -> "Canceled by you"
+        else -> "Canceled by the service provider"
+    }
+
+    if(showMoreInfoWindow) {
+        MoreInfoActivityWindow(serviceRequest, formattedDate, formattedTime, statusText) {
+            showMoreInfoWindow = false
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -192,13 +199,6 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
         Divider(color = Color(0xFF253555), thickness = 1.dp)
 
         Spacer(modifier = Modifier.height(4.dp))
-
-        val statusText = when (serviceRequest.status.toInt()) {
-            1, 2 -> "Pending"
-            3 -> "Completed"
-            4 -> "Canceled by you"
-            else -> "Canceled by the service provider"
-        }
 
         Row(
             modifier = Modifier
@@ -229,7 +229,7 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = ":Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":${serviceRequest.serviceProviderName}", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -277,7 +277,7 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
 }
 
 @Composable
-fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
+fun MoreInfoActivityWindow(serviceRequest: ServiceRequest, formattedDate: String, formattedTime: String, statusText: String, onDismiss: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -299,7 +299,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
             ){
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "28/10/2023 5.31pm",
+                    text = "$formattedDate at $formattedTime",
                     style = textStyle2
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -315,7 +315,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":S424", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":R${serviceRequest.id}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -330,7 +330,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":Completed", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":$statusText", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -345,7 +345,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":${serviceRequest.serviceProviderName}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -360,7 +360,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":LKR ${serviceRequest.paidAmount}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -375,7 +375,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":Engine Fault", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":${serviceRequest.issueCategoryName}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -390,7 +390,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":Honda Fit (Hybrid)", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":${serviceRequest.vehicleModelName}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -405,7 +405,7 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":-", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":${serviceRequest.description}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
