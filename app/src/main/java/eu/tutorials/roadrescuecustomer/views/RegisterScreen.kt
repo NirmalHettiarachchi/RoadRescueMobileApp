@@ -1,6 +1,8 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,7 +55,9 @@ import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCall
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.models.Customer
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -270,6 +274,22 @@ fun AuthField(labelName: String, value: String?): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthFieldBtn(onClickButton: () -> Unit) {
+    val clicked = remember { mutableStateOf(false) }
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (clicked.value) Color(0xFF818EA0) else Color(0xFFC6D4DE),
+        animationSpec = tween(durationMillis = 300), label = ""
+    )
+
+    val onButtonClick = {
+        clicked.value = true
+        onClickButton()
+        GlobalScope.launch {
+            delay(300)
+            clicked.value = false
+        }
+    }
+
     Box(
         modifier = Modifier
             .padding(horizontal = 12.dp)
@@ -278,14 +298,14 @@ fun AuthFieldBtn(onClickButton: () -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Card(
-                onClick = { onClickButton() },
+                onClick = { onButtonClick() },
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 shape = RoundedCornerShape(30.dp),
                 modifier = Modifier
                     .padding(horizontal = 38.dp, vertical = 8.dp)
                     .width(120.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFC6D4DE))
+                colors = CardDefaults.cardColors(containerColor = buttonColor)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -331,12 +351,27 @@ fun AuthHeader() {
 
 @Composable
 fun AuthCommonButton(btnName: String, modifier: Modifier, onClickButton: () -> Unit) {
+    val clicked = remember { mutableStateOf(false) }
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (clicked.value) Color(0xFF3C4962) else Color(0xFF253555),
+        animationSpec = tween(durationMillis = 300), label = ""
+    )
+
+    val onButtonClick = {
+        clicked.value = true
+        onClickButton()
+        GlobalScope.launch {
+            delay(300)
+            clicked.value = false
+        }
+    }
     Button(
-        onClick = { onClickButton() },
+        onClick = { onButtonClick() },
         modifier = modifier.width(200.dp),
         border = BorderStroke(width = 2.dp, color = Color.White),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(
             text = btnName,
