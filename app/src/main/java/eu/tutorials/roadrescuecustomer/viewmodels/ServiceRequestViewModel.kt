@@ -5,9 +5,13 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
 import eu.tutorials.roadrescuecustomer.models.FuelType
 import eu.tutorials.roadrescuecustomer.models.Issues
 import eu.tutorials.roadrescuecustomer.models.ServiceRequest
@@ -19,6 +23,8 @@ import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,6 +55,11 @@ class ServiceRequestViewModel : ViewModel() {
     val vehicleMake: MutableState<VehicleMake> = _vehicleMake
     val vehicleModel: MutableState<VehicleModel> = _vehicleModel
     val description: MutableState<String> = _description
+
+    val requests = mutableStateListOf<ServiceRequest>()
+
+    private val _requestCount = MutableStateFlow(0) // Initial value
+    val requestCount: StateFlow<Int> = _requestCount
 
     val loading = mutableStateOf(false)
 
@@ -99,6 +110,86 @@ class ServiceRequestViewModel : ViewModel() {
             Log.d(TAG, "deleteRequest: End")
             loading.value = false
             _deleteLoading.emit(true)
+        }
+    }
+
+    fun fetchRequests(customerId: String) {
+        viewModelScope.launch {
+            loading.value = true
+            withContext(Dispatchers.IO) {
+                // Database credentials and URL
+                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
+                val databaseUser = "admin"
+                val databasePassword = "admin123"
+
+                try {
+                    Class.forName("com.mysql.jdbc.Driver")
+                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
+                        connection.createStatement().use { statement ->
+                            val resultSet = statement.executeQuery("SELECT * FROM service_request where customer_id = $customerId")
+                            while (resultSet.next()) {
+                                requests.add(resultSetToRequest(resultSet))
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            loading.value = false
+        }
+    }
+
+    fun clearRequests() {
+        this.requests.clear()
+    }
+
+    private fun resultSetToRequest(rs: ResultSet): ServiceRequest {
+        return ServiceRequest(
+            id = rs.getString("id"),
+            customerId = rs.getString("customer_id"),
+            issueCategoryId = rs.getString("issue_category_id"),
+            vehicleTypeId = rs.getString("vehicle_type_id"),
+            vehicleMakeId = rs.getString("vehicle_make_id"),
+            vehicleModelId = rs.getString("vehicle_model_id"),
+            fuelTypeId = rs.getString("fuel_type_id"),
+            description = rs.getString("description"),
+            status = rs.getString("status"),
+            location = rs.getString("location"),
+            paidAmount = rs.getString("paid_amount"),
+            rating = rs.getString("rating"),
+            date = rs.getString("request_timestamp")
+        )
+    }
+
+    fun fetchRequestCount(customerId: String) {
+        var requestCount: Int
+        viewModelScope.launch {
+            loading.value = true
+
+            withContext(Dispatchers.IO) {
+                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
+                val databaseUser = "admin"
+                val databasePassword = "admin123"
+
+                try {
+                    Class.forName("com.mysql.jdbc.Driver")
+                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
+                        connection.createStatement().use { statement ->
+                            val resultSet = statement.executeQuery("SELECT COUNT(*) AS request_count FROM service_request WHERE customer_id = '$customerId'")
+                            if (resultSet.next()) {
+                                requestCount = resultSet.getInt("request_count")
+                            } else {
+                                requestCount = 0
+                            }
+                            _requestCount.value  = requestCount
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            loading.value = false
         }
     }
 

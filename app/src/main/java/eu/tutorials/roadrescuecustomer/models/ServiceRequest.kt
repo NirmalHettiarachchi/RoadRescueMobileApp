@@ -27,7 +27,8 @@ data class ServiceRequest(
     var status: String,
     var location: String,
     var paidAmount: String,
-    var rating: String
+    var rating: String,
+    var date: String = ""
 )
 
 class ServiceRequestRepository {

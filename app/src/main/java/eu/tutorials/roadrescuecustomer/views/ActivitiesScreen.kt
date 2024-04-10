@@ -1,6 +1,8 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import android.graphics.Paint.Align
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,21 +45,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import eu.tutorials.roadrescuecustomer.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.models.ServiceRequest
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ActivitiesScreen() {
+fun ActivitiesScreen(serviceRequestViewModel: ServiceRequestViewModel) {
 
-    val numOfActivities by remember {
-        mutableIntStateOf(1)
+    val customerId = AppPreferences(LocalContext.current).getStringPreference("CUSTOMER_ID", "")
+    LaunchedEffect(key1 = customerId) {
+        serviceRequestViewModel.fetchRequestCount(customerId)
     }
+
+    // Collect StateFlow as state in Compose
+    val numOfActivities = serviceRequestViewModel.requestCount.collectAsState().value
 
     Column(
         backgroundModifier
@@ -72,7 +87,7 @@ fun ActivitiesScreen() {
             if(numOfActivities == 0) {
                 NoActivityActivitiesScreen()
             } else {
-                WithActivityActivitiesScreen()
+                WithActivityActivitiesScreen(serviceRequestViewModel)
             }
         }
     }
@@ -103,8 +118,9 @@ fun NoActivityActivitiesScreen() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WithActivityActivitiesScreen() {
+fun WithActivityActivitiesScreen(serviceRequestViewModel: ServiceRequestViewModel) {
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -119,19 +135,27 @@ fun WithActivityActivitiesScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            ServiceRequestCard()
-            ServiceRequestCard()
-            ServiceRequestCard()
-            ServiceRequestCard()
-            ServiceRequestCard()
+            val loading by serviceRequestViewModel.loading
+            CircularProgressBar(isDisplayed = loading)
+
+            val customerId = AppPreferences(LocalContext.current).getStringPreference("CUSTOMER_ID", "")
+            LaunchedEffect(Unit) {
+                serviceRequestViewModel.clearRequests()
+                serviceRequestViewModel.fetchRequests(customerId)
+            }
+
+            serviceRequestViewModel.requests.forEach { request ->
+                ServiceRequestCard(request)
+            }
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServiceRequestCard() {
+fun ServiceRequestCard(serviceRequest: ServiceRequest) {
 
     var showMoreInfoWindow by remember {
         mutableStateOf(false)
@@ -142,6 +166,10 @@ fun ServiceRequestCard() {
             showMoreInfoWindow = false
         }
     }
+
+    val dateTime = LocalDateTime.parse(serviceRequest.date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"))
+    val formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val formattedTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
 
     Card(
         modifier = Modifier
@@ -155,7 +183,7 @@ fun ServiceRequestCard() {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "28/10/2023 5:31pm",
+            text = "$formattedDate at $formattedTime",
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = textStyle2
         )
@@ -164,6 +192,13 @@ fun ServiceRequestCard() {
         Divider(color = Color(0xFF253555), thickness = 1.dp)
 
         Spacer(modifier = Modifier.height(4.dp))
+
+        val statusText = when (serviceRequest.status.toInt()) {
+            1, 2 -> "Pending"
+            3 -> "Completed"
+            4 -> "Canceled by you"
+            else -> "Canceled by the service provider"
+        }
 
         Row(
             modifier = Modifier
@@ -177,7 +212,7 @@ fun ServiceRequestCard() {
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = ":Completed", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":$statusText", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -211,7 +246,7 @@ fun ServiceRequestCard() {
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = ":LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":LKR ${serviceRequest.paidAmount}", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))

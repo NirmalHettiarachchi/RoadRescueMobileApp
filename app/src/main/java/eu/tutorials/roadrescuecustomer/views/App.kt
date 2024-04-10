@@ -1,6 +1,8 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import CustomerSupportTicketViewModel
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
@@ -25,6 +27,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun App(
     currentStateViewModel: CurrentStateViewModel,
@@ -125,7 +128,7 @@ fun App(
                     )
                 }
                 composable("activitiesscreen") {
-                    ActivitiesScreen()
+                    ActivitiesScreen(serviceRequestViewModel)
                 }
                 composable("helpscreen") {
                     HelpScreen(customerSupportTicketViewModel)
