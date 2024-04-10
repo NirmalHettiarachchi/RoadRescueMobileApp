@@ -152,8 +152,19 @@ fun PendingActivityDashboard(
 
     val loading by serviceRequestViewModel.loading
 
-    CircularProgressBar(isDisplayed = loading)
+    LaunchedEffect(key1 = Unit) {
+        serviceRequestViewModel.deleteLoading.collect { close ->
+            if (close) {
+                currentStateViewModel.setCurrentState(
+                    false,
+                    isReqServiceWindowOpened = false
+                )
+            }
+        }
+    }
 
+    CircularProgressBar(isDisplayed = loading)
+    
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -255,7 +266,6 @@ fun PendingActivityDashboard(
                 }
             }
 
-            //----------------------------------------------------------------------------
             //Cancel btn
             CommonButton(
                 btnName = "Cancel Request",
@@ -265,7 +275,6 @@ fun PendingActivityDashboard(
                     serviceRequestViewModel.deleteRequest(
                         context
                     )
-                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
                 }else{
                     //todo
                 }

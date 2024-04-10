@@ -1,6 +1,8 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +17,9 @@ import eu.tutorials.roadrescuecustomer.models.VehicleModel
 import eu.tutorials.roadrescuecustomer.models.VehicleType
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -47,6 +52,9 @@ class ServiceRequestViewModel : ViewModel() {
 
     val loading = mutableStateOf(false)
 
+    private val _deleteLoading = MutableSharedFlow<Boolean>()
+    val deleteLoading = _deleteLoading.asSharedFlow()
+
     fun setServiceRequest(
         context: Context,
         serviceRequest: ServiceRequest, requestCallback: ServiceRequestRepository.RequestCallback
@@ -69,8 +77,9 @@ class ServiceRequestViewModel : ViewModel() {
 
     fun deleteRequest(context: Context) {
         viewModelScope.launch {
+            Log.d(TAG, "deleteRequest: Started")
             loading.value = true
-
+            Log.d(TAG, "deleteRequest: Delay")
             val deleteResult = withContext(Dispatchers.IO) {
                 deleteRequestFromDatabase(context)
             }
@@ -83,12 +92,15 @@ class ServiceRequestViewModel : ViewModel() {
                     // This also runs on the main thread, safe to show a Toast
                     Toast.makeText(context, deleteResult.message, Toast.LENGTH_SHORT).show()
                 }
+                else -> {
+
+                }
             }
+            Log.d(TAG, "deleteRequest: End")
             loading.value = false
+            _deleteLoading.emit(true)
         }
     }
-
-
 
     val vehicleTypes = mutableStateOf(listOf<VehicleType>())
     val fuelTypes = mutableStateOf(listOf<FuelType>())
