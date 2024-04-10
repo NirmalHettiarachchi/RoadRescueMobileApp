@@ -2,21 +2,19 @@ package eu.tutorials.roadrescuecustomer.viewmodels
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import eu.tutorials.roadrescuecustomer.models.FuelType
 import eu.tutorials.roadrescuecustomer.models.Issues
-import eu.tutorials.roadrescuecustomer.models.RequestModel
+import eu.tutorials.roadrescuecustomer.models.ServiceRequest
 import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 import eu.tutorials.roadrescuecustomer.models.VehicleMake
 import eu.tutorials.roadrescuecustomer.models.VehicleModel
 import eu.tutorials.roadrescuecustomer.models.VehicleType
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -47,13 +45,15 @@ class ServiceRequestViewModel : ViewModel() {
     val vehicleModel: MutableState<VehicleModel> = _vehicleModel
     val description: MutableState<String> = _description
 
+    val loading = mutableStateOf(false)
+
     fun setServiceRequest(
         context: Context,
-        requestModel: RequestModel, requestCallback: ServiceRequestRepository.RequestCallback
+        serviceRequest: ServiceRequest, requestCallback: ServiceRequestRepository.RequestCallback
     ) {
         _repository.requestService(
             context,
-            requestModel,
+            serviceRequest,
             requestCallback
         )
     }
@@ -66,23 +66,35 @@ class ServiceRequestViewModel : ViewModel() {
             requestCallback
         )
     }
-    fun deleteRequest(
-        context: Context,
-        requestCallback: ServiceRequestRepository.RequestCallback
-    ) {
-        _repository.deleteRequest(
-            context,
-            requestCallback
-        )
+
+    fun deleteRequest(context: Context) {
+        viewModelScope.launch {
+            loading.value = true
+
+            val deleteResult = withContext(Dispatchers.IO) {
+                deleteRequestFromDatabase(context)
+            }
+
+            when (deleteResult) {
+                is DeleteResult.Success -> {
+                    Toast.makeText(context, "Request cancelled successfully", Toast.LENGTH_SHORT).show()
+                }
+                is DeleteResult.Failure -> {
+                    // This also runs on the main thread, safe to show a Toast
+                    Toast.makeText(context, deleteResult.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            loading.value = false
+        }
     }
+
+
 
     val vehicleTypes = mutableStateOf(listOf<VehicleType>())
     val fuelTypes = mutableStateOf(listOf<FuelType>())
     val vehicleMakes = mutableStateOf(listOf<VehicleMake>())
     val vehicleModels = mutableStateOf(listOf<VehicleModel>())
     val issues = mutableStateOf(listOf<Issues>())
-
-    val loading = mutableStateOf(false)
 
     fun fetchVehicleTypes() {
 
@@ -143,6 +155,53 @@ class ServiceRequestViewModel : ViewModel() {
             vehicleModels.value = fetchedVehicleModels
             loading.value = false
         }
+    }
+
+    private fun deleteRequestFromDatabase(context: Context): DeleteResult {
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val TABLE_NAME = "service_request"
+            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            DriverManager.getConnection(url, username, databasePassword).use { connection ->
+                val requestId = AppPreferences(context).getStringPreference("REQUEST_ID").toInt()
+                val customerId = AppPreferences(context).getStringPreference("CUSTOMER_ID").toInt()
+
+                val statusQuery = "SELECT status, customer_Id FROM $TABLE_NAME WHERE id = ?"
+                connection.prepareStatement(statusQuery).use { preparedStatement ->
+                    preparedStatement.setInt(1, requestId)
+                    preparedStatement.executeQuery().use { resultSet ->
+                        if (resultSet.next()) {
+                            val status = resultSet.getInt("status")
+                            val fetchedCustomerId = resultSet.getInt("customer_Id")
+                            if (status == 1 && fetchedCustomerId == customerId) {
+                                val deleteQuery = "DELETE FROM $TABLE_NAME WHERE id = ?"
+                                connection.prepareStatement(deleteQuery).use { deleteStatement ->
+                                    deleteStatement.setInt(1, requestId)
+                                    deleteStatement.executeUpdate()
+                                }
+                                return DeleteResult.Success
+                            } else {
+                                return DeleteResult.Failure("Request cannot be cancelled")
+                            }
+                        } else {
+                            return DeleteResult.Failure("No matching request found")
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return DeleteResult.Failure("Error cancelling request")
+        }
+    }
+
+    sealed class DeleteResult {
+        data object Success : DeleteResult()
+        data class Failure(val message: String) : DeleteResult()
     }
 
     private fun getIssuesFromDatabase(): List<Issues> {

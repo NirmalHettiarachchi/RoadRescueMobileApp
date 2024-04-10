@@ -12,10 +12,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,22 +29,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,15 +51,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.R
-import eu.tutorials.roadrescuecustomer.models.RequestModel
+import eu.tutorials.roadrescuecustomer.models.ServiceRequest
 import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
-import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -160,10 +150,9 @@ fun PendingActivityDashboard(
 
     var pendingRequest by remember { mutableStateOf("Requesting Service . . .") }
 
-    val loading = remember {
-        mutableStateOf(false)
-    }
-    CircularProgressBar(isDisplayed = loading.value)
+    val loading by serviceRequestViewModel.loading
+
+    CircularProgressBar(isDisplayed = loading)
 
     Card(
         modifier = cardModifier,
@@ -203,20 +192,7 @@ fun PendingActivityDashboard(
                 }
                 if(System.currentTimeMillis() >= endTimeMillis) {
                     serviceRequestViewModel.deleteRequest(
-                        context,
-                        object : ServiceRequestRepository.RequestCallback {
-                            override fun success(id: String) {
-                                if (id == "1") {
-                                    Toast.makeText(context,"Service request canceled successfully",Toast.LENGTH_SHORT).show()
-                                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
-                                }
-                            }
-
-                            override fun onError(errorMessage: String) {
-                                Toast.makeText(context,"Can't able to cancel",Toast.LENGTH_SHORT).show()
-                                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
-                            }
-                        }
+                        context
                     )
                 }
             }
@@ -285,29 +261,13 @@ fun PendingActivityDashboard(
                 btnName = "Cancel Request",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-
                 if (System.currentTimeMillis() < endTimeMillis) {
-                    loading.value = true
-
                     serviceRequestViewModel.deleteRequest(
-                        context,
-                        object : ServiceRequestRepository.RequestCallback {
-                            override fun success(id: String) {
-                                if (id == "1") {
-                                    Toast.makeText(context,"Service request canceled successfully",Toast.LENGTH_SHORT).show()
-                                    currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
-                                    loading.value = false
-                                }
-                            }
-
-                            override fun onError(errorMessage: String) {
-                                Toast.makeText(context,"Can't able to cancel",Toast.LENGTH_SHORT).show()
-                                currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
-                                loading.value = false
-                            }
-                        })
-                }else{
+                        context
+                    )
                     currentStateViewModel.setCurrentState(false, isReqServiceWindowOpened = false)
+                }else{
+                    //todo
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -527,7 +487,7 @@ fun RequestServiceScreen(
                     )
                     serviceRequestViewModel.setServiceRequest(
                         context,
-                        RequestModel(
+                        ServiceRequest(
                             "0",
                             AppPreferences(context).getStringPreference("CUSTOMER_ID", ""),
                             serviceRequestViewModel.issue.value.id,
