@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eu.tutorials.roadrescuecustomer.AppPreferences
@@ -52,6 +53,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HelpScreen(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
     Column(
@@ -98,6 +100,7 @@ fun PhoneIconButton(context: Context) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewModel) {
 
@@ -274,12 +277,12 @@ fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "${customerSupportTicket.issue}: $formattedDate $formattedTime ",
+                text = "${customerSupportTicket.issue} - $formattedDate $formattedTime ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle5
             )
             Text(
-                text = "Status: ${customerSupportTicket.status} ",
+                text = "${customerSupportTicket.status} ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle5
             )
@@ -287,15 +290,128 @@ fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
         }
     }
     if(showMoreDetailsWindow) {
-        MoreInfoWindow(message =
-        "Support Ticket ID: T${customerSupportTicket.id}" +
-                "\nCategory: ${customerSupportTicket.issue}" +
-                "\nCreated on: $formattedDate at $formattedTime"+
-                "\nStatus: ${customerSupportTicket.status}" +
-                "\nDescription: ${customerSupportTicket.description}" +
-                "\nSolution: ${customerSupportTicket.solution}"
-        ) {
+        CustomerSupportTicketMoreInfoWindow(customerSupportTicket = customerSupportTicket, formattedDate, formattedTime)
+        {
             showMoreDetailsWindow = false
         }
     }
+}
+
+@Composable
+fun CustomerSupportTicketMoreInfoWindow(
+                                        customerSupportTicket: CustomerSupportTicket,
+                                        formattedDate: String,
+                                        formattedTime: String,
+                                        onDismiss: () -> Unit)
+{
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        shape = RoundedCornerShape(20),
+        modifier = Modifier
+            .border(2.dp, Color.White, shape = RoundedCornerShape(20))
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .verticalScroll(rememberScrollState()),
+        tonalElevation = 16.dp,
+        containerColor = Color(0xFFDCE4EC),
+        confirmButton = {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Support Ticket ID ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":R${customerSupportTicket.id}", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Category ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":${customerSupportTicket.issue}", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Created on ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":$formattedDate at $formattedTime", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Status ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":${customerSupportTicket.status}", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Description ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":${customerSupportTicket.description}", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Solution ", style = textStyle4,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp, 0.dp)
+                    )
+                    Text(text = ":${customerSupportTicket.solution}", style = textStyle4, modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
+    )
 }

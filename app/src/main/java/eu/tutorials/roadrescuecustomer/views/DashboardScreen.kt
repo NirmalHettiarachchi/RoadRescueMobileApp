@@ -284,7 +284,8 @@ fun PendingActivityDashboard(
     }
     if (showCostDetailWindow) {
         MoreInfoWindow(
-            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+                    " The actual amount may vary.",
             onDismiss = { showCostDetailWindow = false }
         )
     }
@@ -806,7 +807,7 @@ fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Co
                 )
                 DashboardFieldButton(
                     fieldName = "Request ID",
-                    fieldValue = AppPreferences(context).getStringPreference("REQUEST_ID"),
+                    fieldValue = "R${AppPreferences(context).getStringPreference("REQUEST_ID")}",
                     modifier = Modifier
                         .width(250.dp)
                 )

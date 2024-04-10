@@ -172,12 +172,12 @@ fun ServiceRequestCard() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Status: ", style = textStyle4,
+                text = "Status ", style = textStyle4,
                 modifier = Modifier
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = "Completed", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":Completed", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -189,12 +189,12 @@ fun ServiceRequestCard() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Service Provider: ", style = textStyle4,
+                text = "Service Provider ", style = textStyle4,
                 modifier = Modifier
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = "Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -206,12 +206,12 @@ fun ServiceRequestCard() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Service Fees: ", style = textStyle4,
+                text = "Service Fees ", style = textStyle4,
                 modifier = Modifier
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = "LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -275,12 +275,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Request ID: ", style = textStyle4,
+                        text = "Request ID ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "S424", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":S424", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -290,12 +290,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Status: ", style = textStyle4,
+                        text = "Status ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "Completed", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":Completed", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -305,12 +305,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Service Provider: ", style = textStyle4,
+                        text = "Service Provider ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":Super Garage", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -320,12 +320,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Service Fees: ", style = textStyle4,
+                        text = "Service Fees ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":LKR 3500.00", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -335,12 +335,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Issue: ", style = textStyle4,
+                        text = "Issue ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "Engine Fault", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":Engine Fault", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -350,12 +350,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Vehicle: ", style = textStyle4,
+                        text = "Vehicle ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "Honda Fit (Hybrid)", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":Honda Fit (Hybrid)", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -365,12 +365,12 @@ fun MoreInfoActivityWindow(onDismiss: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Description: ", style = textStyle4,
+                        text = "Description ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = "-", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":-", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
