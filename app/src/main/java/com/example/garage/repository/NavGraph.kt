@@ -1,4 +1,4 @@
-package com.example.garage.views
+package com.example.garage.repository
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -12,11 +12,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.garage.models.GarageTechnician
-import com.example.garage.repository.GarageCommonDetails
-import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LoginViewModel
 import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.views.Activities
+import com.example.garage.views.AddTechnician
+import com.example.garage.views.EditTechnician
+import com.example.garage.views.GarageDashboard
+import com.example.garage.views.GarageProfile
+import com.example.garage.views.GarageProfileEdit
+import com.example.garage.views.LoginScreen
+import com.example.garage.views.TechnicianProfile
+import com.example.garage.views.TechniciansList
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -28,10 +36,11 @@ fun SetupNavGraph(
 
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
+    val loginViewModel:LoginViewModel= viewModel()
 
     NavHost(
         navController = navController,
-        startDestination = Screen.GarageDashboard.route,
+        startDestination = Screen.Login.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -48,6 +57,13 @@ fun SetupNavGraph(
         val currentDate = date.format(Date())
         val currentTime = time.format(Date())
 
+
+
+        composable(
+            route=Screen.Login.route
+        ){
+            LoginScreen(navController=navController, loginViewModel = loginViewModel)
+        }
 
 
 
@@ -118,6 +134,7 @@ fun SetupNavGraph(
         ){
             TechnicianProfile(navController = navController, navyStatus = "technicianProfile",sharedViewModel = sharedViewModel)
         }
+
     }
 }
 

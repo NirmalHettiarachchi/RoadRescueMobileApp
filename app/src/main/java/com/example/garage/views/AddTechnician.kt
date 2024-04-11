@@ -244,7 +244,7 @@ fun AddTechnician(
 
                 CommonButton(
                     btnName = "Register",
-                    modifier = Modifier,
+                    modifier = Modifier.width(105.dp),
                     onClickButton = {
 
 

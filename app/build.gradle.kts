@@ -104,6 +104,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.6.4")
 
 
+    // otp authentication
+
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-auth")
+
     // add gif lib
     implementation ("io.coil-kt:coil-compose:2.6.0")
 
