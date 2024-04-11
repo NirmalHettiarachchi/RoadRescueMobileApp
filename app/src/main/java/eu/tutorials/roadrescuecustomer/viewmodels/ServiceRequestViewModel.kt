@@ -36,7 +36,12 @@ class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
 
     private val _issue = mutableStateOf(Issues("", "", ""))
-    private val indicator = mutableStateOf(false)
+    private val _indicator1 = mutableStateOf(false)
+    private val _indicator2 = mutableStateOf(false)
+    private val _indicator3 = mutableStateOf(false)
+    private val _indicator4 = mutableStateOf(false)
+    private val _indicator5 = mutableStateOf(false)
+    private val _indicator6 = mutableStateOf(false)
     private val _vehicleType = mutableStateOf(VehicleType("", ""))
     private val _fuelType = mutableStateOf(FuelType("", ""))
     private val _vehicleMake = mutableStateOf(VehicleMake("", ""))
@@ -44,12 +49,12 @@ class ServiceRequestViewModel : ViewModel() {
     private val _description = mutableStateOf(_repository.getServiceRequest().description)
 
     val issue: MutableState<Issues> = _issue
-    val indicator1: MutableState<Boolean> = indicator
-    val indicator2: MutableState<Boolean> = indicator
-    val indicator3: MutableState<Boolean> = indicator
-    val indicator4: MutableState<Boolean> = indicator
-    val indicator5: MutableState<Boolean> = indicator
-    val indicator6: MutableState<Boolean> = indicator
+    val indicator1: MutableState<Boolean> = _indicator1
+    val indicator2: MutableState<Boolean> = _indicator2
+    val indicator3: MutableState<Boolean> = _indicator3
+    val indicator4: MutableState<Boolean> = _indicator4
+    val indicator5: MutableState<Boolean> = _indicator5
+    val indicator6: MutableState<Boolean> = _indicator6
     val vehicleType: MutableState<VehicleType> = _vehicleType
     val fuelType: MutableState<FuelType> = _fuelType
     val vehicleMake: MutableState<VehicleMake> = _vehicleMake
