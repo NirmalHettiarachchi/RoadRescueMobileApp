@@ -595,13 +595,13 @@ fun TrackLocation(
                 if (rationalRequired) {
                     Toast.makeText(
                         context,
-                        "Location permission is required for this feature to work.",
+                        "Location permission is required for this feature to work",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     Toast.makeText(
                         context,
-                        "Location permission is required. Please enable it from the system settings.",
+                        "Location permission is required. Please enable it from the system settings",
                         Toast.LENGTH_SHORT
                     )
                         .show()

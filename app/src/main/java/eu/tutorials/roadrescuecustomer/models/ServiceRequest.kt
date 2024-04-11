@@ -91,7 +91,7 @@ class ServiceRequestRepository {
                 insertStmt.setInt(14, 1)
                 insertStmt.setString(15, serviceRequest.location)
                 insertStmt.setDouble(16, 0.0)
-                insertStmt.setInt(17, 5)
+                insertStmt.setInt(17, 0)
 
                 insertStmt.executeUpdate()
 
