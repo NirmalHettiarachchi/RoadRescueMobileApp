@@ -247,22 +247,18 @@ fun SignUpBox(
                                     navController,
                                     context
                                 )
-                                /*  navController.navigate("loginscreen") {
-                                      popUpTo("loginscreen") {
-                                          inclusive = true
-                                      }
-                                  }*/
-//                                MainScope().launch {
-                                navController.navigate("dashboardscreen") {
-                                    popUpTo("dashboardscreen") {
+
+                                navController.navigate("loginscreen") {
+                                    popUpTo("loginscreen") {
                                         inclusive = true
                                     }
                                 }
-//                                }
-
+                                MainScope().launch {
+                                    Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show()
+                                }
                             } else {
                                 MainScope().launch {
-                                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
