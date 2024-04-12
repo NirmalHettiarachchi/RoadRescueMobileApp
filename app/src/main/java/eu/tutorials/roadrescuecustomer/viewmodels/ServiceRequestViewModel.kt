@@ -71,9 +71,6 @@ class ServiceRequestViewModel : ViewModel() {
     private val _requestCount = MutableStateFlow(0) // Initial value
     val requestCount: StateFlow<Int> = _requestCount
 
-    private val _requestCreatedTime = MutableStateFlow("")
-    val requestCreatedTime: StateFlow<String> = _requestCreatedTime
-
     val loading = mutableStateOf(false)
 
     private val _deleteLoading = MutableSharedFlow<Boolean>()
@@ -213,53 +210,6 @@ class ServiceRequestViewModel : ViewModel() {
             loading.value = false
         }
     }
-
-    fun fetchRequestEndTime(requestId: String): String {
-        var endTime = ""
-        fetchRequestTime(requestId) { requestCreatedTime ->
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            val date: Date? = sdf.parse(requestCreatedTime)
-            date?.let {
-                val calendar = Calendar.getInstance()
-                calendar.time = date
-                calendar.add(Calendar.MINUTE, 1)
-                val endTimeMillis = calendar.timeInMillis
-                endTime = endTimeMillis.toString()
-            }
-        }
-        return endTime
-    }
-
-    private fun fetchRequestTime(requestId: String, onTimeFetched: (String) -> Unit) {
-        viewModelScope.launch {
-
-            withContext(Dispatchers.IO) {
-                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
-                val databaseUser = "admin"
-                val databasePassword = "admin123"
-
-                try {
-                    Class.forName("com.mysql.jdbc.Driver")
-                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
-                        connection.createStatement().use { statement ->
-                            val resultSet = statement.executeQuery("SELECT request_timestamp FROM service_request WHERE id = '$requestId'")
-                            var requestCreatedTime = ""
-                            if (resultSet.next()) {
-                                requestCreatedTime = resultSet.getString("request_timestamp")
-                            }
-                            Log.d(TAG, "fetchRequestTime: $requestCreatedTime")
-                            _requestCreatedTime.value = requestCreatedTime
-                            onTimeFetched(requestCreatedTime)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
 
     val vehicleTypes = mutableStateOf(listOf<VehicleType>())
     val fuelTypes = mutableStateOf(listOf<FuelType>())
