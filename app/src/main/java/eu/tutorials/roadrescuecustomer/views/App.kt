@@ -11,7 +11,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +28,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -57,16 +61,30 @@ fun App(
         return route !in listOf("loginscreen", "signupscreen")
     }
 
+    var loading by remember { mutableStateOf(false) }
+
+    CircularProgressBar(isDisplayed = loading)
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             if(shouldShowAppBarAndFooter(currentRoute)) {
                 ModalDrawerSheet(
                     content = {
-                        SidebarContent({
+                        SidebarContent({isLogOut ->
                             scope.launch {
                                 drawerState.close()
+                                if(isLogOut){
+                                    loading = true
+                                    delay(2000)
+                                    loading = false
+                                    AppPreferences(context).clearAllPreferences()
+                                    navController.navigate("loginscreen") {
+                                        popUpTo("loginscreen") { inclusive = true }
+                                    }
+                                }
                             }
+
                         }, navController, context)
                     }
                 )
@@ -114,7 +132,7 @@ fun App(
                     LoginScreen(navController, context, loginViewModel)
                 }
                 composable("signupscreen") {
-                    RegisterScreen(navController, context, registerViewModel)
+                    RegisterScreen(navController, context, registerViewModel, loginViewModel)
                 }
                 composable("profilescreen") {
                     ProfileScreen(

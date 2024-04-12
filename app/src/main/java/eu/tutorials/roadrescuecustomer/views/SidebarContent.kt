@@ -28,7 +28,7 @@ import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 
 @Composable
-fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,context: Context){
+fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: NavHostController,context: Context){
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -45,7 +45,7 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
                         .padding(16.dp)
                         .size(30.dp)
                         .clickable {
-                            menuClicked()
+                            menuClicked(false)
                         },
                     contentDescription = "Localized description"
                 )
@@ -56,11 +56,11 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
             }
             SidebarButton(buttonName = "Help", verticalPadding = 8) {
                 navHostController.navigate("helpscreen")
-                menuClicked()
+                menuClicked(false)
             }
             SidebarButton(buttonName = "Settings", verticalPadding = 8) {
                 navHostController.navigate("settingsscreen")
-                menuClicked()
+                menuClicked(false)
             }
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
@@ -68,7 +68,7 @@ fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,con
             navHostController.navigate("loginscreen") {
                 popUpTo("loginscreen") { inclusive = true }
             }
-            menuClicked()
+            menuClicked(true)
         }
     }
 }

@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -83,7 +84,17 @@ fun LoginBox(
     var loginResponse: LoginResponse? = null
     var mAuth: FirebaseAuth? = null
     mAuth = FirebaseAuth.getInstance()
-    var otpid: String? = null
+    var otpid by remember {
+        mutableStateOf("")
+    }
+
+
+    var loading by remember { mutableStateOf(false) }
+
+
+    CircularProgressBar(isDisplayed = loading)
+
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -97,11 +108,13 @@ fun LoginBox(
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(60.dp))
-            phoneNumber = AuthField("Registered Phone Number", "")
+            phoneNumber = AuthField("Registered Phone Number", "", true)
 
             AuthFieldBtn(
                 onClickButton = {
-                    if (phoneNumber.isNotEmpty()) {
+                    if (phoneNumber.isNotEmpty() && phoneNumber.length == 12 && phoneNumber.startsWith("+94")) {
+//                        showLoading
+                        loading = true
                         loginViewModel.checkPhoneNumberExists(
                             Customer(
                                 null,
@@ -122,10 +135,12 @@ fun LoginBox(
                                                     s: String,
                                                     forceResendingToken: PhoneAuthProvider.ForceResendingToken
                                                 ) {
+                                                    loading = false
                                                     otpid = s
+                                                    Log.d("TAG", "onCodeSent: OTP Received $s")
                                                     Toast.makeText(
                                                         context,
-                                                        "OTP SENT",
+                                                        "OTP sent",
                                                         Toast.LENGTH_SHORT
                                                     )
                                                         .show()
@@ -134,6 +149,7 @@ fun LoginBox(
                                                 override fun onVerificationCompleted(
                                                     phoneAuthCredential: PhoneAuthCredential
                                                 ) {
+                                                    loading = false
                                                     mAuth?.signInWithCredential(phoneAuthCredential)
                                                         ?.addOnCompleteListener(
                                                             mainActivity
@@ -151,6 +167,7 @@ fun LoginBox(
                                                 }
 
                                                 override fun onVerificationFailed(e: FirebaseException) {
+                                                    loading = false
                                                     Toast.makeText(
                                                         context,
                                                         e.message,
@@ -161,10 +178,11 @@ fun LoginBox(
                                                 }
                                             })
                                     } else {
+                                        loading = false
                                         MainScope().launch {
                                             Toast.makeText(
                                                 context,
-                                                "User is not Registered",
+                                                "Phone number is not registered",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }
@@ -172,11 +190,11 @@ fun LoginBox(
                                 }
                             })
                     } else {
-                        Toast.makeText(context, "Enter the Phone Number", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Enter a valid phone number", Toast.LENGTH_SHORT).show()
                     }
                 }
             )
-            otp = AuthField("Enter the OTP", "")
+            otp = AuthField("Enter the OTP", "", false)
             //Edit button
             AuthCommonButton(
                 btnName = "Log in",
@@ -184,9 +202,11 @@ fun LoginBox(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp)
             ) {
+
                 if (otp.isNotEmpty()) {
+                    loading = true
                     val credential =
-                        otpid?.let { PhoneAuthProvider.getCredential(it, otp) }
+                        otpid.let { PhoneAuthProvider.getCredential(it, otp) }
                     if (credential != null) {
                         mAuth?.signInWithCredential(credential)
                             ?.addOnCompleteListener(
@@ -209,6 +229,7 @@ fun LoginBox(
                                                 id: String?
                                             ) {
                                                 if (success) {
+                                                    loading = false
                                                     AppPreferences(context).setStringPreference(
                                                         "NAME",
                                                         "$firstName $lastName"
@@ -237,14 +258,19 @@ fun LoginBox(
                                                         }
                                                     }
                                                 } else {
+                                                    loading = false
                                                     println("User not found or error occurred.")
                                                 }
                                             }
                                         })
                                 } else {
+                                    loading = false
                                     Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
                                 }
                             }
+                    }else{
+                        loading = false
+                        Log.d("TAG", "LoginBox: Credential Null")
                     }
                 } else {
                     Toast.makeText(context, "Enter OTP", Toast.LENGTH_SHORT).show()
