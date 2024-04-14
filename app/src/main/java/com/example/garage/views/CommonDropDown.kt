@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,7 +30,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CommonDropdown(
     optionList:List<Any>,defaultSelection:Any
-){
+): Any {
 
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(defaultSelection) }
@@ -91,4 +90,5 @@ fun CommonDropdown(
         }
 
     }
+    return selectedOption
 }

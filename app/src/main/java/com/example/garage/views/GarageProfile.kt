@@ -1,7 +1,6 @@
 package com.example.garage.views
 
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -68,7 +67,7 @@ import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import org.json.JSONArray
 
-@SuppressLint("QueryPermissionsNeeded")
+
 @Composable
 fun GarageProfile(
     garageId: String?,
@@ -83,6 +82,20 @@ fun GarageProfile(
     navyStatus: String,
     garageSharedViewModel: GarageSharedViewModel,
 ) {
+
+    var garageRatings by remember { mutableStateOf("") }
+
+
+    if ((garageRatings.toIntOrNull() ?: 0) == 0){
+
+        garageRatings="not insert the rating"
+    }else{
+        if (garageRating != null) {
+            garageRatings=garageRating
+        }
+    }
+
+
 
     val processGarage= Garage(
                 garageId!!,
@@ -132,7 +145,7 @@ fun GarageProfile(
             }else if(response.status==500){
                 title=response.status.toString()
                 message=response.message.toString()
-                buttonOneName="Ok"
+                buttonOneName="null"
                 buttonTwoName="null"
                 showDialog.value=true
             }else if(response.status==508){
@@ -151,7 +164,7 @@ fun GarageProfile(
         }else{
             status=401
             message="Cannot call the sever"
-            buttonOneName="Ok"
+            buttonOneName="null"
             buttonTwoName="null"
             showDialog.value=true
             Log.d("response null","null")
@@ -242,13 +255,15 @@ fun GarageProfile(
                             .align(Alignment.Bottom)
                             .background(Color(0xFF253555), shape = RoundedCornerShape(4.dp))
                             .clickable {
-                                val garageData=GarageCommonDetails(
+                                val garageData = GarageCommonDetails(
                                     processGarage.getGarageId(),
                                     processGarage.getGarageName(),
                                     processGarage.getGarageContactNumber(),
                                     processGarage.getGarageStatus(),
                                     processGarage.getGarageEmail(),
-                                    processGarage.getGarageRating().toString(),
+                                    processGarage
+                                        .getGarageRating()
+                                        .toString(),
                                     processGarage.getGarageType(),
                                     processGarage.getOwnerName()
 
@@ -301,18 +316,15 @@ fun GarageProfile(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-
-                            if (garageId != null) {
-                                Text(
-                                    text = garageId,
-                                    color = Color(0xB3000000),
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 20.sp,
-                                )
-                            }
+                            Text(
+                                text = garageRatings,
+                                color = Color(0xB3000000),
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 20.sp,
+                            )
 
 
-                            if (garageOwner != null) {
+                            if (garageRating!=null){
                                 Text(
                                     text = garageOwner,
                                     color = Color(0xB3000000),

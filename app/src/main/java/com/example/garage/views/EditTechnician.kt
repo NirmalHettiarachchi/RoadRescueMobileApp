@@ -404,7 +404,6 @@ fun EditTechnician(
 
                                                        if (responseObject != null){
                                                            if (responseObject.status==200) {
-                                                               showDialog.value = true
                                                                title = "Updated"
                                                                message = responseObject.message.toString()
                                                                buttonOneName = "nul"

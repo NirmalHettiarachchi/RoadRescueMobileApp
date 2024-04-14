@@ -63,12 +63,22 @@ val textStyle4=TextStyle(
     color = Color(0xFF253555)
 )
 
+
+
 val textStyle5=TextStyle(
     fontFamily= FontFamily.Serif,
     fontWeight = FontWeight.Medium,
     letterSpacing = 0.15.sp,
     fontSize = 32.sp,
     color = Color.Red
+)
+
+val textStyle6 = TextStyle(
+    fontFamily= fontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    letterSpacing = 0.15.sp,
+    color = Color(0xFFB8BABE),
 )
 
 

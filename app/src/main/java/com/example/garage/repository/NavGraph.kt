@@ -22,6 +22,7 @@ import com.example.garage.views.GarageDashboard
 import com.example.garage.views.GarageProfile
 import com.example.garage.views.GarageProfileEdit
 import com.example.garage.views.LoginScreen
+import com.example.garage.views.RegisterScreen
 import com.example.garage.views.TechnicianProfile
 import com.example.garage.views.TechniciansList
 import java.text.SimpleDateFormat
@@ -39,7 +40,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route,
+        startDestination = Screen.Register.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -64,13 +65,18 @@ fun SetupNavGraph(
             LoginScreen(navController=navController)
         }
 
+        composable(
+            route=Screen.Register.route
+        ){
+            RegisterScreen(navHostController = navController)
+        }
 
 
         composable(
             route=Screen.GarageDashboard.route
         ){
 
-            GarageDashboard(navController=navController,navStatus="tempData",sharedViewModel=SharedViewModel())
+            GarageDashboard(navController=navController,navStatus="tempData",garageSharedViewModel= garageSharedViewModel)
         }
         
         composable(

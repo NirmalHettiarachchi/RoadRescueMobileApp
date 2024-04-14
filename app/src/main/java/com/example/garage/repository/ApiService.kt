@@ -1,6 +1,7 @@
 package com.example.garage.repository
 
 import com.example.garage.models.NewTechnician
+import com.example.garage.models.UpdateGarage
 import com.example.garage.models.UpdateTechnician
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -28,6 +29,11 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @GET("garage")
     fun getGarageData(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
+
+
+    @Headers("Content-Type: application/json")
+    @PUT("garage")
+    fun updateGarage(@Body garage: UpdateGarage):Call<ResponseBody>
 
     @Headers("Content-Type: application/json")
     @GET("technician")

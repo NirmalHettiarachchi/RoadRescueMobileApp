@@ -56,8 +56,8 @@ import com.example.garage.models.Garage
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
+import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
-import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -69,7 +69,7 @@ import java.time.Period
 fun GarageDashboard(
     navController: NavController,
     navStatus: String,
-    sharedViewModel: SharedViewModel,
+    garageSharedViewModel: GarageSharedViewModel,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -184,7 +184,6 @@ fun GarageDashboard(
         garageDetailsBackend.getGarageType(),
         garageDetailsBackend.getOwnerName()
     )
-
 
     navController.currentBackStackEntry?.savedStateHandle?.set(
         key = "garageDetails",
@@ -476,7 +475,7 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
 
                             // Dropdown load
 
-                            CommonDropdown(
+                           val option= CommonDropdown(
                                 optionList = technicianList,
                                 defaultSelection = "Technician "
                             )

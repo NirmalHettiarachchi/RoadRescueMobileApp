@@ -9,6 +9,7 @@ class Garage {
     private var _garageEmail:String=""
     private var _garageRating:Float=0F
     private var _type:String=""
+    private var _garageProfilePicRef=""
 
     constructor()
     constructor(
@@ -29,6 +30,28 @@ class Garage {
         this._garageEmail = _garageEmail
         this._garageRating = _garageRating
         this._type = _type
+    }
+
+    constructor(_garageName: String, _ownerName: String, _garageContactNumber: String) {
+        this._garageName = _garageName
+        this._ownerName = _ownerName
+        this._garageContactNumber = _garageContactNumber
+    }
+
+    constructor(
+        _garageId: String,
+        _garageName: String,
+        _ownerName: String,
+        _garageContactNumber: String,
+        _garageEmail: String,
+        _garageProfilePicRef: String,
+    ) {
+        this._garageId = _garageId
+        this._garageName = _garageName
+        this._ownerName = _ownerName
+        this._garageContactNumber = _garageContactNumber
+        this._garageEmail = _garageEmail
+        this._garageProfilePicRef = _garageProfilePicRef
     }
 
 
@@ -94,6 +117,14 @@ class Garage {
 
     fun setGarageType(type:String){
         this._type=type
+    }
+
+    fun getGarageProfilePicRef():String{
+        return this._type
+    }
+
+    fun setGarageProfilePicRef(img:String){
+        this._type=img
     }
 }
 

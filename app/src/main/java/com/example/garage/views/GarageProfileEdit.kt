@@ -17,7 +17,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,16 +27,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,20 +50,18 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garage.R
-import com.example.garage.models.CheckBoxDetailsModel
+import com.example.garage.models.Garage
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
-import org.json.JSONArray
+import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 
 @Composable
@@ -80,15 +73,15 @@ fun GarageProfileEdit(
 
     val garageData= garageSharedViewModel.garage
 
-    val partsOfName=garageData?.garageOwner?.split(" ")
-    val textFirstName by remember { mutableStateOf(partsOfName!![0]) }
-    val textLastName by remember { mutableStateOf(partsOfName!![1]) }
-    val garageName by remember { mutableStateOf(garageData?.garageName) }
-    val contactNumber by remember { mutableStateOf(garageData?.garageContactNumber)}
-    val email by remember { mutableStateOf(garageData?.garageEmail) }
+    var garageName by remember { mutableStateOf(garageData?.garageName) }
+    var ownerName by remember { mutableStateOf(garageData?.garageOwner) }
+    var garageStatus by remember { mutableStateOf(garageData?.garageStatus) }
+    var contactNumber by remember { mutableStateOf(garageData?.garageContactNumber)}
+    var email by remember { mutableStateOf(garageData?.garageEmail) }
 
     var showExpertiseArias by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showResponseDialog by remember { mutableStateOf(false) }
     val showDialogSelectPic = remember { mutableStateOf(false) }
     var showSweetAlert by remember { mutableStateOf(false) }
     var selectedServices by remember { mutableStateOf(emptyList<String>()) }
@@ -137,58 +130,11 @@ fun GarageProfileEdit(
     LaunchedEffect(Unit) {
 //        bitmap.value=getSaveImage(context,garageData?.techProfileRef)
         Log.d("image",img.toString())
-        val response=loadExpertiseArias(viewModel,coroutineScope)
-        if (response != null) {
-            if(response?.status==200){
 
-                expertiseAriasList= response.data!!.toString()
-                showExpertiseArias=true
-
-            }else if(response.status==400){
-                title=response.status.toString()
-                message= response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showSweetAlert=true
-
-            }else if(response.status==404){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showSweetAlert=true
-
-            }else if(response.status==500){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showSweetAlert=true
-            }else if(response.status==508){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="null"
-                buttonTwoName="null"
-                showSweetAlert=true
-            }else{
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showSweetAlert=true
-            }
-        }else{
-            status=401
-            message="Cannot call the sever"
-            buttonOneName="Ok"
-            buttonTwoName="null"
-            showSweetAlert=true
-
-        }
     }
 
     // load response message
-    if (showDialog){
+    if (showResponseDialog){
         sweetAlertDialog(
             title = title,
             message = message,
@@ -275,24 +221,67 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                CommonTextField(textFirstName, true, "First Name", Modifier.height(46.dp), false,
-                    KeyboardType.Text)
+                Text(
+                    text = "Garage Name",
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,160.dp,0.dp),
+                    style = textStyle2
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                garageName?.let {
+                    CommonTextField(
+                        it, true, "Garage Name", Modifier.height(46.dp), false,
+                        KeyboardType.Text)
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                CommonTextField(textLastName, true, "Last Name", Modifier.height(46.dp), false,KeyboardType.Text)
+                Text(
+                    text = "Owner Name",
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,168.dp,0.dp),
+                    style = textStyle2
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ownerName?.let { CommonTextField(it, true, "Owner Name", Modifier.height(46.dp), false,KeyboardType.Text) }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
 
-                garageName?.let { CommonTextField(it, true, "Garage Name", Modifier.height(46.dp), false,KeyboardType.Text) }
+                Text(
+                    text = "Garage Status",
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,155.dp,0.dp),
+                    style = textStyle2
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                garageStatus?.let { CommonTextField(it, true, "Garage Status", Modifier.height(46.dp), false,KeyboardType.Text) }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                Text(
+                    text = "Contact number",
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,140.dp,0.dp),
+                    style = textStyle2
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 contactNumber?.let { CommonTextField(it, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number) }
 
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Email",
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,200.dp,0.dp),
+                    style = textStyle2
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -301,94 +290,6 @@ fun GarageProfileEdit(
 
                 //-----------------------------------------------------------------
 
-
-                Text(
-                    text = "Services",
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 26.sp,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-
-
-
-                val isCheckedBraekSysytem by remember { mutableStateOf(false) }
-                var isCheckedOilChange by remember { mutableStateOf(false) }
-                var isCheckedEngineRepair by remember { mutableStateOf(false) }
-                var isCheckedTireRepair by remember { mutableStateOf(false) }
-
-                val checkboxColor =
-                    if (isCheckedBraekSysytem) Color(0xFF253555) else Color.White
-
-                val servicesList= ArrayList<CheckBoxDetailsModel>()
-
-                if (showExpertiseArias) {
-                    val jsonArray = JSONArray(expertiseAriasList)
-                    for (i in 0 until jsonArray.length()) {
-                        val jsonObject = jsonArray.getJSONObject(i)
-                        val techExpertiseId = jsonObject.getString("expertiseId")
-                        val techExpertise = jsonObject.getString("expertise")
-                        servicesList.add(CheckBoxDetailsModel(techExpertiseId,techExpertise, false))
-                    }
-                }
-
-
-
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.6f)
-                        .padding(start = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(servicesList) { service ->
-
-
-                            Box(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-
-                            var isChecked by remember { mutableStateOf(service.getIsSelected()) }
-
-                                Checkbox(
-                                    checked = selectedServices.contains(service.getCheckBoxName()),
-                                    onCheckedChange = { isChecked ->
-                                        selectedServices = if (isChecked) {
-                                            selectedServices + service.getCheckBoxName()+"-"+service.getCheckBoxId()
-                                        } else {
-                                            selectedServices - service.getCheckBoxName()+"-"+service.getCheckBoxId()
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .background(color = checkboxColor)
-                                        .size(20.dp)
-                                        .padding(4.dp)
-                                        .align(Alignment.CenterStart)
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                Text(
-                                    text = service.getCheckBoxName(),
-                                    color = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 24.dp),
-                                    fontFamily = fontFamily
-                                )
-                            }
-                        }
-                    }
-
-                }
 
                 Row(
                     modifier = Modifier
@@ -460,8 +361,81 @@ fun GarageProfileEdit(
                         CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDialog=false})
 
                         CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
-                            showDialog=false
-                            navController.navigate(route = Screen.GarageProfile.route)
+
+                            bitmap.value.let { tempBitMap ->
+                                showDialog=false
+                                val saveLocation=saveImage(context,tempBitMap,garageData?.garageId)
+                                if (saveLocation!=null) {
+                                    coroutineScope.launch {
+
+                                        try {
+                                            val garage=
+                                                garageName?.let { ownerName?.let { it1 ->
+                                                    contactNumber?.let { it2 ->
+                                                        email?.let { it3 ->
+                                                            garageData?.garageId?.let { it4 ->
+                                                                Garage(
+                                                                    it4, it,
+                                                                    it1, it2, it3,saveLocation)
+                                                            }
+                                                        }
+                                                    }
+                                                } }
+                                            if (garage != null) {
+                                                viewModel.updateGarage(garage){responseObject ->
+
+                                                    if (responseObject != null){
+                                                        if (responseObject.status==200) {
+                                                            title = "Updated"
+                                                            message = responseObject.message.toString()
+                                                            buttonOneName = "nul"
+                                                            buttonTwoName = "null"
+                                                            showResponseDialog = true
+
+                                                            garageName=garageName?.trim()
+                                                            ownerName=ownerName?.trim()
+                                                            garageStatus=garageStatus?.trim()
+                                                            contactNumber=contactNumber?.trim()
+                                                            email=email?.trim()
+
+                                                            navController.navigate(route = Screen.GarageProfile.route)
+
+                                                        } else if (responseObject.status == 500) {
+                                                            title = "Failed"
+                                                            message =
+                                                                responseObject.message.toString()
+                                                            buttonOneName = "null"
+                                                            buttonTwoName = "null"
+//                                                                showProgressBar.value=false
+                                                            showResponseDialog = true
+                                                        } else {
+                                                            title = "Failed"
+                                                            message = responseObject.toString()
+                                                            buttonOneName = "null"
+                                                            buttonTwoName = "null"
+//                                                                    showProgressBar.value=false
+                                                            showResponseDialog= true
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        }catch (e: SocketTimeoutException){
+                                            message= e.message.toString()
+                                            buttonOneName= "null"
+                                            buttonTwoName="null"
+                                            showResponseDialog=true
+                                        }catch (e:Exception) {
+                                            message= e.message.toString()
+                                            buttonOneName= "null"
+                                            buttonTwoName="null"
+                                            showResponseDialog=true
+                                        }
+
+
+                                    }
+                                }
+                            }
                         })
 
                     }

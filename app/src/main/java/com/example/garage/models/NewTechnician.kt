@@ -28,3 +28,18 @@ data class UpdateTechnician(
     val techExpertiseAreas: List<String>,
     )
 
+data class UpdateGarage(
+    @SerializedName("garageId")
+    val garageId: String,
+    @SerializedName("garageName")
+    val garageName: String,
+    @SerializedName("ownerName")
+    val ownerName: String,
+    @SerializedName("contactNumber")
+    val contactNumber: String,
+    @SerializedName("garageMail")
+    val garageMail: String,
+    @SerializedName("imageRef")
+    val imageRef: String,
+)
+
