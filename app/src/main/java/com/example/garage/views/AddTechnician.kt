@@ -290,27 +290,21 @@ fun AddTechnician(
                             }catch (e:SocketTimeoutException){
                                 // Handle timeout exception
 //                                showProgressBar.value=false
-                                showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "null"
                                 buttonTwoName="null"
-                                Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
+                                showDialog.value=true
                             }catch (e:Exception){
                                 // Handle other exceptions
 //                                showProgressBar.value=false
-                                showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "Ok"
                                 buttonTwoName="null"
-                                Log.e("NetworkRequest", "Exception: ${e.message}")
+                                showDialog.value=true
                             }
                         }
                     })
 
-                // load progress bar
-                if(showProgressBar.value){
-                    circularIndicatorProgressBar()
-                }
 
                 // load response message
                 if (showDialog.value){

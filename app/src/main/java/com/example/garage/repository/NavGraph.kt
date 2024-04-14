@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import com.example.garage.models.GarageTechnician
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageSharedViewModel
-import com.example.garage.viewModels.LoginViewModel
 import com.example.garage.viewModels.SharedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
@@ -36,7 +35,7 @@ fun SetupNavGraph(
 
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
-    val loginViewModel:LoginViewModel= viewModel()
+
 
     NavHost(
         navController = navController,
@@ -62,7 +61,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.Login.route
         ){
-            LoginScreen(navController=navController, loginViewModel = loginViewModel)
+            LoginScreen(navController=navController)
         }
 
 

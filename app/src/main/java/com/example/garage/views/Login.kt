@@ -1,5 +1,6 @@
 package com.example.garage.views
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +15,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,49 +27,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garage.R
-import com.example.garage.ui.theme.Pink40
-import com.example.garage.ui.theme.Pink80
-import com.example.garage.ui.theme.Purple40
-import com.example.garage.ui.theme.Purple80
-import com.example.garage.ui.theme.PurpleGrey40
-import com.example.garage.ui.theme.PurpleGrey80
-import com.example.garage.viewModels.LoginViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
 
 
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController,
-    loginViewModel: LoginViewModel
+    navController: NavHostController
 ) {
 
+    val viewModel= viewModel<MainViewModel>()
 
     Column(
         backgroundModifier
@@ -92,7 +66,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                LoginBox(navController = navController, loginViewModel =loginViewModel )//LoginBox(navController, context, loginViewModel)
+                LoginBox(navController = navController, viewModel =viewModel )//LoginBox(navController, context, loginViewModel)
             }
         }
         Footer(navController, "")
@@ -104,15 +78,25 @@ fun LoginScreen(
 @Composable
 fun LoginBox(
     navController: NavHostController,
-    loginViewModel: LoginViewModel
+    viewModel: MainViewModel
 ) {
+
+    val showDialog = remember { mutableStateOf(false) }
+
+    var status by remember { mutableStateOf(0) }
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+
+    val coroutineScope = rememberCoroutineScope()
     var phoneNumber by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     val context = LocalContext.current
 //    var loginResponse: LoginResponse? = null
-    var mAuth: FirebaseAuth? = null
-    mAuth = FirebaseAuth.getInstance()
-    var otpid: String? = null
+//    var mAuth: FirebaseAuth? = null
+//    mAuth = FirebaseAuth.getInstance()
+//    var otpid: String? = null
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -130,6 +114,58 @@ fun LoginBox(
 
             AuthFieldBtn(
                 onClickButton = {
+                    coroutineScope.launch {
+                        try {
+                            if (phoneNumber.isNotEmpty() && phoneNumber.length==10) {
+                                viewModel.checkPhoneNumberIsExists(phoneNumber,"loginSearch"){responseObject->
+                                    if (responseObject != null) {
+                                        if(responseObject.status==200){
+                                            title="Success"
+                                            message= responseObject.message.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
+                                            showDialog.value=true
+                                        }else if (responseObject.status==500){
+
+                                            title="Failed"
+                                            message= responseObject.message.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
+                                            showDialog.value=true
+                                        }else{
+                                            Log.d("check request","methana handle karanna ")
+                                            title="Phone Number is not exists."
+                                            message= responseObject.toString()
+                                            buttonOneName= "null"
+                                            buttonTwoName="null"
+                                            showDialog.value=true
+                                        }
+                                    }
+                                }
+                            }else{
+                                title="Error..!"
+                                message= "Phone number length does not match the required length. Please enter a valid phone number."
+                                buttonOneName= "null"
+                                buttonTwoName="null"
+                                showDialog.value=true
+                            }
+                        } catch (e: Exception) {
+                            message= e.message.toString()
+                            buttonOneName= "null"
+                            buttonTwoName="null"
+                            showDialog.value=true
+                        }catch (e:SocketTimeoutException){
+                            message= e.message.toString()
+                            buttonOneName= "null"
+                            buttonTwoName="null"
+                            showDialog.value=true
+                        }
+
+                    }
+
+
+
+
 //                    if (phoneNumber.isNotEmpty()) {
 //                        loginViewModel.checkPhoneNumberExists(
 //                            Customer(
@@ -240,4 +276,17 @@ fun LoginBox(
 
         }
     }
+
+    if (showDialog.value){
+        sweetAlertDialog(
+            title = title,
+            message = message,
+            buttonOneName = buttonOneName,
+            buttonTwoName = buttonTwoName,
+            onConfirm = {
+                showDialog.value=false
+            }
+        )
+    }
+
 }

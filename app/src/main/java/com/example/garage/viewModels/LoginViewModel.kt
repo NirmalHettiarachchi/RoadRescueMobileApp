@@ -62,6 +62,8 @@ class LoginViewModel:ViewModel() {
 //        }.start()
     }
 
+
+
     fun checkPhoneNumberExists(callback: PhoneNumberCheckCallback, param: PhoneNumberCheckCallback) {
 //        val DATABASE_NAME = "road_rescue"
 //        val TABLE_NAME = "customer"

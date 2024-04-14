@@ -101,13 +101,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.4")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.5")
 
 
     // otp authentication
 
-    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
-    implementation("com.google.firebase:firebase-auth")
+//    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+//    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+//    implementation("com.google.firebase:firebase-analytics-impl:16.3.0")
 
     // add gif lib
     implementation ("io.coil-kt:coil-compose:2.6.0")
