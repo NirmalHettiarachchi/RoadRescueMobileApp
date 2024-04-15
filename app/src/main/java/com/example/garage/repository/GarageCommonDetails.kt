@@ -13,5 +13,6 @@ class GarageCommonDetails (
     val garageEmail:String,
     val garageRating:String,
     val garageType:String,
-    val garageOwner:String
+    val garageOwner:String,
+    val garageProfileImageRef:String
 ):Parcelable

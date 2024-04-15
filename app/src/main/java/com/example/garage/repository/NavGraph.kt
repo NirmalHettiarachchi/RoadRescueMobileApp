@@ -116,6 +116,7 @@ fun SetupNavGraph(
                 garageRating=result?.garageRating,
                 garageType=result?.garageType,
                 garageOwner=result?.garageOwner,
+                garageProfileImageRef=result?.garageProfileImageRef,
                 navController = navController,
                 navyStatus = "dasdewa",
                 garageSharedViewModel = garageSharedViewModel

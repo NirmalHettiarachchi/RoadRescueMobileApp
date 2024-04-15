@@ -2,9 +2,13 @@ package com.example.garage.views
 
 
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,7 +62,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.example.garage.R
 import com.example.garage.models.Garage
 import com.example.garage.repository.GarageCommonDetails
@@ -78,12 +82,17 @@ fun GarageProfile(
     garageType: String?,
     garageEmail: String?,
     garageOwner: String?,
+    garageProfileImageRef:String?,
     navController: NavController,
     navyStatus: String,
     garageSharedViewModel: GarageSharedViewModel,
 ) {
 
     var garageRatings by remember { mutableStateOf("") }
+
+    val context= LocalContext.current
+    var img: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
+    var bitmap= remember { mutableStateOf(img) }
 
 
     if ((garageRatings.toIntOrNull() ?: 0) == 0){
@@ -96,18 +105,24 @@ fun GarageProfile(
     }
 
 
+    Log.d("2222",garageProfileImageRef.toString())
 
-    val processGarage= Garage(
-                garageId!!,
-                garageName!!,
-                garageOwner!!,garageContactNumber!!,garageStatus!!,garageEmail!!,garageRating?.toFloat()!!,garageType!!
+    val processGarage = Garage(
+        garageId!!,
+        garageName!!,
+        garageOwner!!,
+        garageContactNumber!!,
+        garageStatus!!,
+        garageEmail!!,
+        garageRating?.toFloat()!!,
+        garageType!!,
+        garageProfileImageRef!!
     )
 
 
 
     val viewModel= viewModel<MainViewModel>()
 
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val listOfServices = ArrayList<GarageProfileViewModel>()
     val coroutineScope = rememberCoroutineScope()
     var expertiseAriasList by remember { mutableStateOf("") }
@@ -121,6 +136,10 @@ fun GarageProfile(
     var buttonTwoName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
+        if (garageProfileImageRef!="0") {
+            bitmap.value=getSaveImage(context,garageProfileImageRef)
+        }
+        Log.d("image",img.toString())
         val response=loadExpertiseArias(viewModel,coroutineScope)
         if (response != null) {
             if(response?.status==200){
@@ -228,22 +247,17 @@ fun GarageProfile(
                             .fillMaxWidth()
                     ) {
 
-                        AsyncImage(
+                        Image(
+                            bitmap=bitmap.value.asImageBitmap(),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Unspecified)
                                 .clip(CircleShape)
                                 .clickable { }
                                 .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                            model = if (selectedImageUri == null) {
-                                R.drawable.user_fill
-                            } else {
-                                selectedImageUri
-                            },
-                            contentDescription = "Technician Pitcher",
+                            contentDescription = "Garage Profile Pitcher",
                             contentScale = ContentScale.Crop,
-
-                            )
+                        )
                     }
 
 
@@ -265,8 +279,8 @@ fun GarageProfile(
                                         .getGarageRating()
                                         .toString(),
                                     processGarage.getGarageType(),
-                                    processGarage.getOwnerName()
-
+                                    processGarage.getOwnerName(),
+                                    processGarage.getGarageProfilePicRef()
                                 )
                                 garageSharedViewModel.garageCommonDetails(garageData)
                                 navController.navigate(route = Screen.GarageProfileEdit.route)
@@ -290,10 +304,10 @@ fun GarageProfile(
                                             fontSize = 50.sp
                                         )
                                     ) {
-                                        append(garageName?.get(0).toString())
+                                        append(garageName[0].toString())
                                     }
 
-                                    append(garageName?.substring(1))
+                                    append(garageName.substring(1))
 
                                     withStyle(
                                         style = SpanStyle(

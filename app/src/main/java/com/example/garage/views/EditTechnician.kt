@@ -245,7 +245,7 @@ fun EditTechnician(
                                 .clip(CircleShape)
                                 .clickable { }
                                 .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                            contentDescription = "Technician Pitcher",
+                            contentDescription = "Technician Profile Pitcher",
                             contentScale = ContentScale.Crop,
                         )
 
@@ -376,12 +376,9 @@ fun EditTechnician(
                         // technician update
                         CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {
 
-                            Log.d("before image save",bitmap.value.toString())
-
                            bitmap.value.let {tempBitmap ->
 
                                val saveLocation=saveImage(context,tempBitmap,technicianDetails?.techId)
-                               Log.e("saveLoaation","$saveLocation")
                                if (saveLocation!=null){
 
                                    coroutineScope.launch{
@@ -406,7 +403,7 @@ fun EditTechnician(
                                                            if (responseObject.status==200) {
                                                                title = "Updated"
                                                                message = responseObject.message.toString()
-                                                               buttonOneName = "nul"
+                                                               buttonOneName = "null"
                                                                buttonTwoName = "null"
 
                                                                showDialog.value=true
@@ -440,13 +437,11 @@ fun EditTechnician(
                                            message= e.message.toString()
                                            buttonOneName= "null"
                                            buttonTwoName="null"
-                                           Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
                                        }catch (e:Exception) {
                                            showDialog.value=true
                                            message= e.message.toString()
                                            buttonOneName= "Ok"
                                            buttonTwoName="null"
-                                           Log.e("NetworkRequest", "Exception: ${e.message}")
                                        }
                                    }
                                }

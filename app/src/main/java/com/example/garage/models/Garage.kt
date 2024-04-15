@@ -21,6 +21,7 @@ class Garage {
         _garageEmail: String,
         _garageRating: Float,
         _type: String,
+        _garageProfilePicRef: String
     ) {
         this._garageId = _garageId
         this._garageName = _garageName
@@ -30,6 +31,7 @@ class Garage {
         this._garageEmail = _garageEmail
         this._garageRating = _garageRating
         this._type = _type
+        this._garageProfilePicRef = _garageProfilePicRef
     }
 
     constructor(_garageName: String, _ownerName: String, _garageContactNumber: String) {
@@ -44,7 +46,7 @@ class Garage {
         _ownerName: String,
         _garageContactNumber: String,
         _garageEmail: String,
-        _garageProfilePicRef: String,
+        _garageProfilePicRef: String
     ) {
         this._garageId = _garageId
         this._garageName = _garageName
@@ -120,11 +122,11 @@ class Garage {
     }
 
     fun getGarageProfilePicRef():String{
-        return this._type
+        return this._garageProfilePicRef
     }
 
     fun setGarageProfilePicRef(img:String){
-        this._type=img
+        this._garageProfilePicRef=img
     }
 }
 

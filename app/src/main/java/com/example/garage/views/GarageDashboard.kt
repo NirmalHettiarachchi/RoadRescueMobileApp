@@ -158,6 +158,9 @@ fun GarageDashboard(
             val garageEmail = jsonObject.getString("email")
             val garageRating = jsonObject.getString("garageRating").toFloat()
             val garageType = jsonObject.getString("garageType")
+            val garageProfileImageRef = jsonObject.getString("imageRef")
+
+            Log.d("1111111111111111", garageProfileImageRef)
 
             garageDetailsBackend.setGarageName(garageName)
             garageDetailsBackend.setOwnerName(ownerName)
@@ -166,7 +169,7 @@ fun GarageDashboard(
             garageDetailsBackend.setGarageEmail(garageEmail)
             garageDetailsBackend.setGarageRating(garageRating)
             garageDetailsBackend.setGarageType(garageType)
-
+            garageDetailsBackend.setGarageProfilePicRef(garageProfileImageRef)
 
         } catch (e: JSONException) {
             e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
@@ -182,7 +185,8 @@ fun GarageDashboard(
         garageDetailsBackend.getGarageEmail(),
         garageDetailsBackend.getGarageRating().toString(),
         garageDetailsBackend.getGarageType(),
-        garageDetailsBackend.getOwnerName()
+        garageDetailsBackend.getOwnerName(),
+        garageDetailsBackend.getGarageProfilePicRef()
     )
 
     navController.currentBackStackEntry?.savedStateHandle?.set(
@@ -289,7 +293,6 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
     try {
         viewModel.getGarageDetails("1", "search") { responseObject ->
             if (responseObject != null) {
-                Log.d("responseBody", responseObject.toString())
                 response = responseObject
             } else {
                 response = ResponseObject(400, "response is null", null)

@@ -1,13 +1,16 @@
 package com.example.garage.views
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -61,6 +64,9 @@ import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.net.SocketTimeoutException
 
 
@@ -128,9 +134,9 @@ fun GarageProfileEdit(
 
 
     LaunchedEffect(Unit) {
-//        bitmap.value=getSaveImage(context,garageData?.techProfileRef)
-        Log.d("image",img.toString())
-
+        if (garageData?.garageProfileImageRef!="0") {
+            bitmap.value=getSaveGarageImage(garageData?.garageProfileImageRef)
+        }
     }
 
     // load response message
@@ -141,8 +147,8 @@ fun GarageProfileEdit(
             buttonOneName = buttonOneName,
             buttonTwoName = buttonTwoName,
             onConfirm = {
-                showDialog=false
-                navController.navigate(route = Screen.TechnicianList.route)
+                showResponseDialog=false
+                navController.navigate(route = Screen.GarageDashboard.route)
             }
         )
     }
@@ -229,7 +235,7 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                garageName?.let {
+                garageName=garageName?.let {
                     CommonTextField(
                         it, true, "Garage Name", Modifier.height(46.dp), false,
                         KeyboardType.Text)
@@ -246,7 +252,7 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                ownerName?.let { CommonTextField(it, true, "Owner Name", Modifier.height(46.dp), false,KeyboardType.Text) }
+                ownerName=ownerName?.let { CommonTextField(it, true, "Owner Name", Modifier.height(46.dp), false,KeyboardType.Text) }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -259,7 +265,7 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                garageStatus?.let { CommonTextField(it, true, "Garage Status", Modifier.height(46.dp), false,KeyboardType.Text) }
+                garageStatus=garageStatus?.let { CommonTextField(it, false, "Garage Status", Modifier.height(46.dp), false,KeyboardType.Text) }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -272,7 +278,7 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                contactNumber?.let { CommonTextField(it, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number) }
+                contactNumber= contactNumber?.let { CommonTextField(it, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number) }
 
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -285,7 +291,7 @@ fun GarageProfileEdit(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                email?.let { CommonTextField(it, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email) }
+               email=email?.let { CommonTextField(it, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email) }
 
 
                 //-----------------------------------------------------------------
@@ -307,7 +313,86 @@ fun GarageProfileEdit(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {showDialog=true})
+                    CommonButton(btnName = "Save", modifier = Modifier) {
+
+//                        showDialog=true
+                        bitmap.value.let { tempBitMap ->
+                            val saveLocation = saveImageGarage(context, tempBitMap, garageData?.garageId)
+                            if (saveLocation != null) {
+                                coroutineScope.launch {
+
+                                    try {
+                                        if (garageData!=null) {
+                                            val garage = garageName?.let {
+                                                ownerName?.let { it1 ->
+                                                    contactNumber?.let { it2 ->
+                                                        email?.let { it3 ->
+                                                            Garage(
+                                                                garageData.garageId,
+                                                                it, it1, it2, it3,saveLocation
+
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            if (garage != null) {
+                                                viewModel.updateGarage(garage) { responseObject ->
+
+                                                    if (responseObject != null) {
+                                                        if (responseObject.status == 200) {
+                                                            title = "Updated"
+                                                            message = responseObject.message.toString()
+                                                            buttonOneName = "null"
+                                                            buttonTwoName = "null"
+                                                            showDialog = false
+                                                            showResponseDialog = true
+
+                                                            garageName = garageName?.trim()
+                                                            ownerName = ownerName?.trim()
+                                                            garageStatus = garageStatus?.trim()
+                                                            contactNumber = contactNumber?.trim()
+                                                            email = email?.trim()
+
+
+                                                        } else if (responseObject.status == 400) {
+                                                            title = "Failed"
+                                                            message = responseObject.message.toString()
+                                                            buttonOneName = "null"
+                                                            buttonTwoName = "null"
+                                                            showDialog = false
+                                                            showResponseDialog = true
+                                                        } else {
+                                                            title = "Error..!"
+                                                            message = responseObject.data.toString()
+                                                            buttonOneName = "null"
+                                                            buttonTwoName = "null"
+                                                            showDialog = false
+                                                            showResponseDialog = true
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    } catch (e: SocketTimeoutException) {
+                                        message = e.message.toString()
+                                        buttonOneName = "null"
+                                        buttonTwoName = "null"
+                                        showDialog = false
+                                        showResponseDialog = true
+                                    } catch (e: Exception) {
+                                        message = e.message.toString()
+                                        buttonOneName = "null"
+                                        buttonTwoName = "null"
+                                        showDialog = false
+                                        showResponseDialog = true
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -323,128 +408,6 @@ fun GarageProfileEdit(
     }
 
 
-
-    if (showDialog){
-        Dialog(
-            onDismissRequest = {  },
-            content = {
-                Column (
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .fillMaxHeight(0.2f)
-                        .background(
-                            Color(0xFFACB3C0),
-                            shape = RoundedCornerShape(20.dp)
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ){
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "Your details was updated.",style = textStyleDefault)
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDialog=false})
-
-                        CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
-
-                            bitmap.value.let { tempBitMap ->
-                                showDialog=false
-                                val saveLocation=saveImage(context,tempBitMap,garageData?.garageId)
-                                if (saveLocation!=null) {
-                                    coroutineScope.launch {
-
-                                        try {
-                                            val garage=
-                                                garageName?.let { ownerName?.let { it1 ->
-                                                    contactNumber?.let { it2 ->
-                                                        email?.let { it3 ->
-                                                            garageData?.garageId?.let { it4 ->
-                                                                Garage(
-                                                                    it4, it,
-                                                                    it1, it2, it3,saveLocation)
-                                                            }
-                                                        }
-                                                    }
-                                                } }
-                                            if (garage != null) {
-                                                viewModel.updateGarage(garage){responseObject ->
-
-                                                    if (responseObject != null){
-                                                        if (responseObject.status==200) {
-                                                            title = "Updated"
-                                                            message = responseObject.message.toString()
-                                                            buttonOneName = "nul"
-                                                            buttonTwoName = "null"
-                                                            showResponseDialog = true
-
-                                                            garageName=garageName?.trim()
-                                                            ownerName=ownerName?.trim()
-                                                            garageStatus=garageStatus?.trim()
-                                                            contactNumber=contactNumber?.trim()
-                                                            email=email?.trim()
-
-                                                            navController.navigate(route = Screen.GarageProfile.route)
-
-                                                        } else if (responseObject.status == 500) {
-                                                            title = "Failed"
-                                                            message =
-                                                                responseObject.message.toString()
-                                                            buttonOneName = "null"
-                                                            buttonTwoName = "null"
-//                                                                showProgressBar.value=false
-                                                            showResponseDialog = true
-                                                        } else {
-                                                            title = "Failed"
-                                                            message = responseObject.toString()
-                                                            buttonOneName = "null"
-                                                            buttonTwoName = "null"
-//                                                                    showProgressBar.value=false
-                                                            showResponseDialog= true
-                                                        }
-                                                    }
-
-                                                }
-                                            }
-                                        }catch (e: SocketTimeoutException){
-                                            message= e.message.toString()
-                                            buttonOneName= "null"
-                                            buttonTwoName="null"
-                                            showResponseDialog=true
-                                        }catch (e:Exception) {
-                                            message= e.message.toString()
-                                            buttonOneName= "null"
-                                            buttonTwoName="null"
-                                            showResponseDialog=true
-                                        }
-
-
-                                    }
-                                }
-                            }
-                        })
-
-                    }
-
-
-                }
-            }
-        )
-    }
 
     // image loader
 
@@ -520,7 +483,44 @@ fun GarageProfileEdit(
 }
 
 
+fun saveImageGarage(context: Context, tempBitmap: Bitmap, garageId: String?):String? {
+    val fileName="image_$garageId ${System.currentTimeMillis()}.jpg"
+    val directory= File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString()+ File.separator+"RodaRescue")
+
+    if (!directory.exists()){
+        directory.mkdirs()
+    }
+    val file = File(directory,fileName)
+    try {
+        val stream: OutputStream = FileOutputStream(file)
+        tempBitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)
+        stream.flush()
+        stream.close()
+        Toast.makeText(context, "Image saved successfully", Toast.LENGTH_SHORT).show()
+    }catch (e:Exception){
+        e.printStackTrace()
+        Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+    }
+    return fileName
+}
 
 
+fun getSaveGarageImage(techImageRef:String?): Bitmap {
+    var bitmap: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
+    Log.d("img 2 ","$bitmap")
+    val directory= File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString()+ File.separator+"RodaRescue")
 
-
+    if (directory.exists() && directory.isDirectory){
+        val file = techImageRef?.let { File(directory, it) }
+        if (file != null) {
+            if(file.exists()){
+                bitmap= BitmapFactory.decodeFile(file.absolutePath)
+            }
+        }
+    }
+    return bitmap
+}
