@@ -180,7 +180,7 @@ fun IssueDetailsWindow(
                     if (serviceRequestViewModel.issue.value.id.isNotEmpty()) {
                         onDismiss()
                     } else {
-                        Toast.makeText(context, "Please Select Issue", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Select an issue", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -141,7 +141,7 @@ class ServiceRequestViewModel : ViewModel() {
                                     "JOIN vehicle_model ON vehicle_model.id = service_request.vehicle_model_id " +
                                     "JOIN service_provider ON service_provider.id = service_request.assigned_service_provider_id " +
                                     "JOIN issue_category ON issue_category.id = service_request.issue_category_id " +
-                                    "WHERE service_request.customer_id = $customerId;")
+                                    "WHERE service_request.customer_id = $customerId AND service_provider_id IS NOT NULL;")
                             while (resultSet.next()) {
                                 requests.add(resultSetToRequest(resultSet))
                             }
@@ -194,7 +194,7 @@ class ServiceRequestViewModel : ViewModel() {
                     Class.forName("com.mysql.jdbc.Driver")
                     DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
                         connection.createStatement().use { statement ->
-                            val resultSet = statement.executeQuery("SELECT COUNT(*) AS request_count FROM service_request WHERE customer_id = '$customerId'")
+                            val resultSet = statement.executeQuery("SELECT COUNT(*) AS request_count FROM service_request WHERE customer_id = '$customerId' AND service_provider_id IS NOT NULL")
                             if (resultSet.next()) {
                                 requestCount = resultSet.getInt("request_count")
                             } else {

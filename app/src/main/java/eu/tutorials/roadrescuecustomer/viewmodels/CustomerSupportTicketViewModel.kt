@@ -30,7 +30,7 @@ class CustomerSupportTicketViewModel : ViewModel() {
                     Class.forName("com.mysql.jdbc.Driver")
                     DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
                         connection.createStatement().use { statement ->
-                            val resultSet = statement.executeQuery("SELECT * FROM customer_support_ticket where customer_id = $customerId")
+                            val resultSet = statement.executeQuery("SELECT *, CONVERT_TZ(created_time, '+00:00', '+05:30') AS created_time_ist FROM customer_support_ticket where customer_id = $customerId ORDER BY created_time DESC")
                             while (resultSet.next()) {
                                 tickets.add(resultSetToTicket(resultSet))
                             }
@@ -54,7 +54,7 @@ class CustomerSupportTicketViewModel : ViewModel() {
             id = rs.getInt("id"), // Adjust field names based on your database
             customerId = rs.getInt("customer_id"),
             issue = rs.getString("title"),
-            date = rs.getString("created_time"),
+            date = rs.getString("created_time_ist"),
             status = rs.getString("status"),
             description = rs.getString("description"),
             solution = rs.getString("solution")

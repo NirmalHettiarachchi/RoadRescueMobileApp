@@ -2,6 +2,7 @@ package eu.tutorials.roadrescuecustomer.views
 
 import android.Manifest
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.R
@@ -62,6 +66,10 @@ import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
 
 @Composable
 fun DashboardScreen(
@@ -71,6 +79,54 @@ fun DashboardScreen(
     locationViewModel: LocationViewModel,
     context: Context,
 ) {
+
+    var loading by remember {
+        mutableStateOf(currentStateViewModel.loading)
+    }
+    CircularProgressBar(isDisplayed = loading.value)
+
+    LaunchedEffect(key1 = true) {
+        currentStateViewModel.fetchLatestRequest(
+            AppPreferences(context).getStringPreference(
+                "CUSTOMER_ID",
+                ""
+            )
+        )
+    }
+
+    var showPending by remember {
+        mutableStateOf(false)
+    }
+
+    if (currentStateViewModel.latestRequests.collectAsState().value.isNotEmpty()) {
+        val first = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        first.timeZone = TimeZone.getTimeZone("UTC") // Or whatever IST is supposed to be
+        val dd = first.parse(currentStateViewModel.latestRequests.collectAsState().value.first().date)
+
+        val formatterUTC: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        formatterUTC.timeZone = TimeZone.getTimeZone("UTC") // UTC timezone
+        Log.d("===", formatterUTC.format(Date()))
+        val ddd = Date()
+
+        //get time in milliseconds
+        val diff: Long = ddd.time - dd.time
+
+        val seconds = diff / 1000
+
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+
+        Log.d("TAG", "DashboardScreen: ddd.time.... $ddd.time")
+        Log.d("TAG", "DashboardScreen: ddd.... $diff")
+        Log.d("TAG", "DashboardScreen: True.... $minutes")
+        if (minutes <= 3) {
+            showPending = true
+        }
+    } else {
+        showPending = false
+    }
+
     Column(
         backgroundModifier
             .verticalScroll(rememberScrollState()),
@@ -84,7 +140,7 @@ fun DashboardScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle1
             )
-            if (!currentStateViewModel.isServiceRequested.value) {
+            if (!currentStateViewModel.isServiceRequested.value && !showPending) {
                 if (currentStateViewModel.isReqServiceWindowOpened.value) {
                     RequestServiceScreen(
                         onDismiss = {
@@ -109,7 +165,14 @@ fun DashboardScreen(
                 PendingActivityDashboard(
                     serviceRequestViewModel = serviceRequestViewModel,
                     currentStateViewModel = currentStateViewModel
-                )
+                ) {
+                    currentStateViewModel.setCurrentState(
+                        false,
+                        isReqServiceWindowOpened = false
+                    )
+                    currentStateViewModel.clearRecentRequest()
+                    showPending = false
+                }
             }
             HelpBox()
         }
@@ -144,6 +207,7 @@ fun NoPendingActivityDashboard(
 fun PendingActivityDashboard(
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
+    onClick: () -> Unit
 ) {
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
@@ -155,10 +219,7 @@ fun PendingActivityDashboard(
     LaunchedEffect(key1 = Unit) {
         serviceRequestViewModel.deleteLoading.collect { close ->
             if (close) {
-                currentStateViewModel.setCurrentState(
-                    false,
-                    isReqServiceWindowOpened = false
-                )
+                onClick()
             }
         }
     }
@@ -180,33 +241,33 @@ fun PendingActivityDashboard(
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            LaunchedEffect(key1 = "periodicCheck") {
-                // 3 minutes in milliseconds
-                while (System.currentTimeMillis() < endTimeMillis) {
-                    serviceRequestViewModel.checkRequest(
-                        context,
-                        object : ServiceRequestRepository.RequestCallback {
-                            override fun success(id: String) {
-                                if (id == "1") {
-
-                                } else {
-                                    pendingRequest = "Service Requested"
-                                }
-                            }
-
-                            override fun onError(errorMessage: String) {
-                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
-                            }
-                        })
-
-                    delay(15000L) // Wait for 15 seconds before the next call
-                }
-                if(System.currentTimeMillis() >= endTimeMillis) {
-                    serviceRequestViewModel.deleteRequest(
-                        context
-                    )
-                }
-            }
+//            LaunchedEffect(key1 = "periodicCheck") {
+//                // 3 minutes in milliseconds
+//                while (System.currentTimeMillis() < endTimeMillis) {
+//                    serviceRequestViewModel.checkRequest(
+//                        context,
+//                        object : ServiceRequestRepository.RequestCallback {
+//                            override fun success(id: String) {
+//                                if (id == "1") {
+//
+//                                } else {
+//                                    pendingRequest = "Service Requested"
+//                                }
+//                            }
+//
+//                            override fun onError(errorMessage: String) {
+//                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
+//                            }
+//                        })
+//
+//                    delay(15000L) // Wait for 15 seconds before the next call
+//                }
+//                if(System.currentTimeMillis() >= endTimeMillis) {
+//                    serviceRequestViewModel.deleteRequest(
+//                        context
+//                    )
+//                }
+//            }
 
             Text(
                 text = "$pendingRequest",
