@@ -241,33 +241,33 @@ fun PendingActivityDashboard(
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-//            LaunchedEffect(key1 = "periodicCheck") {
-//                // 3 minutes in milliseconds
-//                while (System.currentTimeMillis() < endTimeMillis) {
-//                    serviceRequestViewModel.checkRequest(
-//                        context,
-//                        object : ServiceRequestRepository.RequestCallback {
-//                            override fun success(id: String) {
-//                                if (id == "1") {
-//
-//                                } else {
-//                                    pendingRequest = "Service Requested"
-//                                }
-//                            }
-//
-//                            override fun onError(errorMessage: String) {
-//                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
-//                            }
-//                        })
-//
-//                    delay(15000L) // Wait for 15 seconds before the next call
-//                }
-//                if(System.currentTimeMillis() >= endTimeMillis) {
-//                    serviceRequestViewModel.deleteRequest(
-//                        context
-//                    )
-//                }
-//            }
+            LaunchedEffect(key1 = "periodicCheck") {
+                // 3 minutes in milliseconds
+                while (System.currentTimeMillis() < endTimeMillis) {
+                    serviceRequestViewModel.checkRequest(
+                        context,
+                        object : ServiceRequestRepository.RequestCallback {
+                            override fun success(id: String) {
+                                if (id == "1") {
+
+                                } else {
+                                    pendingRequest = "Service Requested"
+                                }
+                            }
+
+                            override fun onError(errorMessage: String) {
+                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
+                            }
+                        })
+
+                    delay(15000L) // Wait for 15 seconds before the next call
+                }
+                if(System.currentTimeMillis() >= endTimeMillis) {
+                    serviceRequestViewModel.deleteRequest(
+                        context
+                    )
+                }
+            }
 
             Text(
                 text = "$pendingRequest",

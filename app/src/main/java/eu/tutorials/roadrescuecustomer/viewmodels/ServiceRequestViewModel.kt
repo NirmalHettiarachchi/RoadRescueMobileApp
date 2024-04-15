@@ -306,7 +306,7 @@ class ServiceRequestViewModel : ViewModel() {
                                 }
                                 return DeleteResult.Success
                             } else {
-                                return DeleteResult.Failure("Request cannot be cancelled")
+                                return DeleteResult.Failure("Request can not be cancelled")
                             }
                         } else {
                             return DeleteResult.Failure("No matching request found")
