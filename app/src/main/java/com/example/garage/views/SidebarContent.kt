@@ -1,6 +1,5 @@
-package eu.tutorials.roadrescuecustomer.views
+package com.example.garage.views
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,64 +23,108 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import eu.tutorials.roadrescuecustomer.AppPreferences
+
 
 @Composable
-fun SidebarContent(menuClicked:()->Unit,navHostController: NavHostController,context: Context){
+
+fun SidebarContent(menuClicked:()->Unit){
+
     Column(
+
         verticalArrangement = Arrangement.SpaceBetween,
+
         modifier = Modifier
+
             .fillMaxHeight()
+
             .width(240.dp)
+
             .background(Color(0xFF253555))
+
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(30.dp)
-                        .clickable {
-                            menuClicked()
-                        },
-                    contentDescription = "Localized description"
-                )
-                Divider()
-                Spacer(modifier = Modifier
+
+        Column {
+
+            Icon(
+
+                imageVector = Icons.Filled.Menu,
+
+                tint = Color.White,
+
+                modifier = Modifier
+
+                    .padding(16.dp)
+
+                    .size(30.dp)
+
+                    .clickable {
+
+                        menuClicked()
+
+                    },
+
+                contentDescription = "Localized Description"
+
+            )
+
+            Divider()
+
+            Spacer(
+
+                modifier = Modifier
+
                     .background(Color.White)
-                    .height(2.dp))
-            }
-            SidebarButton(buttonName = "Help", verticalPadding = 8,{})
-            SidebarButton(buttonName = "Settings", verticalPadding = 8,{})
+
+                    .height(2.dp)
+
+            )
+
         }
-        SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
-            AppPreferences(context).clearAllPreferences()
-            navHostController.navigate("loginscreen") {
-                popUpTo("loginscreen") { inclusive = true }
-            }
-        }
+
+        SidebarButton(buttonName="Help",verticalPadding=8)
+
+        SidebarButton(buttonName="Setting",verticalPadding=8)
+
     }
+
+    SidebarButton(buttonName="Log Out",verticalPadding=16)
+
 }
 
+
+
 @Composable
-fun SidebarButton(buttonName: String, verticalPadding: Int,onClick:()->Unit) {
+
+fun SidebarButton(buttonName:String,verticalPadding:Int){
+
     Button(
-        onClick = {
-            onClick()
-        },
+
+        onClick = { },
+
+
+
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+
         modifier = Modifier
+
             .fillMaxWidth()
+
             .padding(horizontal = 16.dp, vertical = verticalPadding.dp),
+
         colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+
     ) {
+
         Text(
+
             text = buttonName,
+
             color = Color(0xFF253555),
+
             style = textStyle3.copy(textAlign = TextAlign.Center)
+
         )
+
     }
+
 }

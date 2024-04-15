@@ -7,7 +7,7 @@ class GarageTechnician {
     private var _techContactNumber = ""
     private var _techExpertiseAreas: List<String> = emptyList()
     private var _techStatus: Int = 0
-
+    private var _techImageRef: String = ""
 
 
 
@@ -18,6 +18,22 @@ class GarageTechnician {
         _techContactNumber: String,
         _techExpertiseAreas: List<String>,
         _techStatus: Int,
+        _techImageRef:String
+    ) {
+        this._techFirstName = _techFirstName
+        this._techLastName = _techLastName
+        this._techContactNumber = _techContactNumber
+        this._techExpertiseAreas = _techExpertiseAreas
+        this._techStatus = _techStatus
+        this._techImageRef=_techImageRef
+    }
+
+    constructor(
+        _techFirstName: String,
+        _techLastName: String,
+        _techContactNumber: String,
+        _techExpertiseAreas: List<String>,
+        _techStatus: Int
     ) {
         this._techFirstName = _techFirstName
         this._techLastName = _techLastName
@@ -30,16 +46,14 @@ class GarageTechnician {
         _techId: String,
         _techFirstName: String,
         _techLastName: String,
-        _techContactNumber: String,
-        _techExpertiseAreas: List<String>,
-        _techStatus: Int,
+        _techImageRef: String,
+        _techExpertiseAreas: List<String>
     ) {
         this._techId = _techId
         this._techFirstName = _techFirstName
         this._techLastName = _techLastName
-        this._techContactNumber = _techContactNumber
+        this._techImageRef = _techImageRef
         this._techExpertiseAreas = _techExpertiseAreas
-        this._techStatus = _techStatus
     }
 
     constructor()
@@ -90,7 +104,15 @@ class GarageTechnician {
     }
 
     fun setTechExpertiseAreas(techExpertiseAreas: List<String>) {
-        this._techExpertiseAreas
+        this._techExpertiseAreas=techExpertiseAreas
+    }
+
+    fun getTechImageRef(): String {
+        return this._techImageRef
+    }
+
+    fun setTechImageRef(imageRef: String) {
+        this._techImageRef = imageRef
     }
 }
 

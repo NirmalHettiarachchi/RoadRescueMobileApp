@@ -34,10 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.CheckBoxDetailsModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -74,34 +74,40 @@ fun AddTechnician(
                 title=response.status.toString()
                 message= response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
 
             }else if(response.status==404){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
 
             }else if(response.status==500){
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
             }else if(response.status==508){
                 title=response.status.toString()
                 message=response.message.toString()
-                buttonOneName="Ok"
+                buttonOneName="null"
+                buttonTwoName="null"
                 showDialog.value=true
             }else{
                 title=response.status.toString()
                 message=response.message.toString()
                 buttonOneName="Ok"
+                buttonTwoName="null"
                 showDialog.value=true
             }
         }else{
             status=401
             message="Cannot call the sever"
             buttonOneName="Ok"
+            buttonTwoName="null"
             showDialog.value=true
             Log.d("response null","null")
         }
@@ -157,7 +163,7 @@ fun AddTechnician(
                     textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false,KeyboardType.Text)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),false,KeyboardType.Number)
+                    textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),true,KeyboardType.Number)
                     Spacer(modifier = Modifier.height(16.dp))
 
                 }
@@ -188,8 +194,9 @@ fun AddTechnician(
                         val jsonArray = JSONArray(expertiseAriasList)
                         for (i in 0 until jsonArray.length()) {
                             val jsonObject = jsonArray.getJSONObject(i)
+                            val techExpertiseId = jsonObject.getString("expertiseId")
                             val techExpertise = jsonObject.getString("expertise")
-                            servicesList.add(CheckBoxDetailsModel(techExpertise, false))
+                            servicesList.add(CheckBoxDetailsModel(techExpertiseId,techExpertise, false))
                         }
                     }
 
@@ -206,9 +213,9 @@ fun AddTechnician(
                                 checked = selectedServices.contains(service.getCheckBoxName()),
                                 onCheckedChange = { isChecked ->
                                     selectedServices = if (isChecked) {
-                                        selectedServices + service.getCheckBoxName()
+                                        selectedServices + service.getCheckBoxName()+"-"+service.getCheckBoxId()
                                     } else {
-                                        selectedServices - service.getCheckBoxName()
+                                        selectedServices - service.getCheckBoxName()+"-"+service.getCheckBoxId()
                                     }
                                 },
                                 modifier = Modifier
@@ -237,26 +244,24 @@ fun AddTechnician(
 
                 CommonButton(
                     btnName = "Register",
-                    modifier = Modifier,
+                    modifier = Modifier.width(105.dp),
                     onClickButton = {
 
 
                         coroutineScope.launch {
                             try {
 //                                showProgressBar.value=true
-                                viewModel.addTechnicianTest(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
+                                viewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
 
-                                    Log.d("wada karpan hutta", responseObject.toString())
+
                                     if (responseObject != null) {
-                                        // Call your function here
-                                        Log.d("wada karpan hutta", "labbak maaha")
-                                        Log.d("sadhu sadhu", responseObject.message.toString())
+
 
                                         if(responseObject.status==201){
                                             title="Success"
                                             message= responseObject.message.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
 
@@ -268,15 +273,15 @@ fun AddTechnician(
 
                                             title="Failed"
                                             message= responseObject.message.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName="null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
                                         }else{
                                             title="Failed"
                                             message= responseObject.toString()
-                                            buttonOneName= null.toString()
-                                            buttonTwoName=null.toString()
+                                            buttonOneName= "null"
+                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
                                             showDialog.value=true
                                         }
@@ -285,27 +290,21 @@ fun AddTechnician(
                             }catch (e:SocketTimeoutException){
                                 // Handle timeout exception
 //                                showProgressBar.value=false
-                                showDialog.value=true
                                 message= e.message.toString()
-                                buttonOneName= "Ok"
-                                buttonTwoName=null.toString()
-                                Log.e("NetworkRequest","SocketTimeoutException: ${e.message}")
+                                buttonOneName= "null"
+                                buttonTwoName="null"
+                                showDialog.value=true
                             }catch (e:Exception){
                                 // Handle other exceptions
 //                                showProgressBar.value=false
-                                showDialog.value=true
                                 message= e.message.toString()
                                 buttonOneName= "Ok"
-                                buttonTwoName=null.toString()
-                                Log.e("NetworkRequest", "Exception: ${e.message}")
+                                buttonTwoName="null"
+                                showDialog.value=true
                             }
                         }
                     })
 
-                // load progress bar
-                if(showProgressBar.value){
-                    circularIndicatorProgressBar()
-                }
 
                 // load response message
                 if (showDialog.value){

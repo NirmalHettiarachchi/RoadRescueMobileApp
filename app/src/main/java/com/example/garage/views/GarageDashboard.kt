@@ -2,7 +2,9 @@ package com.example.garage.views
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +33,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,27 +52,155 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.Garage
+import com.example.garage.models.ResponseObject
+import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.viewModels.GarageDashboardViewModel
+import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
+import java.net.SocketTimeoutException
+import java.time.Period
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GarageDashboard(
-    garageDetails:GarageDashboardViewModel,
-    technicianList:List<String>,
     navController: NavController,
-    navStatus:String,
-
+    navStatus: String,
+    garageSharedViewModel: GarageSharedViewModel,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val viewModel = viewModel<MainViewModel>()
+
+    var showLoadGarageDetails by remember { mutableStateOf(false) }
+    var showMessageDialog by remember { mutableStateOf(false) }
+
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var garage by remember { mutableStateOf("") }
+    var garageDetailsBackend = Garage()
+
+    val technicians = listOf<String>(
+        "Saman Kumara",
+        "Tharindu Dakshina",
+        "Ajith Muthukumara",
+        "Namal Rajapakasha"
+    )
+
+    LaunchedEffect(Unit) {
+        val response = loadGarageDetails(viewModel)
+        if (response != null) {
+            if (response.status == 200) {
+
+                garage = response.data!!.toString()
+//                showProgressBar=false
+                showLoadGarageDetails = true
+
+            } else if (response.status == 400) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+
+            } else if (response.status == 404) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+
+            } else if (response.status == 500) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            } else if (response.status == 508) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "null"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            } else {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            }
+        } else {
+            title = "401"
+            message = "Cannot call the sever"
+            buttonOneName = "Ok"
+            buttonTwoName = "null"
+            showMessageDialog = true
+            Log.d("response null", "null")
+        }
+
+
+    }
+
+
+    if (showLoadGarageDetails) {
+        try {
+            val jsonObject = JSONObject(garage)
+
+            val garageName = jsonObject.getString("garageName")
+            val ownerName = jsonObject.getString("OwnerName")
+            val garageContactNumber = jsonObject.getString("contactNumber")
+            val garageStatus = jsonObject.getString("garageStatus")
+            val garageEmail = jsonObject.getString("email")
+            val garageRating = jsonObject.getString("garageRating").toFloat()
+            val garageType = jsonObject.getString("garageType")
+            val garageProfileImageRef = jsonObject.getString("imageRef")
+
+            Log.d("1111111111111111", garageProfileImageRef)
+
+            garageDetailsBackend.setGarageName(garageName)
+            garageDetailsBackend.setOwnerName(ownerName)
+            garageDetailsBackend.setGarageContactNumber(garageContactNumber)
+            garageDetailsBackend.setGarageStatus(garageStatus)
+            garageDetailsBackend.setGarageEmail(garageEmail)
+            garageDetailsBackend.setGarageRating(garageRating)
+            garageDetailsBackend.setGarageType(garageType)
+            garageDetailsBackend.setGarageProfilePicRef(garageProfileImageRef)
+
+        } catch (e: JSONException) {
+            e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
+        }
+
+    }
+
+    val garageCommonDetails = GarageCommonDetails(
+        "1",
+        garageDetailsBackend.getGarageName(),
+        garageDetailsBackend.getGarageContactNumber(),
+        garageDetailsBackend.getGarageStatus(),
+        garageDetailsBackend.getGarageEmail(),
+        garageDetailsBackend.getGarageRating().toString(),
+        garageDetailsBackend.getGarageType(),
+        garageDetailsBackend.getOwnerName(),
+        garageDetailsBackend.getGarageProfilePicRef()
+    )
+
+    navController.currentBackStackEntry?.savedStateHandle?.set(
+        key = "garageDetails",
+        value = garageCommonDetails
+    )
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(){
+                    SidebarContent() {
                         scope.launch {
                             drawerState.close()
                         }
@@ -79,25 +209,27 @@ fun GarageDashboard(
             )
         }
     ) {
-        Scaffold (
-            topBar = {Header {
-                scope.launch { drawerState.open() }
-            }},
-            bottomBar = { Footer(navController,navStatus)
+        Scaffold(
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(navController, navStatus)
             }
-        ){
-            Column (
+        ) {
+            Column(
                 modifier = defaultBackground.padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
-                ){
-
+                ) {
 
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Welcome, ${garageDetails.getGarageName()}",
+                    text = "Welcome, ${garageDetailsBackend.getGarageName()}",
                     color = Color(0xFF253555),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
@@ -111,7 +243,7 @@ fun GarageDashboard(
                         .fillMaxWidth(0.84f)
                         .fillMaxHeight(0.85f)
                         .verticalScroll(state = rememberScrollState()),
-                    shape= RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
                     border = BorderStroke(width = 2.dp, Color.White),
 
@@ -120,32 +252,73 @@ fun GarageDashboard(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Load are service requests
-
-                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+                    // custommer request load karanna one
+                    ServiceRequest(
+                        garageDetailsBackend,
+                        technicians,
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ServiceRequest(garageDetails,technicianList,Modifier.align(Alignment.CenterHorizontally))
+                    ServiceRequest(
+                        garageDetailsBackend,
+                        technicians,
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
+
+            if (showMessageDialog) {
+                sweetAlertDialog(
+                    title = title,
+                    message = message,
+                    buttonOneName = buttonOneName,
+                    buttonTwoName = buttonTwoName,
+                    onConfirm = {
+                        showMessageDialog = false
+                    }
+                )
+            }
         }
     }
 }
-//GarageApiClient.getGarage()
+
+suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.getGarageDetails("1", "search") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
+}
 
 
+// meke data tika load karanna one custommerge trigger eka dala
 
-
-
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<String>,modifier: Modifier){
+fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier: Modifier) {
 
-    val garageViewModel: MainViewModel = viewModel()
-    val viewState by garageViewModel.backendState.observeAsState()
+    val garageDetails = GarageDashboardViewModel(
+        "Nirmal Dakshina", Period.of(1, 2, 3),
+        "Tire Punch", "Need help as soon as possible", 25000.00
+    )
+
+
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -178,10 +351,16 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Issue", color = Color.Black, modifier = Modifier
-                .weight(1f)
-                .padding(8.dp, 0.dp))
-            Text(text = garageDetails.getStatus(),color = Color.Black, modifier = Modifier.weight(1f))
+            Text(
+                text = "Issue", color = Color.Black, modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp, 0.dp)
+            )
+            Text(
+                text = garageDetails.getStatus(),
+                color = Color.Black,
+                modifier = Modifier.weight(1f)
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -192,10 +371,17 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Description", color = Color.Black, modifier = Modifier
-                .weight(1f)
-                .padding(8.dp, 0.dp))
-            Text(text = garageDetails.getAssignServiceProvider(),color = Color.Black, modifier = Modifier.weight(1f), maxLines = 3)
+            Text(
+                text = "Description", color = Color.Black, modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp, 0.dp)
+            )
+            Text(
+                text = garageDetails.getAssignServiceProvider(),
+                color = Color.Black,
+                modifier = Modifier.weight(1f),
+                maxLines = 3
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -206,15 +392,21 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Service Fees(approx..)", color = Color.Black, modifier = Modifier
-                .weight(1f)
-                .padding(8.dp, 0.dp))
-            Text(text = "LKR ${garageDetails.getServiceFee()}0",color = Color.Black, modifier = Modifier.weight(1f),)
+            Text(
+                text = "Service Fees(approx..)", color = Color.Black, modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp, 0.dp)
+            )
+            Text(
+                text = "LKR ${garageDetails.getServiceFee()}0",
+                color = Color.Black,
+                modifier = Modifier.weight(1f),
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val phoneNumber="+94716788537"
+        val phoneNumber = "0716788537"
         val context = LocalContext.current
 
 
@@ -225,14 +417,14 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
         ) {
             IconButton(onClick = {
 
-                val intent= Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
 
                 context.startActivity(intent)
 
             }) {
                 Icon(
                     imageVector = Icons.Default.Call,
-                    contentDescription ="Contact icon",
+                    contentDescription = "Contact icon",
                     tint = Color.Black
                 )
             }
@@ -240,12 +432,12 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
             CommonButton(
                 btnName = "Accept",
                 modifier = Modifier.align(Alignment.CenterVertically),
-                onClickButton = {showDialog=true}
+                onClickButton = { showDialog = true }
             )
 
-            if (showDialog){
+            if (showDialog) {
                 Dialog(
-                    onDismissRequest = {  },
+                    onDismissRequest = { },
                     content = {
                         Column(
                             modifier = Modifier
@@ -259,12 +451,11 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                         ) {
 
 
-
-                            Row (
+                            Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.End
-                            ){
-                                IconButton(onClick = { showDialog = false  }) {
+                            ) {
+                                IconButton(onClick = { showDialog = false }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "close icon",
@@ -287,7 +478,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
 
                             // Dropdown load
 
-                            CommonDropdown(
+                           val option= CommonDropdown(
                                 optionList = technicianList,
                                 defaultSelection = "Technician "
                             )
@@ -303,7 +494,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
 
-
+/*
 //                                    garageViewModel.fetchBackend()
                                     Log.d("rsp","request is ok ")
 
@@ -323,7 +514,7 @@ fun ServiceRequest(garageDetails:GarageDashboardViewModel, technicianList:List<S
                                         viewState?.response !=null -> {
                                             Log.d("data final","${viewState?.response!!.data}")
                                         }
-                                    }
+                                    }*/
 
                                 }
                             )

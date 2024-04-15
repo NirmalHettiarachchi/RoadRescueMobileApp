@@ -2,6 +2,8 @@ package com.example.garage.repository
 
 sealed class Screen(val route :String) {
 
+    object Login:Screen(route="loginScreen")
+    object Register:Screen(route="RegisterScreen")
     object GarageDashboard:Screen(route="garageDashboard_Screen")
 
     object Activities:Screen(route = "GarageActivities_Screen")
