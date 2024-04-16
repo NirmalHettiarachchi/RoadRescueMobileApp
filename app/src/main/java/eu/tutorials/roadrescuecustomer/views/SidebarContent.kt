@@ -27,9 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
-fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: NavHostController,context: Context, currentStateViewModel: CurrentStateViewModel){
+fun SidebarContent(
+    menuClicked:(isLogOut : Boolean)->Unit,
+    navHostController: NavHostController,
+    context: Context,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
+){
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -73,6 +80,7 @@ fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: Nav
                 isServiceRequested = false,
                 isReqServiceWindowOpened = false
             )
+            serviceRequestViewModel.clearData()
             menuClicked(true)
         }
     }

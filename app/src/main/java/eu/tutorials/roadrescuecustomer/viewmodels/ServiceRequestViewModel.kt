@@ -159,6 +159,12 @@ class ServiceRequestViewModel : ViewModel() {
         this.requests.clear()
     }
 
+    fun clearData() {
+        issue.value = Issues("", "", "")
+        vehicleModel.value = VehicleModel("", "")
+        description.value = ""
+    }
+
     private fun resultSetToRequest(rs: ResultSet): ServiceRequest {
         return ServiceRequest(
             id = rs.getString("id"),
