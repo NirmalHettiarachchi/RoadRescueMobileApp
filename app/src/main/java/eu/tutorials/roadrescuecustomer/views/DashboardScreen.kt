@@ -713,33 +713,15 @@ fun CommonIssuesBox(
                 modifier = Modifier
                     .padding(vertical = 8.dp, horizontal = 24.dp)
             ) {
-                CommonIssueButton(issueCategory = "Mechanical Issues") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Mechanical Issues"
-                }
-                CommonIssueButton(issueCategory = "Electrical Issues") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Electrical Issues"
-                }
-                CommonIssueButton(issueCategory = "Engine Problems") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Engine Problems"
-                }
-                CommonIssueButton(issueCategory = "Fuel Issues") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Fuel Issues"
-                }
-                CommonIssueButton(issueCategory = "Exhaust Issues") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Exhaust Issues"
-                }
-                CommonIssueButton(issueCategory = "Cooling Problems") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Cooling Problems"
-                }
-                CommonIssueButton(issueCategory = "Other") {
-                    currentStateViewModel.isReqServiceWindowOpened.value = true
-                    serviceRequestViewModel.issue.value.category = "Other"
+                serviceRequestViewModel.fetchIssues()
+                val issues by serviceRequestViewModel.issues
+                issues.forEach { issue ->
+                    CommonIssueButton(issueCategory = issue.category) {
+                        currentStateViewModel.isReqServiceWindowOpened.value = true
+                        serviceRequestViewModel.issue.value.category = issue.category
+                        serviceRequestViewModel.issue.value.approximatedCost = issue.approximatedCost
+                        serviceRequestViewModel.issue.value.id = issue.id
+                    }
                 }
             }
         }
