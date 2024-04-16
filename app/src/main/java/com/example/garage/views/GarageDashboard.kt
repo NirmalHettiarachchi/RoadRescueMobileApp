@@ -223,7 +223,6 @@ fun GarageDashboard(
             Column(
                 modifier = defaultBackground.padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
-
                 ) {
 
 
@@ -358,7 +357,7 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getStatus(),
+                text = garageDetails.getIssue(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f)
             )

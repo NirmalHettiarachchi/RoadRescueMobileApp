@@ -1,6 +1,5 @@
-package com.example.garage.views
+package com.example.garage.views.TechnicianApp
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,11 +18,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.garage.R
-import com.example.garage.repository.Screen
-import com.example.garage.repository.TechData
 
 @Composable
-fun Footer(
+fun TechnicianFooter(
     navController: NavController,
     navStatus:String,
 ){
@@ -37,20 +34,19 @@ fun Footer(
             .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
             .background(color = Color(0xFF253555))
     ){
+
         Icon(
-            painter = painterResource(id = R.drawable.technicins_footer),
+            painter = painterResource(id = R.drawable.compass_fill),
             modifier = Modifier
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    // loadAllTechnicians()
-                    navController.navigate(route = Screen.TechnicianList.route)
-                },
-            tint = Color.White,
-            contentDescription = "footer technician"
 
+                }
+            ,
+            tint = Color.Unspecified,
+            contentDescription = null
         )
-
 
         Icon(
             painter = painterResource(id = R.drawable.home),
@@ -58,7 +54,7 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    navController.navigate(route = Screen.GarageDashboard.route)
+//                    navController.navigate(route = Screen.GarageDashboard.route)
                 }
             ,
             tint = Color.Unspecified,
@@ -71,11 +67,11 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    navController.navigate(route = Screen.Activities.route)
+//                    navController.navigate(route = Screen.Activities.route)
                 }
             ,
             tint = Color.Unspecified,
-            contentDescription = "garage activities"
+            contentDescription = "Technician activities"
         )
 
         Icon(
@@ -84,18 +80,12 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    Log.d("ane hutto ",navStatus)
-                    val technicianData = TechData(
-                        techId = navStatus,
-                        techFirstName = "",
-                        techLastName = "technician.getTechLastName()",
-                        techProfileRef = "technician.getTechImageRef()"
-                    )
-                    navController.navigate(route = Screen.GarageProfile.route)
+
+//                    navController.navigate(route = Screen.GarageProfile.route)
                 }
             ,
             tint = Color.Unspecified,
-            contentDescription = "garage profile"
+            contentDescription = "Technician profile"
         )
 
     }

@@ -27,11 +27,11 @@ class GarageDashboardViewModel(
         this._date
     }
 
-    fun getStatus(): String {
+    fun getIssue(): String {
         return this._issue
     }
 
-    fun setStatus(issue: String) {
+    fun setIssue(issue: String) {
         this._issue = issue
     }
 
