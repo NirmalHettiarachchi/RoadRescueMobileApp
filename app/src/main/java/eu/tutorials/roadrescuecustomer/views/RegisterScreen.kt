@@ -248,11 +248,11 @@ fun SignUpBox(
                                     context
                                 )
 
-                                navController.navigate("loginscreen") {
-                                    popUpTo("loginscreen") {
-                                        inclusive = true
-                                    }
-                                }
+//                                navController.navigate("loginscreen") {
+//                                    popUpTo("loginscreen") {
+//                                        inclusive = true
+//                                    }
+//                                }
                                 MainScope().launch {
                                     Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show()
                                 }

@@ -53,6 +53,8 @@ class SingUpRepository() {
                     phoneNumberExists = resultSet.getInt(1) > 0
                 }
 
+                resultSet.close()
+
                 // Insert the new user if the phone number does not exist
                 if (!phoneNumberExists) {
                     val insertStmt =
@@ -63,9 +65,27 @@ class SingUpRepository() {
                     insertStmt.setString(4, user.lName)
 
                     insertStmt.executeUpdate()
-                    MainScope().launch {
-                        callback.onUserAddedSuccessfully(resultSet.getInt("id").toString())
+
+
+
+
+                    // Prepare a statement to check if the phone number already exists
+                    val checkStmt1 =
+                        connection.prepareStatement("SELECT * FROM $TABLE_NAME WHERE phone_number = ?")
+                    checkStmt1.setString(1, user.phoneNumber)
+
+                    // Execute the query
+                    val resultSet1 = checkStmt1.executeQuery()
+
+                    if (resultSet1.next()) {
+                        val id = resultSet1.getInt("id").toString()
+                        MainScope().launch {
+                            callback.onUserAddedSuccessfully(id)
+                        }
                     }
+
+
+
                 } else {
                     MainScope().launch {
                         callback.onUserAlreadyExists()
