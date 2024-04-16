@@ -65,14 +65,14 @@ fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: Nav
             }
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
+            navHostController.navigate("loginscreen") {
+                popUpTo("loginscreen") { inclusive = true }
+            }
             AppPreferences(context).clearAllPreferences()
             currentStateViewModel.setCurrentState(
                 isServiceRequested = false,
                 isReqServiceWindowOpened = false
             )
-            navHostController.navigate("loginscreen") {
-                popUpTo("loginscreen") { inclusive = true }
-            }
             menuClicked(true)
         }
     }
