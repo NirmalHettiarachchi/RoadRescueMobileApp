@@ -52,6 +52,7 @@ class ServiceRequestViewModel : ViewModel() {
     private val _vehicleMake = mutableStateOf(VehicleMake("", ""))
     private val _vehicleModel = mutableStateOf(VehicleModel("", ""))
     private val _description = mutableStateOf(_repository.getServiceRequest().description)
+    private val _approxCost = mutableStateOf(_repository.getServiceRequest().approxCost)
 
     val issue: MutableState<Issues> = _issue
     val indicator1: MutableState<Boolean> = _indicator1
@@ -65,6 +66,7 @@ class ServiceRequestViewModel : ViewModel() {
     val vehicleMake: MutableState<VehicleMake> = _vehicleMake
     val vehicleModel: MutableState<VehicleModel> = _vehicleModel
     val description: MutableState<String> = _description
+    val approxCost: MutableState<String> = _approxCost
 
     val requests = mutableStateListOf<ServiceRequest>()
 
@@ -182,7 +184,8 @@ class ServiceRequestViewModel : ViewModel() {
             date = rs.getString("request_timestamp"),
             vehicleModelName = rs.getString("model"),
             serviceProviderName = rs.getString("garage_name"),
-            issueCategoryName = rs.getString("category")
+            issueCategoryName = rs.getString("category"),
+            approxCost = rs.getString("approx_cost")
         )
     }
 

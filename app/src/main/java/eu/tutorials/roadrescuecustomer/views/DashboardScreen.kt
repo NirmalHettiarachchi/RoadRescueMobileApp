@@ -579,7 +579,7 @@ fun RequestServiceScreen(
                             description,
                             "",
                             locationViewModel.location.value.toString(),
-                            "", ""
+                            "", "", approxCost = serviceRequestViewModel.issue.value.approximatedCost
                         ), object : ServiceRequestRepository.RequestCallback {
                             override fun success(message: String) {
                                 Toast.makeText(

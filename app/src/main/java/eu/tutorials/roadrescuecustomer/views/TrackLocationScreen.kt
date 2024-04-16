@@ -86,7 +86,7 @@ fun NoPendingActivityTrackLocationScreen() {
         ) {
             Spacer(modifier = Modifier.height(128.dp))
             Text(
-                text = "No any pending service requests!",
+                text = "No any accepted pending service requests!",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )

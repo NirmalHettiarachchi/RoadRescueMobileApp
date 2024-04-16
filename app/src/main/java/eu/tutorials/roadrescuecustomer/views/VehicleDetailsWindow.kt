@@ -105,6 +105,8 @@ fun VehicleDetailsWindow(
                 vehicleModel = getVehicleModel
                 vehicleModelId = getVehicleModelId
 
+                serviceRequestViewModel.vehicleModel.value.id = getVehicleModelId
+
                 Spacer(modifier = Modifier.height(8.dp))
                 CommonButton(
                     btnName = "Save",

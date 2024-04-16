@@ -31,7 +31,8 @@ data class ServiceRequest(
     var date: String = "",
     var vehicleModelName: String = "",
     var serviceProviderName: String = "",
-    var issueCategoryName: String = ""
+    var issueCategoryName: String = "",
+    var approxCost: String = ""
 )
 
 class ServiceRequestRepository {
@@ -67,7 +68,7 @@ class ServiceRequestRepository {
 
                 val insertStmt =
                     connection.prepareStatement(
-                        "INSERT INTO $TABLE_NAME(customer_id, issue_category_id,indicator_1,indicator_2,indicator_3,indicator_4,indicator_5,indicator_6,vehicle_type_id,vehicle_make_id,vehicle_model_id,fuel_type_id,description,status,location,paid_amount,rating) VALUES(?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        "INSERT INTO $TABLE_NAME(customer_id, issue_category_id,indicator_1,indicator_2,indicator_3,indicator_4,indicator_5,indicator_6,vehicle_type_id,vehicle_make_id,vehicle_model_id,fuel_type_id,description,status,location,paid_amount,rating, approx_cost) VALUES(?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         Statement.RETURN_GENERATED_KEYS
                     )
                 AppPreferences(context).getStringPreference("CUSTOMER_ID", "").toIntOrNull()?.let {
@@ -92,6 +93,7 @@ class ServiceRequestRepository {
                 insertStmt.setString(15, serviceRequest.location)
                 insertStmt.setDouble(16, 0.0)
                 insertStmt.setInt(17, 0)
+                insertStmt.setDouble(18, serviceRequest.approxCost.toDouble())
 
                 insertStmt.executeUpdate()
 
