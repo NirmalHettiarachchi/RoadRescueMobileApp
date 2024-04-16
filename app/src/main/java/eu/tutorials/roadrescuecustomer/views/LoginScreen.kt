@@ -112,7 +112,13 @@ fun LoginBox(
 
             AuthFieldBtn(
                 onClickButton = {
-                    if (phoneNumber.isNotEmpty() && phoneNumber.length == 12 && phoneNumber.startsWith("+94")) {
+
+                    Log.d("TAG", "LoginBox: Condition 1 : ${phoneNumber.isNotEmpty()}")
+                    Log.d("TAG", "LoginBox: Condition 2 : ${phoneNumber.trim().length == 12}")
+                    Log.d("TAG", "LoginBox: Condition 3 : ${phoneNumber.trim().startsWith("+94")}")
+
+
+                    if (phoneNumber.isNotEmpty() && phoneNumber.trim().length == 12 && phoneNumber.trim().startsWith("+94")) {
 //                        showLoading
                         loading = true
                         loginViewModel.checkPhoneNumberExists(

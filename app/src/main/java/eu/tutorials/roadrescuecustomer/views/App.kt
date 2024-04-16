@@ -85,7 +85,7 @@ fun App(
                                 }
                             }
 
-                        }, navController, context)
+                        }, navController, context, currentStateViewModel)
                     }
                 )
             }

@@ -26,9 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
+import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 
 @Composable
-fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: NavHostController,context: Context){
+fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: NavHostController,context: Context, currentStateViewModel: CurrentStateViewModel){
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -65,6 +66,10 @@ fun SidebarContent(menuClicked:(isLogOut : Boolean)->Unit,navHostController: Nav
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {
             AppPreferences(context).clearAllPreferences()
+            currentStateViewModel.setCurrentState(
+                isServiceRequested = false,
+                isReqServiceWindowOpened = false
+            )
             navHostController.navigate("loginscreen") {
                 popUpTo("loginscreen") { inclusive = true }
             }
