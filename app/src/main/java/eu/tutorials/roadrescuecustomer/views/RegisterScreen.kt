@@ -231,7 +231,12 @@ fun SignUpBox(
                 .align(Alignment.CenterHorizontally)
                 .padding(10.dp)
         ) {
-            if (otp.isNotEmpty()) {
+            if(firstName.isEmpty() || lastName.isEmpty()) {
+                MainScope().launch {
+                    Toast.makeText(context, "Fill all the required fields", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else if (otp.isNotEmpty()) {
                 loading = true
                 val credential =
                     otpid?.let { PhoneAuthProvider.getCredential(it, otp) }
