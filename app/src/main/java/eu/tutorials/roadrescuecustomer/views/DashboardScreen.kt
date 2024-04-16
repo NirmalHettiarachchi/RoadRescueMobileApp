@@ -556,6 +556,10 @@ fun RequestServiceScreen(
                         "DESCRIPTION",
                         description
                     )
+                    AppPreferences(context).setStringPreference(
+                        "VEHICLE_MODEL",
+                        serviceRequestViewModel.vehicleModel.value.vehicleModel
+                    )
                     serviceRequestViewModel.setServiceRequest(
                         context,
                         ServiceRequest(
@@ -844,7 +848,7 @@ fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Co
                 )
                 DashboardFieldButton(
                     fieldName = "Vehicle",
-                    fieldValue = serviceRequestViewModel.vehicleModel.value.vehicleModel,
+                    fieldValue = AppPreferences(context).getStringPreference("VEHICLE_MODEL"),
                     modifier = Modifier
                         .width(250.dp)
                 )

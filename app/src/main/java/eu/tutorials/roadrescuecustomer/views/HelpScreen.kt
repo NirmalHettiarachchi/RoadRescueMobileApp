@@ -334,7 +334,7 @@ fun CustomerSupportTicketMoreInfoWindow(
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":R${customerSupportTicket.id}", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":H${customerSupportTicket.id}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
