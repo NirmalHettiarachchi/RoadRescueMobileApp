@@ -38,8 +38,13 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -84,7 +89,8 @@ fun EditTechnician(
 ){
 
     val technicianDetails= sharedViewModel.technician
-
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     var textTechFirstName by remember { mutableStateOf(technicianDetails?.techFirstName) }
     var textTechLastName by remember { mutableStateOf(technicianDetails?.techLastName) }
 
@@ -190,359 +196,378 @@ fun EditTechnician(
         }
     }
 
-
-
-
-
-    Column(
-        modifier = defaultBackground,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent() {
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                }
+            )
+        }
     ) {
-        Header(menuClicked = {})
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(text = "Edit Technician", style = textStyle4, modifier = Modifier, fontSize = 26.sp)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Card(
-            modifier = cardDefaultModifier.align(Alignment.CenterHorizontally),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
-            border = BorderStroke(width = 2.dp, Color.White),
+        Scaffold(
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(navController, navyStatus)
+            }
         ) {
             Column(
+                modifier = defaultBackground.padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
 
-                Row (
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
+                Spacer(modifier = Modifier.height(24.dp))
 
+                Text(text = "Edit Technician", style = textStyle4, modifier = Modifier, fontSize = 26.sp)
 
-                    Card (
-                        shape = CircleShape,
-                        modifier = Modifier
-                            .background(Color.Unspecified, shape = CircleShape)
-                            .fillMaxWidth(0.5f)
-                            .fillMaxHeight(0.93f)
-                            .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape)
-                    ){
+                Spacer(modifier = Modifier.height(8.dp))
 
+                Card(
+                    modifier = cardDefaultModifier.align(Alignment.CenterHorizontally),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+                    border = BorderStroke(width = 2.dp, Color.White),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        Image(
-                            bitmap=bitmap.value.asImageBitmap(),
+                        Row (
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Unspecified)
-                                .clip(CircleShape)
-                                .clickable { }
-                                .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
-                            contentDescription = "Technician Profile Pitcher",
-                            contentScale = ContentScale.Crop,
-                        )
+                                .weight(0.5f)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+
+
+                            Card (
+                                shape = CircleShape,
+                                modifier = Modifier
+                                    .background(Color.Unspecified, shape = CircleShape)
+                                    .fillMaxWidth(0.5f)
+                                    .fillMaxHeight(0.93f)
+                                    .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape)
+                            ){
+
+
+                                Image(
+                                    bitmap=bitmap.value.asImageBitmap(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Unspecified)
+                                        .clip(CircleShape)
+                                        .clickable { }
+                                        .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                                    contentDescription = "Technician Profile Pitcher",
+                                    contentScale = ContentScale.Crop,
+                                )
+
+                            }
+
+                            Icon(imageVector = Icons.Rounded.Edit,
+                                contentDescription = "edit Image",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Bottom)
+                                    .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        showDialogSelectPic.value = true
+                                    }
+                            )
+
+                        }
+
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Column (
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            textTechFirstName?.let {
+                                CommonTextField(
+                                    value = it,
+                                    isEditing = true,
+                                    placeholderName = "First Name...",
+                                    modifier = Modifier,
+                                    prefixStatus = false,
+                                    KeyboardType.Text
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            textTechLastName?.let {
+                                CommonTextField(
+                                    value = it,
+                                    isEditing = true,
+                                    placeholderName = "Last Name...",
+                                    modifier = Modifier.height(52.dp),
+                                    prefixStatus = false,
+                                    KeyboardType.Text
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.779f)
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+
+                                val isCheckedBreakSystem by remember { mutableStateOf(false) }
+                                val checkboxColor = if(isCheckedBreakSystem) Color(0xFF253555) else Color.White
+
+                                val servicesList= ArrayList<CheckBoxDetailsModel>()
+
+
+                                if (showExpertiseArias) {
+                                    val jsonArray = JSONArray(expertiseAriasList)
+                                    for (i in 0 until jsonArray.length()) {
+                                        val jsonObject = jsonArray.getJSONObject(i)
+                                        val techExpertiseId = jsonObject.getString("expertiseId")
+                                        val techExpertise = jsonObject.getString("expertise")
+                                        servicesList.add(CheckBoxDetailsModel(techExpertiseId,techExpertise, false))
+                                    }
+                                }
+
+                                Text(text = "Expertise Technician", style = textStyle1, modifier = Modifier.padding(16.dp))
+
+                                servicesList.forEach{service->
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+
+                                    Row {
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Checkbox(
+                                            checked = selectedServices.contains(service.getCheckBoxName()),
+                                            onCheckedChange = { isChecked ->
+                                                selectedServices = if (isChecked) {
+                                                    selectedServices + service.getCheckBoxName()+"-"+service.getCheckBoxId()
+                                                } else {
+                                                    selectedServices - service.getCheckBoxName()+"-"+service.getCheckBoxId()
+                                                }
+                                            },
+                                            modifier = Modifier
+                                                .background(color = checkboxColor)
+                                                .size(20.dp)
+                                                .padding(4.dp)
+                                                .align(Alignment.CenterVertically)
+                                        )
+
+                                        Spacer(modifier = Modifier.width(16.dp))
+
+                                        Text(
+                                            text = service.getCheckBoxName(),
+                                            color = Color.Black,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = fontFamily
+                                        )
+
+                                    }
+
+                                }
+
+                            }
+
+                            Row (
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ){
+                                CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {})
+
+                                // technician update
+                                CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {
+
+                                    bitmap.value.let {tempBitmap ->
+
+                                        val saveLocation=saveImage(context,tempBitmap,technicianDetails?.techId)
+                                        if (saveLocation!=null){
+
+                                            coroutineScope.launch{
+                                                try {
+                                                    if (technicianDetails != null) {
+                                                        textTechLastName?.let {
+                                                            textTechFirstName?.let { it1 ->
+                                                                GarageTechnician(
+                                                                    technicianDetails.techId.substringAfter('-'),
+                                                                    it1,
+                                                                    it,
+                                                                    saveLocation,
+                                                                    selectedServices
+                                                                )
+                                                            }
+                                                        }?.let {
+                                                            viewModel.updateTechnician(
+                                                                it
+                                                            ){responseObject ->
+
+                                                                if (responseObject != null){
+                                                                    if (responseObject.status==200) {
+                                                                        title = "Updated"
+                                                                        message = responseObject.message.toString()
+                                                                        buttonOneName = "null"
+                                                                        buttonTwoName = "null"
+
+                                                                        showDialog.value=true
+                                                                        textTechFirstName=textTechFirstName?.trim()
+                                                                        textTechLastName=textTechLastName?.trim()
+                                                                    } else if (responseObject.status == 500) {
+                                                                        title = "Failed"
+                                                                        message =
+                                                                            responseObject.message.toString()
+                                                                        buttonOneName = "null"
+                                                                        buttonTwoName = "null"
+//                                                                showProgressBar.value=false
+                                                                        showDialog.value = true
+                                                                    } else {
+                                                                        title = "Failed"
+                                                                        message = responseObject.toString()
+                                                                        buttonOneName = "null"
+                                                                        buttonTwoName = "null"
+//                                                                    showProgressBar.value=false
+                                                                        showDialog.value = true
+                                                                    }
+                                                                }
+
+                                                            }
+                                                        }
+                                                    }
+                                                }catch (e: SocketTimeoutException){
+                                                    // Handle timeout exception
+//                                showProgressBar.value=false
+                                                    showDialog.value=true
+                                                    message= e.message.toString()
+                                                    buttonOneName= "null"
+                                                    buttonTwoName="null"
+                                                }catch (e:Exception) {
+                                                    showDialog.value=true
+                                                    message= e.message.toString()
+                                                    buttonOneName= "Ok"
+                                                    buttonTwoName="null"
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                })
+                            }
+                        }
+
 
                     }
+                }
 
-                    Icon(imageVector = Icons.Rounded.Edit,
-                        contentDescription = "edit Image",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .align(Alignment.Bottom)
-                            .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
-                            .clickable {
-                                showDialogSelectPic.value = true
+                //-------
+                if (showDialogSelectPic.value) {
+                    Dialog(
+                        onDismissRequest = { showDialogSelectPic.value = false },
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .height(80.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFF253555))
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_camera_alt_24),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(Color.White)
+                                            .clickable {
+                                                launcher.launch()
+                                                showDialogSelectPic.value = false
+                                            }
+                                    )
+                                    Text(
+                                        text = "Camera",
+                                        style = textStyle4
+                                    )
+                                }
+                                Spacer(modifier = Modifier.weight(0.2f))
+
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_image_24),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(Color.White)
+                                            .clickable {
+                                                launcherImage.launch("image/*")
+                                                showDialogSelectPic.value = false
+                                            }
+                                    )
+                                    Text(
+                                        text = "Gallery",
+                                        style = textStyle4
+                                    )
+                                }
+
                             }
+                        }
                     )
 
                 }
 
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-
-                Column (
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    textTechFirstName?.let {
-                        CommonTextField(
-                            value = it,
-                            isEditing = true,
-                            placeholderName = "First Name...",
-                            modifier = Modifier,
-                            prefixStatus = false,
-                            KeyboardType.Text
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    textTechLastName?.let {
-                        CommonTextField(
-                            value = it,
-                            isEditing = true,
-                            placeholderName = "Last Name...",
-                            modifier = Modifier.height(52.dp),
-                            prefixStatus = false,
-                            KeyboardType.Text
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.779f)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-
-                        val isCheckedBreakSystem by remember { mutableStateOf(false) }
-                        val checkboxColor = if(isCheckedBreakSystem) Color(0xFF253555) else Color.White
-
-                        val servicesList= ArrayList<CheckBoxDetailsModel>()
-
-
-                        if (showExpertiseArias) {
-                            val jsonArray = JSONArray(expertiseAriasList)
-                            for (i in 0 until jsonArray.length()) {
-                                val jsonObject = jsonArray.getJSONObject(i)
-                                val techExpertiseId = jsonObject.getString("expertiseId")
-                                val techExpertise = jsonObject.getString("expertise")
-                                servicesList.add(CheckBoxDetailsModel(techExpertiseId,techExpertise, false))
-                            }
+                // load response message
+                if (showDialog.value){
+                    sweetAlertDialog(
+                        title = title,
+                        message = message,
+                        buttonOneName = buttonOneName,
+                        buttonTwoName = buttonTwoName,
+                        onConfirm = {
+                            showDialog.value=false
+                            navController.navigate(route = Screen.TechnicianList.route)
                         }
-
-                        Text(text = "Expertise Technician", style = textStyle1, modifier = Modifier.padding(16.dp))
-
-                        servicesList.forEach{service->
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-
-                            Row {
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                Checkbox(
-                                    checked = selectedServices.contains(service.getCheckBoxName()),
-                                    onCheckedChange = { isChecked ->
-                                        selectedServices = if (isChecked) {
-                                            selectedServices + service.getCheckBoxName()+"-"+service.getCheckBoxId()
-                                        } else {
-                                            selectedServices - service.getCheckBoxName()+"-"+service.getCheckBoxId()
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .background(color = checkboxColor)
-                                        .size(20.dp)
-                                        .padding(4.dp)
-                                        .align(Alignment.CenterVertically)
-                                )
-
-                                Spacer(modifier = Modifier.width(16.dp))
-
-                                Text(
-                                    text = service.getCheckBoxName(),
-                                    color = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = fontFamily
-                                )
-
-                            }
-
-                        }
-
-                    }
-
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ){
-                        CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {})
-
-                        // technician update
-                        CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {
-
-                           bitmap.value.let {tempBitmap ->
-
-                               val saveLocation=saveImage(context,tempBitmap,technicianDetails?.techId)
-                               if (saveLocation!=null){
-
-                                   coroutineScope.launch{
-                                       try {
-                                           if (technicianDetails != null) {
-                                               textTechLastName?.let {
-                                                   textTechFirstName?.let { it1 ->
-                                                       GarageTechnician(
-                                                           technicianDetails.techId.substringAfter('-'),
-                                                           it1,
-                                                           it,
-                                                           saveLocation,
-                                                           selectedServices
-                                                       )
-                                                   }
-                                               }?.let {
-                                                   viewModel.updateTechnician(
-                                                       it
-                                                   ){responseObject ->
-
-                                                       if (responseObject != null){
-                                                           if (responseObject.status==200) {
-                                                               title = "Updated"
-                                                               message = responseObject.message.toString()
-                                                               buttonOneName = "null"
-                                                               buttonTwoName = "null"
-
-                                                               showDialog.value=true
-                                                               textTechFirstName=textTechFirstName?.trim()
-                                                               textTechLastName=textTechLastName?.trim()
-                                                           } else if (responseObject.status == 500) {
-                                                               title = "Failed"
-                                                               message =
-                                                                   responseObject.message.toString()
-                                                               buttonOneName = "null"
-                                                               buttonTwoName = "null"
-//                                                                showProgressBar.value=false
-                                                               showDialog.value = true
-                                                           } else {
-                                                               title = "Failed"
-                                                               message = responseObject.toString()
-                                                               buttonOneName = "null"
-                                                               buttonTwoName = "null"
-//                                                                    showProgressBar.value=false
-                                                               showDialog.value = true
-                                                           }
-                                                       }
-
-                                                   }
-                                               }
-                                           }
-                                       }catch (e: SocketTimeoutException){
-                                           // Handle timeout exception
-//                                showProgressBar.value=false
-                                           showDialog.value=true
-                                           message= e.message.toString()
-                                           buttonOneName= "null"
-                                           buttonTwoName="null"
-                                       }catch (e:Exception) {
-                                           showDialog.value=true
-                                           message= e.message.toString()
-                                           buttonOneName= "Ok"
-                                           buttonTwoName="null"
-                                       }
-                                   }
-                               }
-
-                           }
-                        })
-                    }
+                    )
                 }
 
-
+                Spacer(modifier = Modifier.height(26.dp))
             }
         }
-
-        //-------
-        if (showDialogSelectPic.value) {
-            Dialog(
-                onDismissRequest = { showDialogSelectPic.value = false },
-                content = {
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier
-                            .width(300.dp)
-                            .height(80.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF253555))
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_camera_alt_24),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
-                                    .clickable {
-                                        launcher.launch()
-                                        showDialogSelectPic.value = false
-                                    }
-                            )
-                            Text(
-                                text = "Camera",
-                                style = textStyle4
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(0.2f))
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_image_24),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
-                                    .clickable {
-                                        launcherImage.launch("image/*")
-                                        showDialogSelectPic.value = false
-                                    }
-                            )
-                            Text(
-                                text = "Gallery",
-                                style = textStyle4
-                            )
-                        }
-
-                    }
-                }
-            )
-
-        }
-
-        // load response message
-        if (showDialog.value){
-            sweetAlertDialog(
-                title = title,
-                message = message,
-                buttonOneName = buttonOneName,
-                buttonTwoName = buttonTwoName,
-                onConfirm = {
-                    showDialog.value=false
-                    navController.navigate(route = Screen.TechnicianList.route)
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(26.dp))
-
-        Footer(navController,navyStatus)
     }
 }
 

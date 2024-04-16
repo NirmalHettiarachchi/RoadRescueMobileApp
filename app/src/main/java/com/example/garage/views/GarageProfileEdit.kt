@@ -36,8 +36,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -79,6 +84,8 @@ fun GarageProfileEdit(
 
     val garageData= garageSharedViewModel.garage
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     var garageName by remember { mutableStateOf(garageData?.garageName) }
     var ownerName by remember { mutableStateOf(garageData?.garageOwner) }
     var garageStatus by remember { mutableStateOf(garageData?.garageStatus) }
@@ -153,6 +160,279 @@ fun GarageProfileEdit(
         )
     }
 
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent() {
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                }
+            )
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(navController, navStatus)
+            }
+        ) {
+            Column(
+                modifier = defaultBackground.padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Card(
+                    modifier = cardDefaultModifier,
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+                    border = BorderStroke(width = 2.dp, Color.White),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+
+                        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+                        val photoPickerLauncher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.PickVisualMedia(),
+                            onResult = {
+                                selectedImageUri = it
+                            }
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Card(
+                                shape = CircleShape,
+                                border = BorderStroke(width = 2.dp, color = Color.Unspecified),
+                                modifier = Modifier
+                                    .padding(8.dp, 16.dp, 8.dp, 8.dp)
+                                    .fillMaxHeight(0.15f)
+                                    .fillMaxWidth(0.28f)
+                            ) {
+
+
+                                Image(
+                                    bitmap=bitmap.value.asImageBitmap(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Unspecified)
+                                        .clip(CircleShape)
+                                        .clickable { }
+                                        .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                                    contentDescription = "Garage Pitcher",
+                                    contentScale = ContentScale.Crop,
+                                )
+                            }
+
+                            Icon(imageVector = Icons.Rounded.Edit,
+                                contentDescription = "edit Image",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.Bottom)
+                                    .background(Color(0xFF253555), shape = RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        showDialogSelectPic.value = true
+                                    }
+                            )
+
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Garage Name",
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,160.dp,0.dp),
+                            style = textStyle2
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        garageName=garageName?.let {
+                            CommonTextField(
+                                it, true, "Garage Name", Modifier.height(46.dp), false,
+                                KeyboardType.Text)
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Text(
+                            text = "Owner Name",
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,168.dp,0.dp),
+                            style = textStyle2
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        ownerName=ownerName?.let { CommonTextField(it, true, "Owner Name", Modifier.height(46.dp), false,KeyboardType.Text) }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Text(
+                            text = "Garage Status",
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,155.dp,0.dp),
+                            style = textStyle2
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        garageStatus=garageStatus?.let { CommonTextField(it, false, "Garage Status", Modifier.height(46.dp), false,KeyboardType.Text) }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                        Text(
+                            text = "Contact number",
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,140.dp,0.dp),
+                            style = textStyle2
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        contactNumber= contactNumber?.let { CommonTextField(it, false, "Contact number", Modifier.height(46.dp), false,KeyboardType.Number) }
+
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Email",
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,200.dp,0.dp),
+                            style = textStyle2
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        email=email?.let { CommonTextField(it, true, "Email", Modifier.height(46.dp), false,KeyboardType.Email) }
+
+
+                        //-----------------------------------------------------------------
+
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {
+
+                                navController.navigate(route = Screen.GarageDashboard.route)
+                            })
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            CommonButton(btnName = "Save", modifier = Modifier) {
+
+//                        showDialog=true
+                                bitmap.value.let { tempBitMap ->
+                                    val saveLocation = saveImageGarage(context, tempBitMap, garageData?.garageId)
+                                    if (saveLocation != null) {
+                                        coroutineScope.launch {
+
+                                            try {
+                                                if (garageData!=null) {
+                                                    val garage = garageName?.let {
+                                                        ownerName?.let { it1 ->
+                                                            contactNumber?.let { it2 ->
+                                                                email?.let { it3 ->
+                                                                    Garage(
+                                                                        garageData.garageId,
+                                                                        it, it1, it2, it3,saveLocation
+
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (garage != null) {
+                                                        viewModel.updateGarage(garage) { responseObject ->
+
+                                                            if (responseObject != null) {
+                                                                if (responseObject.status == 200) {
+                                                                    title = "Updated"
+                                                                    message = responseObject.message.toString()
+                                                                    buttonOneName = "null"
+                                                                    buttonTwoName = "null"
+                                                                    showDialog = false
+                                                                    showResponseDialog = true
+
+                                                                    garageName = garageName?.trim()
+                                                                    ownerName = ownerName?.trim()
+                                                                    garageStatus = garageStatus?.trim()
+                                                                    contactNumber = contactNumber?.trim()
+                                                                    email = email?.trim()
+
+
+                                                                } else if (responseObject.status == 400) {
+                                                                    title = "Failed"
+                                                                    message = responseObject.message.toString()
+                                                                    buttonOneName = "null"
+                                                                    buttonTwoName = "null"
+                                                                    showDialog = false
+                                                                    showResponseDialog = true
+                                                                } else {
+                                                                    title = "Error..!"
+                                                                    message = responseObject.data.toString()
+                                                                    buttonOneName = "null"
+                                                                    buttonTwoName = "null"
+                                                                    showDialog = false
+                                                                    showResponseDialog = true
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            } catch (e: SocketTimeoutException) {
+                                                message = e.message.toString()
+                                                buttonOneName = "null"
+                                                buttonTwoName = "null"
+                                                showDialog = false
+                                                showResponseDialog = true
+                                            } catch (e: Exception) {
+                                                message = e.message.toString()
+                                                buttonOneName = "null"
+                                                buttonTwoName = "null"
+                                                showDialog = false
+                                                showResponseDialog = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                        }
+
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+            }
+        }
+    }
 
 
 

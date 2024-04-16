@@ -177,6 +177,7 @@ fun GarageDashboard(
 
     }
 
+    // Sheared garage common details using Parcelize
     val garageCommonDetails = GarageCommonDetails(
         "1",
         garageDetailsBackend.getGarageName(),

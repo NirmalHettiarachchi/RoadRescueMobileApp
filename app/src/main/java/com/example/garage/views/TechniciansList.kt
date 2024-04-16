@@ -29,9 +29,14 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,6 +73,8 @@ fun TechniciansList(
     navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel,
 ) {
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     val viewModel= viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
     var showLoadTechnicians by remember { mutableStateOf(false) }
@@ -136,154 +143,178 @@ fun TechniciansList(
     }
 
 
-
-    Column (
-        modifier = defaultBackground,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-
-
-
-        Header(menuClicked = {})
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row (modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center){
-
-                CommonButton(
-                    btnName = "Add Technician",
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .width(156.dp)
-                        .height(50.dp),
-                    onClickButton = {
-                        navController.navigate(route = Screen.AddTechnician.route)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent() {
+                        scope.launch {
+                            drawerState.close()
+                        }
                     }
-                )
+                }
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Card(
-            modifier = cardDefaultModifier
-                .align(Alignment.CenterHorizontally),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
-            border = BorderStroke(width = 2.dp, Color.White), 
-        ) {
-
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.09f)
-                    .background(Color(0xFFD9D9D9)),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+    ){
+        Scaffold (
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
+                }
+            },
+            bottomBar = {
+                Footer(navController, navyStatus)
+            }
+        ){
+            Column (
+                modifier = defaultBackground.padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ){
 
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center){
 
-                    Text(text = "Name", style = textStyle1, modifier = Modifier)
+                Spacer(modifier = Modifier.height(16.dp))
 
+                Row (modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center){
+
+                    CommonButton(
+                        btnName = "Add Technician",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .width(156.dp)
+                            .height(50.dp),
+                        onClickButton = {
+                            navController.navigate(route = Screen.AddTechnician.route)
+                        }
+                    )
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(0.8f),
-                    contentAlignment = Alignment.Center){
+                Card(
+                    modifier = cardDefaultModifier
+                        .align(Alignment.CenterHorizontally),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+                    border = BorderStroke(width = 2.dp, Color.White),
+                ) {
 
-                    Text(text = "Status", style = textStyle1, modifier = Modifier)
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.09f)
+                            .background(Color(0xFFD9D9D9)),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
 
-                }
+                        Box (
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1f),
+                            contentAlignment = Alignment.Center){
 
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1.3f),
-                    contentAlignment = Alignment.Center){
+                            Text(text = "Name", style = textStyle1, modifier = Modifier)
 
-                    Text(text = "", style = textStyle1, modifier = Modifier)
-
-                }
-            }
-
-
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-
-                // load all technicians in the table
-                if (showLoadTechnicians){
-
-                    val jsonArray= JSONArray(techList)
-
-                    for (i in 0 until jsonArray.length()){
-                        val jsonObject=jsonArray.getJSONObject(i)
-                        val techId=jsonObject.getString("techId")
-                        val techFirstName=jsonObject.getString("techFirstName")
-                        val techLastName=jsonObject.getString("techLastName")
-                        val techStatus=jsonObject.getString("techStatus")
-                        val techContactNumber=jsonObject.getString("techContactNumb")
-                        val techProfileRef=jsonObject.getString("techProfilePicRef")
-                        val techExpertiseList=jsonObject.getString("expertiseList")
-
-                        val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
-                        val resultList = contentString.split(", ")
-
-
-                        techDetails.setTechId(techId)
-                        techDetails.setTechFirstName(techFirstName)
-                        techDetails.setTechLastName(techLastName)
-                        techDetails.setTechContactNumber(techContactNumber)
-                        techDetails.setTechImageRef(techProfileRef)
-                        techDetails.setTechExpertiseAreas(resultList)
-
-
-                        if (techStatus.equals("Available")){
-                            techDetails.setTechStatus(1)
-                        }else{
-                            techDetails.setTechStatus(0)
                         }
 
-                        TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel,sharedViewModel)
-                        Divider()
+
+                        Box (
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(0.8f),
+                            contentAlignment = Alignment.Center){
+
+                            Text(text = "Status", style = textStyle1, modifier = Modifier)
+
+                        }
+
+                        Box (
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1.3f),
+                            contentAlignment = Alignment.Center){
+
+                            Text(text = "", style = textStyle1, modifier = Modifier)
+
+                        }
                     }
 
-                }
-            }
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+
+                        // load all technicians in the table
+                        if (showLoadTechnicians){
+
+                            val jsonArray= JSONArray(techList)
+
+                            for (i in 0 until jsonArray.length()){
+                                val jsonObject=jsonArray.getJSONObject(i)
+                                val techId=jsonObject.getString("techId")
+                                val techFirstName=jsonObject.getString("techFirstName")
+                                val techLastName=jsonObject.getString("techLastName")
+                                val techStatus=jsonObject.getString("techStatus")
+                                val techContactNumber=jsonObject.getString("techContactNumb")
+                                val techProfileRef=jsonObject.getString("techProfilePicRef")
+                                val techExpertiseList=jsonObject.getString("expertiseList")
+
+                                val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
+                                val resultList = contentString.split(", ")
+
+
+                                techDetails.setTechId(techId)
+                                techDetails.setTechFirstName(techFirstName)
+                                techDetails.setTechLastName(techLastName)
+                                techDetails.setTechContactNumber(techContactNumber)
+                                techDetails.setTechImageRef(techProfileRef)
+                                techDetails.setTechExpertiseAreas(resultList)
+
+
+                                if (techStatus.equals("Available")){
+                                    techDetails.setTechStatus(1)
+                                }else{
+                                    techDetails.setTechStatus(0)
+                                }
+
+                                TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel,sharedViewModel)
+                                Divider()
+                            }
+
+                        }
+                    }
 
 //            if (showProgressBar){
 //                circularIndicatorProgressBar()
 //            }
 
-            // load response message
-            if (showMessageDialog){
-                sweetAlertDialog(
-                    title = title,
-                    message = message,
-                    buttonOneName = buttonOneName,
-                    buttonTwoName = buttonTwoName,
-                    onConfirm = {
-                        showMessageDialog=false
+                    // load response message
+                    if (showMessageDialog){
+                        sweetAlertDialog(
+                            title = title,
+                            message = message,
+                            buttonOneName = buttonOneName,
+                            buttonTwoName = buttonTwoName,
+                            onConfirm = {
+                                showMessageDialog=false
+                            }
+                        )
                     }
-                )
+
+                }
+
+                Spacer(modifier = Modifier.height(26.dp))
+
+
             }
-
         }
-
-        Spacer(modifier = Modifier.height(26.dp))
-
-        Footer(navController,navyStatus)
     }
+
+
 }
 
 

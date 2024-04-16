@@ -2,7 +2,6 @@ package com.example.garage.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,13 +29,12 @@ fun SidebarContent(menuClicked:()->Unit){
 
     Column(
 
-        verticalArrangement = Arrangement.SpaceBetween,
 
         modifier = Modifier
 
             .fillMaxHeight()
 
-            .width(240.dp)
+            .width(250.dp)
 
             .background(Color(0xFF253555))
 
@@ -46,48 +43,38 @@ fun SidebarContent(menuClicked:()->Unit){
         Column {
 
             Icon(
-
                 imageVector = Icons.Filled.Menu,
-
                 tint = Color.White,
-
                 modifier = Modifier
-
                     .padding(16.dp)
-
                     .size(30.dp)
-
                     .clickable {
-
                         menuClicked()
-
                     },
-
                 contentDescription = "Localized Description"
-
             )
 
-            Divider()
+            Spacer(modifier = Modifier
+                .background(Color.White)
+                .height(2.dp))
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f)
+        ) {
+            SidebarButton(buttonName="Open",verticalPadding=8, onClick = {})
 
-            Spacer(
+            SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {})
 
-                modifier = Modifier
+            SidebarButton(buttonName="Help",verticalPadding=8, onClick = {})
 
-                    .background(Color.White)
-
-                    .height(2.dp)
-
-            )
+            SidebarButton(buttonName="Settings",verticalPadding=8, onClick = {})
 
         }
 
-        SidebarButton(buttonName="Help",verticalPadding=8)
-
-        SidebarButton(buttonName="Setting",verticalPadding=8)
-
+        SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {})
     }
-
-    SidebarButton(buttonName="Log Out",verticalPadding=16)
 
 }
 
@@ -95,7 +82,7 @@ fun SidebarContent(menuClicked:()->Unit){
 
 @Composable
 
-fun SidebarButton(buttonName:String,verticalPadding:Int){
+fun SidebarButton(buttonName:String,verticalPadding:Int,onClick:()->Unit){
 
     Button(
 
