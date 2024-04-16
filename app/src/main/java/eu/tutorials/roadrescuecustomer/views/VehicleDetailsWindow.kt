@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
@@ -38,6 +40,7 @@ fun VehicleDetailsWindow(
     var vehicleMakeId by remember { mutableStateOf("") }
     var vehicleModel by remember { mutableStateOf("") }
     var vehicleModelId by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     val loading = serviceRequestViewModel.loading.value
     
@@ -107,7 +110,7 @@ fun VehicleDetailsWindow(
                     btnName = "Save",
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    if (vehicleModel.isNotEmpty()) {
+                    if (serviceRequestViewModel.vehicleModel.value.id.isNotEmpty()) {
                         serviceRequestViewModel.vehicleType.value.vehicleType = vehicleType
                         serviceRequestViewModel.vehicleType.value.id = getVehicleTypeId
                         serviceRequestViewModel.fuelType.value.id = getFuelTypeId
@@ -117,6 +120,8 @@ fun VehicleDetailsWindow(
                         serviceRequestViewModel.vehicleModel.value.id = getVehicleModelId
                         serviceRequestViewModel.vehicleModel.value.vehicleModel = vehicleModel
                         onDismiss()
+                    } else {
+                        Toast.makeText(context, "Select a vehicle model", Toast.LENGTH_SHORT).show()
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
