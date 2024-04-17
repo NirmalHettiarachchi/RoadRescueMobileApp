@@ -32,7 +32,8 @@ data class ServiceRequest(
     var vehicleModelName: String = "",
     var serviceProviderName: String = "",
     var issueCategoryName: String = "",
-    var approxCost: String = ""
+    var approxCost: String = "",
+    var reqAmount: String? = null
 )
 
 class ServiceRequestRepository {

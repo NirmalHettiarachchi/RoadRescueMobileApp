@@ -256,7 +256,7 @@ fun PendingActivityDashboard(
                             }
 
                             override fun onError(errorMessage: String) {
-                                Toast.makeText(context,"Error Occurred",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,"Error occurred",Toast.LENGTH_SHORT).show()
                             }
                         })
 
