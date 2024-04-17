@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +48,7 @@ import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.launch
 import java.sql.Connection
 import java.sql.DriverManager
@@ -58,6 +60,7 @@ import java.sql.Statement
 @Composable
 fun ProfileScreen(
     profileViewModel: ProfileViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
 ) {
     Column(
         backgroundModifier
@@ -76,7 +79,7 @@ fun ProfileScreen(
                     style = textStyle1
                 )
                 utilFun()
-                ProfileBox(profileViewModel)
+                ProfileBox(profileViewModel, serviceRequestViewModel)
             }
         }
     }
@@ -113,7 +116,7 @@ fun utilFun() {
 }
 
 @Composable
-fun ProfileBox(profileViewModel: ProfileViewModel) {
+fun ProfileBox(profileViewModel: ProfileViewModel, serviceRequestViewModel: ServiceRequestViewModel) {
     val context = LocalContext.current
 
     var isEditing by remember { mutableStateOf(false) }
@@ -124,6 +127,12 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
 
     val loading by profileViewModel.loading.collectAsState()
     CircularProgressBar(isDisplayed = loading)
+
+    val customerId = eu.tutorials.roadrescuecustomer.AppPreferences(LocalContext.current)
+        .getStringPreference("CUSTOMER_ID", "")
+    LaunchedEffect(key1 = customerId) {
+        serviceRequestViewModel.fetchRequestCount(customerId)
+    }
 
     Card(
         modifier = cardModifier,
@@ -166,7 +175,8 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
             )
             ProfileFieldButton(
                 labelName = "Number of Service Requests",
-                value = profileViewModel.numOfServiceRequests.value.toString(),
+                value = serviceRequestViewModel.requestCount.collectAsState().value.toString(),
+//                value = profileViewModel.numOfServiceRequests.value.toString(),
                 onClickButton = { showNumOfReqServiceWindow = true }
             )
 
@@ -214,7 +224,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel) {
         }
     }
     if (showNumOfReqServiceWindow) {
-        MoreInfoWindow(message = "Shows the number of completed service requests.") {
+        MoreInfoWindow(message = "Shows the number of completed and accepted service requests.") {
             showNumOfReqServiceWindow = false
         }
     }

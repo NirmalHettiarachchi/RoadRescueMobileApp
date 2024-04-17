@@ -137,6 +137,7 @@ fun App(
                 composable("profilescreen") {
                     ProfileScreen(
                         profileViewModel = profileViewModel,
+                        serviceRequestViewModel = serviceRequestViewModel
                     )
                 }
                 composable("tracklocationscreen") {

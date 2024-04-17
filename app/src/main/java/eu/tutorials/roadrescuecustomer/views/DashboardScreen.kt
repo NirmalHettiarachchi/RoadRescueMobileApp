@@ -614,7 +614,7 @@ fun RequestServiceScreen(
     }
     if (showCostDetailWindow) {
         MoreInfoWindow(
-            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided. The actual amount may vary.",
+            "The cost provided is an approximation based on the issue category you have provided. The actual amount may vary.",
             onDismiss = { showCostDetailWindow = false }
         )
     }
