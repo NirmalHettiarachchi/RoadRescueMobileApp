@@ -23,6 +23,8 @@ import com.example.garage.views.GarageProfile
 import com.example.garage.views.GarageProfileEdit
 import com.example.garage.views.LoginScreen
 import com.example.garage.views.RegisterScreen
+import com.example.garage.views.TechnicianApp.TechnicianCompleteJob
+import com.example.garage.views.TechnicianApp.TechnicianDashboard
 import com.example.garage.views.TechnicianProfile
 import com.example.garage.views.TechniciansList
 import java.text.SimpleDateFormat
@@ -40,7 +42,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Register.route,
+        startDestination = Screen.TechnicianDashboard.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -139,6 +141,18 @@ fun SetupNavGraph(
             route=Screen.TechnicianProfile.route
         ){
             TechnicianProfile(navController = navController, navyStatus = "technicianProfile",sharedViewModel = sharedViewModel)
+        }
+
+        composable(
+            route=Screen.TechnicianDashboard.route
+        ){
+            TechnicianDashboard(navController = navController, navStatus = "technicianDashboard")
+        }
+
+        composable(
+            route=Screen.TechnicianCompleteJob.route
+        ){
+            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob")
         }
 
     }

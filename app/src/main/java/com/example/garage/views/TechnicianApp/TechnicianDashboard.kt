@@ -1,11 +1,8 @@
 package com.example.garage.views.TechnicianApp
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,25 +17,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -46,23 +37,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.example.garage.models.Garage
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.views.CommonButton
-import com.example.garage.views.CommonDropdown
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
-import com.example.garage.views.closerButtonStyles
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
 import java.time.Period
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TechnicianDashboard(
     navController: NavController,
@@ -116,7 +104,7 @@ fun TechnicianDashboard(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.84f)
-                        .fillMaxHeight(0.85f)
+                        .fillMaxHeight(0.95f)
                         .verticalScroll(state = rememberScrollState()),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
@@ -126,6 +114,25 @@ fun TechnicianDashboard(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    ServiceRequest(
+                        navController,
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ServiceRequest(
+                        navController,
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ServiceRequest(
+                        navController,
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
+
                 }
             }
 
@@ -134,7 +141,7 @@ fun TechnicianDashboard(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier: Modifier) {
+fun ServiceRequest(navController: NavController,modifier: Modifier) {
 
     val garageDetails = GarageDashboardViewModel(
         "Nirmal Dakshina", Period.of(1, 2, 3),
@@ -153,8 +160,6 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
 
         ) {
 
-        var showDialog by remember { mutableStateOf(false) }
-
         Spacer(modifier = Modifier.height(8.dp))
 
         Row (
@@ -171,9 +176,11 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
 
             Icon(
                 imageVector = Icons.Default.LocationOn,
-                contentDescription = "Contact icon",
+                contentDescription = "location",
                 tint = Color.Black,
-                modifier = Modifier.clickable {  }
+                modifier = Modifier
+                    .padding(100.dp,0.dp,0.dp,0.dp)
+                    .clickable {  }
             )
 
             Icon(
@@ -280,114 +287,15 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {
-
-                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
-
-                context.startActivity(intent)
-
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Call,
-                    contentDescription = "Contact icon",
-                    tint = Color.Black
-                )
-            }
 
             CommonButton(
                 btnName = "Accept",
                 modifier = Modifier.align(Alignment.CenterVertically),
-                onClickButton = { showDialog = true }
+                onClickButton = {
+                    navController.navigate(route = Screen.TechnicianCompleteJob.route)
+                }
             )
 
-            if (showDialog) {
-                Dialog(
-                    onDismissRequest = { },
-                    content = {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .fillMaxHeight(0.4f)
-                                .background(
-                                    Color(0xFFACB3C0),
-                                    shape = RoundedCornerShape(20.dp)
-                                ),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                IconButton(onClick = { showDialog = false }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "close icon",
-                                        modifier = closerButtonStyles,
-                                        tint = Color.White
-                                    )
-                                }
-                            }
-
-
-                            Text(
-                                text = "Assign a Technician ",
-                                style = textStyle4,
-                                modifier = Modifier,
-                                textAlign = TextAlign.Center,
-                                fontSize = 24.sp
-                            )
-
-                            Spacer(modifier = Modifier.height(32.dp))
-
-                            // Dropdown load
-
-                            val option= CommonDropdown(
-                                optionList = technicianList,
-                                defaultSelection = "Technician "
-                            )
-
-
-                            Spacer(modifier = Modifier.height(64.dp))
-
-                            // accept button load
-
-
-                            CommonButton(
-                                btnName = "Accept",
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                                onClickButton = {
-
-/*
-//                                    garageViewModel.fetchBackend()
-                                    Log.d("rsp","request is ok ")
-
-//                                    val  viewState by garageViewModel.backendState
-
-                                    when{
-
-                                        viewState!!.loading -> {
-                                            // loading  wanna mona hari danna
-                                            Log.d("loading","${viewState?.loading}")
-                                        }
-
-                                        viewState?.error !=null ->{
-                                            viewState?.error!!.message?.let { Log.d("err", "it") }
-                                        }
-
-                                        viewState?.response !=null -> {
-                                            Log.d("data final","${viewState?.response!!.data}")
-                                        }
-                                    }*/
-
-                                }
-                            )
-
-                        }
-                    }
-                )
-            }
         }
         Spacer(modifier = Modifier.height(8.dp))
     }

@@ -56,8 +56,6 @@ android {
 dependencies {
 
 
-    /*val navVersion = "2.7.4"
-    implementation("androidx.navigation:navigation-compose:$navVersion")*/
 
 
     implementation ("androidx.navigation:navigation-compose:2.7.7")
@@ -73,6 +71,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-auth:22.3.1")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -112,5 +111,11 @@ dependencies {
 
     // add gif lib
     implementation ("io.coil-kt:coil-compose:2.6.0")
+
+    //google map
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
 
 }
