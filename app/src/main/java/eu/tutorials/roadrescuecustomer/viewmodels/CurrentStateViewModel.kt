@@ -111,6 +111,7 @@ class CurrentStateViewModel : ViewModel() {
                 val date = resultSet.getString("request_timestamp")
                 val update = resultSet.getTimestamp("updated_at")
                 val approx_cost = resultSet.getInt("approx_cost")
+                val requestCost = resultSet.getString("requested_amount")
                 val serviceProviderName = resultSet.getString("garage_name")
                 val model = resultSet.getString("model")
                 val issueCategory = resultSet.getString("category")
@@ -133,7 +134,8 @@ class CurrentStateViewModel : ViewModel() {
                     approxCost = approx_cost.toString(),
                     serviceProviderName = serviceProviderName ?: "",
                     vehicleModelName = model ?: "",
-                    issueCategoryName = issueCategory ?: ""
+                    issueCategoryName = issueCategory ?: "",
+                    reqAmount = requestCost ?: ""
                 )
                 latestRequests.add(serviceRequest)
             }

@@ -655,7 +655,7 @@ fun ServiceProvidedDashboard(
 
 
             Text(
-                text = "Please make the payment of \nLKR ${request.approxCost}",
+                text = "Please make the payment of \nLKR ${request.reqAmount}",
                 style = textStyle2,
                 textAlign = TextAlign.Center
             )
