@@ -1,6 +1,7 @@
 package com.example.garage.views.TechnicianApp
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -151,6 +152,8 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
     val context = LocalContext.current
 
 
+    
+
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -179,8 +182,8 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                 contentDescription = "location",
                 tint = Color.Black,
                 modifier = Modifier
-                    .padding(100.dp,0.dp,0.dp,0.dp)
-                    .clickable {  }
+                    .padding(100.dp, 0.dp, 0.dp, 0.dp)
+                    .clickable { }
             )
 
             Icon(
@@ -299,4 +302,8 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
+}
+
+fun getData() {
+    Log.d("delay checked","delay is ok ")
 }

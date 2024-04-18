@@ -42,11 +42,11 @@ fun SetupNavGraph(
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
     val locationViewModel:LocationViewModel= viewModel()
-    val locationUtils:LocationUtils=LocationUtils(context)
+    val locationUtils=LocationUtils(context)
 
     NavHost(
         navController = navController,
-        startDestination = Screen.TechnicianDashboard.route,
+        startDestination = Screen.GarageDashboard.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)

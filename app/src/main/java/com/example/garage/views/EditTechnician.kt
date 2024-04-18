@@ -144,8 +144,9 @@ fun EditTechnician(
 
 
     LaunchedEffect(Unit) {
-        bitmap.value=getSaveImage(context,technicianDetails?.techProfileRef)
-        Log.d("image",img.toString())
+        if (technicianDetails?.techProfileRef!="0") {
+            bitmap.value=getSaveImage(technicianDetails?.techProfileRef)
+        }
         val response=loadExpertiseArias(viewModel,coroutineScope)
         if (response != null) {
             if(response?.status==200){
@@ -396,7 +397,9 @@ fun EditTechnician(
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceAround
                             ){
-                                CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {})
+                                CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {
+                                    navController.navigate(route = Screen.TechnicianList.route)
+                                })
 
                                 // technician update
                                 CommonButton(btnName = "Save", modifier = Modifier, onClickButton = {
@@ -571,9 +574,9 @@ fun EditTechnician(
     }
 }
 
-fun getSaveImage(context: Context, techImageRef:String?): Bitmap {
+fun getSaveImage(techImageRef:String?): Bitmap {
     var bitmap: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
-    Log.d("img 2 ","$bitmap")
+    Log.d("img 1 ","$techImageRef")
     val directory= File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             .toString()+ File.separator+"RodaRescue")

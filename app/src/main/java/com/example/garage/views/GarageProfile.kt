@@ -144,7 +144,7 @@ fun GarageProfile(
 
     LaunchedEffect(Unit) {
         if (garageProfileImageRef!="0") {
-            bitmap.value=getSaveImage(context,garageProfileImageRef)
+            bitmap.value=getSaveImage(garageProfileImageRef)
         }
         Log.d("image",img.toString())
         val response=loadExpertiseArias(viewModel,coroutineScope)

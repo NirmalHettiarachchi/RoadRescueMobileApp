@@ -359,6 +359,12 @@ class MainViewModel : ViewModel() {
 
         viewModelScope.launch{
             try {
+
+                val garageData = garageService.getGarageData("search", "1")
+
+
+
+
                 val call = garageService.updateGarage(UpdateGarage(
                     garage.getGarageId(),
                     garage.getGarageName(),

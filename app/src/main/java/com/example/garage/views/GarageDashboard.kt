@@ -85,12 +85,14 @@ fun GarageDashboard(
     var garage by remember { mutableStateOf("") }
     var garageDetailsBackend = Garage()
 
-    val technicians = listOf<String>(
-        "Saman Kumara",
-        "Tharindu Dakshina",
-        "Ajith Muthukumara",
-        "Namal Rajapakasha"
-    )
+    var technicians = emptyList<String>()
+
+    /* LaunchedEffect(Unit){
+        while (true) {
+            getData()
+            delay(5000)
+        }
+    }*/
 
     LaunchedEffect(Unit) {
         val response = loadGarageDetails(viewModel)
@@ -159,8 +161,18 @@ fun GarageDashboard(
             val garageRating = jsonObject.getString("garageRating").toFloat()
             val garageType = jsonObject.getString("garageType")
             val garageProfileImageRef = jsonObject.getString("imageRef")
+            val availableTechnicians = jsonObject.getJSONArray("availableTechnicians")
 
-            Log.d("1111111111111111", garageProfileImageRef)
+            for (i in 0 until availableTechnicians.length()) {
+                val jsonObject = availableTechnicians.getJSONObject(i)
+                val techId = jsonObject.getString("techId")
+                val techFName = jsonObject.getString("f_name")
+                val techLName = jsonObject.getString("l_name")
+
+                technicians += "$techId-$techFName $techLName"
+            }
+
+            Log.d("availableTechnicians", "$availableTechnicians ")
 
             garageDetailsBackend.setGarageName(garageName)
             garageDetailsBackend.setOwnerName(ownerName)
@@ -241,7 +253,7 @@ fun GarageDashboard(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.84f)
-                        .fillMaxHeight(0.85f)
+                        .fillMaxHeight(0.95f)
                         .verticalScroll(state = rememberScrollState()),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),

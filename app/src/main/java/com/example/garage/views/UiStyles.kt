@@ -111,7 +111,7 @@ val defaultBackground =Modifier
 
 val cardDefaultModifier=Modifier
     .fillMaxWidth(0.84f)
-    .fillMaxHeight(0.85f)
+    .fillMaxHeight(0.95f)
 
  val closerButtonStyles=Modifier
      .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
