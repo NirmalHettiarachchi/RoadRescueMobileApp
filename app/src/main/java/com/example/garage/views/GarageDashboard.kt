@@ -54,15 +54,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.models.Garage
 import com.example.garage.models.ResponseObject
+import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.GarageCommonDetails
-import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.SocketTimeoutException
-import java.time.Period
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -76,6 +76,7 @@ fun GarageDashboard(
     val viewModel = viewModel<MainViewModel>()
 
     var showLoadGarageDetails by remember { mutableStateOf(false) }
+    var showServiceRequests by remember { mutableStateOf(false) }
     var showMessageDialog by remember { mutableStateOf(false) }
 
     var title by remember { mutableStateOf("") }
@@ -83,6 +84,7 @@ fun GarageDashboard(
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
     var garage by remember { mutableStateOf("") }
+    var requestServices by remember { mutableStateOf("") }
     var garageDetailsBackend = Garage()
 
     var technicians = emptyList<String>()
@@ -145,6 +147,47 @@ fun GarageDashboard(
             Log.d("response null", "null")
         }
 
+            // fetch services requests
+        val serviceResponse=fetchServiceRequests(viewModel)
+
+        if (serviceResponse != null) {
+            if (serviceResponse.status == 200) {
+                requestServices=serviceResponse.data!!.toString()
+                showServiceRequests=true
+            }else if (serviceResponse.status == 400) {
+                title = serviceResponse.status.toString()
+                message = serviceResponse.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+
+            } else if (serviceResponse.status == 404) {
+                title = serviceResponse.status.toString()
+                message = serviceResponse.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+
+            } else if (serviceResponse.status == 500) {
+                title = serviceResponse.status.toString()
+                message = serviceResponse.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            } else if (serviceResponse.status == 508) {
+                title = serviceResponse.status.toString()
+                message = serviceResponse.message.toString()
+                buttonOneName = "null"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            }
+        }else{
+            title = "401"
+            message = "Cannot call the sever"
+            buttonOneName = "Ok"
+            buttonTwoName = "null"
+            showMessageDialog = true
+        }
 
     }
 
@@ -265,19 +308,36 @@ fun GarageDashboard(
 
                     // Load are service requests
                     // custommer request load karanna one
-                    ServiceRequest(
-                        garageDetailsBackend,
-                        technicians,
-                        Modifier.align(Alignment.CenterHorizontally)
-                    )
+                    if(showServiceRequests){
+                        val jsonArray=JSONArray(requestServices)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        for (i in 0 until jsonArray.length()) {
+                            val jsonObject = jsonArray.getJSONObject(i)
 
-                    ServiceRequest(
-                        garageDetailsBackend,
-                        technicians,
-                        Modifier.align(Alignment.CenterHorizontally)
-                    )
+                            val issue = jsonObject.getString("issue")
+                            val customerContactNumber = jsonObject.getString("customerContactNumber")
+                            val approx_cost = jsonObject.getDouble("approx_cost")
+                            val requestTime = jsonObject.getString("requestTimeStamp")
+                            val description = jsonObject.getString("description")
+                            val indicatorLightStatus = jsonObject.getString("indicatorLightStatus")
+
+                            Log.d("issue", "$issue ")
+                            Log.d("customerContactNumber", "$customerContactNumber ")
+                            Log.d("approx_cost", "$approx_cost ")
+                            Log.d("requestTimeStamp", "$requestTime ")
+                            Log.d("indicatorLightStatus", "$indicatorLightStatus ")
+                             var serviceRequest=ServicesRequestModel(customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
+
+                            ServiceRequest(
+                                serviceRequest,
+                                technicians,
+                                Modifier.align(Alignment.CenterHorizontally)
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -297,6 +357,25 @@ fun GarageDashboard(
             }
         }
     }
+}
+
+suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.getGarageDetails("1", "getServices") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    }catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
 }
 
 suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
@@ -323,13 +402,10 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier: Modifier) {
+fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<String>, modifier: Modifier) {
 
-    val garageDetails = GarageDashboardViewModel(
-        "Nirmal Dakshina", Period.of(1, 2, 3),
-        "Tire Punch", "Need help as soon as possible", 25000.00
-    )
-
+    val context = LocalContext.current
+    val phoneNumber = serviceRequest.getCustomerContactNumber()
 
     Card(
         modifier = modifier
@@ -345,7 +421,7 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "You have new service request ${garageDetails.getDate()}",
+            text = "You have new service request ${serviceRequest.getTime()}",
             color = Color(0xFF253555),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -369,9 +445,30 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getIssue(),
+                text = serviceRequest.getIssue(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Indicator light state", color = Color.Black, modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp, 0.dp)
+            )
+            Text(
+                text = serviceRequest.getIndicatorState(),
+                color = Color.Black,
+                modifier = Modifier.weight(1f),
+                maxLines = 3
             )
         }
 
@@ -389,7 +486,7 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getAssignServiceProvider(),
+                text = if (serviceRequest.getDescription().isEmpty()) "No Description" else serviceRequest.getDescription(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
                 maxLines = 3
@@ -410,16 +507,13 @@ fun ServiceRequest(garageDetails: Garage, technicianList: List<String>, modifier
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = "LKR ${garageDetails.getServiceFee()}0",
+                text = "LKR ${serviceRequest.getServiceFee()}0",
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
             )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
-        val phoneNumber = "0716788537"
-        val context = LocalContext.current
 
 
         Row(

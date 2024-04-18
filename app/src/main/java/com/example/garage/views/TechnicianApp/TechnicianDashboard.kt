@@ -41,15 +41,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.GarageDashboardViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
-import java.time.Period
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -144,9 +143,9 @@ fun TechnicianDashboard(
 @Composable
 fun ServiceRequest(navController: NavController,modifier: Modifier) {
 
-    val garageDetails = GarageDashboardViewModel(
-        "Nirmal Dakshina", Period.of(1, 2, 3),
-        "Tire Punch", "Need help as soon as possible", 25000.00
+    val garageDetails = ServicesRequestModel(
+        "Nirmal Dakshina", "date",
+        "Tire Punch", "Need help as soon as possible", 25000.00,"paka"
     )
     val phoneNumber = "0716788537"
     val context = LocalContext.current
@@ -233,7 +232,7 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getAssignServiceProvider(),
+                text = garageDetails.getDescription(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
                 maxLines = 2
