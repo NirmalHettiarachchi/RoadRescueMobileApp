@@ -39,6 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -70,6 +72,8 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 @Composable
 fun DashboardScreen(
@@ -90,7 +94,8 @@ fun DashboardScreen(
             AppPreferences(context).getStringPreference(
                 "CUSTOMER_ID",
                 ""
-            )
+            ),
+            showLoading = true
         )
     }
 
@@ -98,14 +103,21 @@ fun DashboardScreen(
         mutableStateOf(false)
     }
 
+    var waitingTime by remember {
+        mutableLongStateOf(0L)
+    }
+
+    val request = currentStateViewModel.latestRequests.collectAsState().value.firstOrNull()
+
     if (currentStateViewModel.latestRequests.collectAsState().value.isNotEmpty()) {
         val first = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
         first.timeZone = TimeZone.getTimeZone("UTC") // Or whatever IST is supposed to be
-        val dd = first.parse(currentStateViewModel.latestRequests.collectAsState().value.first().date)
+        val dd =
+            first.parse(currentStateViewModel.latestRequests.collectAsState().value.first().date)
 
-        val formatterUTC: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val formatterUTC: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
         formatterUTC.timeZone = TimeZone.getTimeZone("UTC") // UTC timezone
-        Log.d("===", formatterUTC.format(Date()))
+        val d = Date(System.currentTimeMillis())
         val ddd = Date()
 
         //get time in milliseconds
@@ -117,10 +129,31 @@ fun DashboardScreen(
         val hours = minutes / 60
         val days = hours / 24
 
-        Log.d("TAG", "DashboardScreen: ddd.time.... $ddd.time")
-        Log.d("TAG", "DashboardScreen: ddd.... $diff")
-        Log.d("TAG", "DashboardScreen: True.... $minutes")
-        if (minutes <= 3) {
+        Log.d(
+            "TAG",
+            "DashboardScreen: Date Fetched From UTC ${currentStateViewModel.latestRequests.collectAsState().value.first().date}"
+        )
+//        Log.d("TAG", "DashboardScreen: ddd.time.... ${ddd.time}")
+//        Log.d("TAG", "DashboardScreen: ddd.... $diff")
+//        Log.d("TAG", "DashboardScreen: True.... $minutes")
+        Log.d("TAG", "DashboardScreen: Date1 ==== $dd    Date2 ====$ddd")
+
+
+        val date1 = System.currentTimeMillis()
+        Thread.sleep(1000)
+        val date2 = System.currentTimeMillis()
+
+        val duration = abs(ddd.time - dd.time)
+        val days1 = TimeUnit.MILLISECONDS.toDays(duration)
+        val hours1 = TimeUnit.MILLISECONDS.toHours(duration)
+        val minutes1 = TimeUnit.MILLISECONDS.toMinutes(duration)
+
+        Log.d("TAG", "DashboardScreen: Duration Minutes....... $minutes1")
+        waitingTime = (3 - minutes1) * 60 * 1000
+
+        val seconds1 = TimeUnit.MILLISECONDS.toSeconds(duration)
+
+        if (minutes <= 3 && currentStateViewModel.latestRequests.collectAsState().value.first().status.toInt() <= 4) {
             showPending = true
         }
     } else {
@@ -162,17 +195,74 @@ fun DashboardScreen(
                     )
                 }
             } else {
-                PendingActivityDashboard(
-                    serviceRequestViewModel = serviceRequestViewModel,
-                    currentStateViewModel = currentStateViewModel
-                ) {
-                    currentStateViewModel.setCurrentState(
-                        false,
-                        isReqServiceWindowOpened = false
+
+
+                if (request?.status?.toInt() == 1) {
+                    LaunchedEffect(key1 = true) {
+                        while (true) {
+                            currentStateViewModel.fetchLatestRequest(
+                                AppPreferences(context).getStringPreference(
+                                    "CUSTOMER_ID",
+                                    ""
+                                ),
+                                showLoading = false
+                            )
+                            delay(10000)
+                        }
+                    }
+                    PendingActivityDashboard(
+                        waitingTime = waitingTime,
+                        request = request,
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        currentStateViewModel = currentStateViewModel
+                    ) {
+                        currentStateViewModel.setCurrentState(
+                            false,
+                            isReqServiceWindowOpened = false
+                        )
+                        currentStateViewModel.clearRecentRequest()
+                        showPending = false
+                    }
+                } else if (request?.status?.toInt() == 2) {
+                    LaunchedEffect(key1 = true) {
+                        while (true) {
+                            currentStateViewModel.fetchLatestRequest(
+                                AppPreferences(context).getStringPreference(
+                                    "CUSTOMER_ID",
+                                    ""
+                                ),
+                                showLoading = false
+                            )
+                            delay(10000)
+                        }
+                    }
+                    AssignedActivityDashboard(
+                        request = request,
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        currentStateViewModel = currentStateViewModel
                     )
+                } else if (request?.status?.toInt() == 3) {
+                    ServiceProvidedDashboard(
+                        request = request,
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        currentStateViewModel = currentStateViewModel
+                    )
+                } else if (request?.status?.toInt() == 4) {
+                    RateScreen(
+                        serviceRequestViewModel = serviceRequestViewModel,
+                        onRate = {
+                            currentStateViewModel.setCurrentState(
+                                false,
+                                isReqServiceWindowOpened = false
+                            )
+                            currentStateViewModel.clearRecentRequest()
+                            showPending = false
+                        })
+                } else {
                     currentStateViewModel.clearRecentRequest()
                     showPending = false
                 }
+
             }
             HelpBox()
         }
@@ -205,6 +295,8 @@ fun NoPendingActivityDashboard(
 
 @Composable
 fun PendingActivityDashboard(
+    waitingTime: Long,
+    request: ServiceRequest,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
     onClick: () -> Unit
@@ -224,8 +316,38 @@ fun PendingActivityDashboard(
         }
     }
 
+
+    if (currentStateViewModel.latestRequests.collectAsState().value.isNotEmpty()) {
+        val first = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        first.timeZone = TimeZone.getTimeZone("UTC") // Or whatever IST is supposed to be
+        val dd =
+            first.parse(currentStateViewModel.latestRequests.collectAsState().value.first().date)
+
+        val formatterUTC: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        formatterUTC.timeZone = TimeZone.getTimeZone("UTC") // UTC timezone
+        val ddd = Date()
+
+        val duration = abs(ddd.time - dd.time)
+        val minutes1 = TimeUnit.MILLISECONDS.toMinutes(duration)
+
+        Log.d("TAG", "PendingActivityDashboard: Current Minutes Diff $minutes1")
+
+        val wt = (3 - minutes1) * 60 * 1000
+        Log.d("TAG", "PendingActivityDashboard: Current Minutes === ${3 - minutes1}")
+        Log.d("TAG", "PendingActivityDashboard: Current Pending Time === ${wt}")
+
+        if (minutes1 <= 3) {
+            Timer(waitingTime = wt) {
+                serviceRequestViewModel.deleteRequest(
+                    context
+                )
+            }
+        }
+    }
+
+
     CircularProgressBar(isDisplayed = loading)
-    
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
@@ -241,33 +363,33 @@ fun PendingActivityDashboard(
                 .padding(4.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            LaunchedEffect(key1 = "periodicCheck") {
-                // 3 minutes in milliseconds
-                while (System.currentTimeMillis() < endTimeMillis) {
-                    serviceRequestViewModel.checkRequest(
-                        context,
-                        object : ServiceRequestRepository.RequestCallback {
-                            override fun success(id: String) {
-                                if (id == "1") {
-
-                                } else {
-                                    pendingRequest = "Service Requested"
-                                }
-                            }
-
-                            override fun onError(errorMessage: String) {
-                                Toast.makeText(context,"Error occurred",Toast.LENGTH_SHORT).show()
-                            }
-                        })
-
-                    delay(15000L) // Wait for 15 seconds before the next call
-                }
-                if(System.currentTimeMillis() >= endTimeMillis) {
-                    serviceRequestViewModel.deleteRequest(
-                        context
-                    )
-                }
-            }
+//            LaunchedEffect(key1 = "periodicCheck") {
+//                // 3 minutes in milliseconds
+//                while (System.currentTimeMillis() < endTimeMillis) {
+//                    serviceRequestViewModel.checkRequest(
+//                        context,
+//                        object : ServiceRequestRepository.RequestCallback {
+//                            override fun success(id: String) {
+//                                if (id == "1") {
+//
+//                                } else {
+//                                    pendingRequest = "Service Requested"
+//                                }
+//                            }
+//
+//                            override fun onError(errorMessage: String) {
+//                                Toast.makeText(context, "Error occurred", Toast.LENGTH_SHORT).show()
+//                            }
+//                        })
+//
+//                    delay(15000L) // Wait for 15 seconds before the next call
+//                }
+//                if (System.currentTimeMillis() >= endTimeMillis) {
+//                    serviceRequestViewModel.deleteRequest(
+//                        context
+//                    )
+//                }
+//            }
 
             Text(
                 text = "$pendingRequest",
@@ -317,12 +439,19 @@ fun PendingActivityDashboard(
                 mutableStateOf(false)
             }
 
-            CommonButton(btnName = "Show Details", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            CommonButton(
+                btnName = "Show Details",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
                 showRequestDetailsWindow = true
             }
 
-            if(showRequestDetailsWindow) {
-                RequestDetails(serviceRequestViewModel = serviceRequestViewModel, context = context) {
+            if (showRequestDetailsWindow) {
+                RequestDetails(
+                    request = request,
+                    serviceRequestViewModel = serviceRequestViewModel,
+                    context = context
+                ) {
                     showRequestDetailsWindow = false
                 }
             }
@@ -336,7 +465,7 @@ fun PendingActivityDashboard(
                     serviceRequestViewModel.deleteRequest(
                         context
                     )
-                }else{
+                } else {
                     //todo
                 }
             }
@@ -351,6 +480,244 @@ fun PendingActivityDashboard(
         )
     }
 }
+
+@Composable
+private fun Timer(
+    waitingTime: Long,
+    onFinish: () -> Unit
+) = LaunchedEffect(waitingTime) {
+    delay(waitingTime)
+    onFinish()
+}
+
+
+@Composable
+fun AssignedActivityDashboard(
+    request: ServiceRequest,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
+) {
+    val context = LocalContext.current
+    var showCostDetailWindow by remember { mutableStateOf(false) }
+
+    val loading by serviceRequestViewModel.loading
+
+
+    CircularProgressBar(isDisplayed = loading)
+
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "${request.serviceProviderName} is Assigned",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            //todo
+            AnimatedCircle(isDisplayed = true)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = { showCostDetailWindow = true },
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                border = BorderStroke(width = 2.dp, color = Color.White),
+                modifier = Modifier
+                    .height(58.dp)
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .width(250.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC6D4DE))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Cost: LKR ${request.approxCost}",
+                        style = textStyle2,
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.question_fill),
+                        contentDescription = "Info",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            var showRequestDetailsWindow by remember {
+                mutableStateOf(false)
+            }
+
+            CommonButton(
+                btnName = "Show Details",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                showRequestDetailsWindow = true
+            }
+
+            if (showRequestDetailsWindow) {
+                RequestDetails(
+                    request = request,
+                    serviceRequestViewModel = serviceRequestViewModel,
+                    context = context
+                ) {
+                    showRequestDetailsWindow = false
+                }
+            }
+
+            CommonButton(
+                btnName = "Track",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+
+            }
+//            Spacer(modifier = Modifier.height(16.dp))
+
+            CommonButton(
+                btnName = "Any Issue",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+    if (showCostDetailWindow) {
+        MoreInfoWindow(
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+                    " The actual amount may vary.",
+            onDismiss = { showCostDetailWindow = false }
+        )
+    }
+}
+
+
+@Composable
+fun ServiceProvidedDashboard(
+    request: ServiceRequest,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
+) {
+    val context = LocalContext.current
+    var showCostDetailWindow by remember { mutableStateOf(false) }
+
+    val loading by serviceRequestViewModel.loading
+
+
+    CircularProgressBar(isDisplayed = loading)
+
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Service Provided...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
+                style = textStyle2,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            //todo
+            AnimatedCircle(isDisplayed = true)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+
+            Text(
+                text = "Please make the payment of \nLKR ${request.approxCost}",
+                style = textStyle2,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            var showRequestDetailsWindow by remember {
+                mutableStateOf(false)
+            }
+
+            var showPaymentDialog by remember {
+                mutableStateOf(false)
+            }
+
+            CommonButton(
+                btnName = "Make Payment",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                showPaymentDialog = true
+            }
+
+            CommonButton(
+                btnName = "Show Details",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                showRequestDetailsWindow = true
+            }
+
+            if (showRequestDetailsWindow) {
+                RequestDetails(
+                    request = request,
+                    serviceRequestViewModel = serviceRequestViewModel,
+                    context = context
+                ) {
+                    showRequestDetailsWindow = false
+                }
+            }
+
+            if (showPaymentDialog) {
+                PaymentMethodDialog(serviceRequestViewModel) {
+                    showPaymentDialog = false
+                }
+            }
+
+            CommonButton(
+                btnName = "Any Issue",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+    if (showCostDetailWindow) {
+        MoreInfoWindow(
+            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+                    " The actual amount may vary.",
+            onDismiss = { showCostDetailWindow = false }
+        )
+    }
+}
+
 
 @Composable
 fun RequestServiceBox(
@@ -416,7 +783,7 @@ fun RequestServiceScreen(
     }
 
     CircularProgressBar(isDisplayed = loading.value)
-    
+
     if (showLoadingLocationWindow) {
 //        MoreInfoWindow(message = "Getting the current location . . . ") {
 //
@@ -471,17 +838,17 @@ fun RequestServiceScreen(
 
             FillDetailsButton(
                 detailButtonName =
-                        if (serviceRequestViewModel.issue.value.category.isEmpty()) "Issue Details (required)"
-                        else "Issue: ${serviceRequestViewModel.issue.value.category}"
+                if (serviceRequestViewModel.issue.value.category.isEmpty()) "Issue Details (required)"
+                else "Issue: ${serviceRequestViewModel.issue.value.category}"
             ) {
                 showIssueDetailsWindow = true
             }
             FillDetailsButton(
                 detailButtonName =
-                        if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) "Vehicle Details (required)"
-                        else "Vehicle: ${
-                                    serviceRequestViewModel.vehicleModel.value.vehicleModel
-                        } "
+                if (serviceRequestViewModel.vehicleModel.value.vehicleModel.isEmpty()) "Vehicle Details (required)"
+                else "Vehicle: ${
+                    serviceRequestViewModel.vehicleModel.value.vehicleModel
+                } "
             ) {
                 showVehicleDetailsWindow = true
             }
@@ -579,7 +946,9 @@ fun RequestServiceScreen(
                             description,
                             "",
                             locationViewModel.location.value.toString(),
-                            "", "", approxCost = serviceRequestViewModel.issue.value.approximatedCost
+                            "",
+                            "",
+                            approxCost = serviceRequestViewModel.issue.value.approximatedCost
                         ), object : ServiceRequestRepository.RequestCallback {
                             override fun success(message: String) {
                                 Toast.makeText(
@@ -590,6 +959,12 @@ fun RequestServiceScreen(
                                 currentStateViewModel.setCurrentState(
                                     true,
                                     isReqServiceWindowOpened = false
+                                )
+                                currentStateViewModel.fetchLatestRequest(
+                                    AppPreferences(context).getStringPreference(
+                                        "CUSTOMER_ID",
+                                        ""
+                                    )
                                 )
                                 loading.value = false
                             }
@@ -723,7 +1098,8 @@ fun CommonIssuesBox(
                     CommonIssueButton(issueCategory = issue.category) {
                         currentStateViewModel.isReqServiceWindowOpened.value = true
                         serviceRequestViewModel.issue.value.category = issue.category
-                        serviceRequestViewModel.issue.value.approximatedCost = issue.approximatedCost
+                        serviceRequestViewModel.issue.value.approximatedCost =
+                            issue.approximatedCost
                         serviceRequestViewModel.issue.value.id = issue.id
                     }
                 }
@@ -813,9 +1189,13 @@ fun DashboardFieldButton(fieldName: String, fieldValue: String, modifier: Modifi
     Spacer(modifier = Modifier.height(16.dp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Context, onDismiss: () -> Unit) {
+fun RequestDetails(
+    request: ServiceRequest,
+    serviceRequestViewModel: ServiceRequestViewModel,
+    context: Context,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         shape = RoundedCornerShape(10),
@@ -829,7 +1209,7 @@ fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Co
         tonalElevation = 16.dp,
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -842,35 +1222,32 @@ fun RequestDetails(serviceRequestViewModel: ServiceRequestViewModel, context: Co
 
                 DashboardFieldButton(
                     fieldName = "Issue",
-                    fieldValue = AppPreferences(context).getStringPreference("ISSUE"),
+                    fieldValue = request.issueCategoryName,
                     modifier = Modifier
                         .width(250.dp)
                 )
                 DashboardFieldButton(
                     fieldName = "Vehicle",
-                    fieldValue = AppPreferences(context).getStringPreference("VEHICLE_MODEL"),
+                    fieldValue = request.vehicleModelName,
                     modifier = Modifier
                         .width(250.dp)
                 )
                 DashboardFieldButton(
                     fieldName = "Request ID",
-                    fieldValue = "R${AppPreferences(context).getStringPreference("REQUEST_ID")}",
+                    fieldValue = "R${request.id}",
                     modifier = Modifier
                         .width(250.dp)
                 )
 
                 OutlinedTextField(
-                    value = AppPreferences(context).getStringPreference(
-                        "DESCRIPTION"
-                    ),
+                    value = request.description,
                     onValueChange = { },
                     modifier = Modifier
                         .height(100.dp)
                         .width(250.dp)
                         .border(2.dp, Color.White, shape = RoundedCornerShape(20))
                         .shadow(2.dp, shape = RoundedCornerShape(20))
-                        .background(Color.White)
-                    ,
+                        .background(Color.White),
                     enabled = false,
                     placeholder = {
                         Text(

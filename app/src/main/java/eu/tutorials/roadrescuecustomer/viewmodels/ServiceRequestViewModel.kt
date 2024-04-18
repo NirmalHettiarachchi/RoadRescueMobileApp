@@ -78,6 +78,9 @@ class ServiceRequestViewModel : ViewModel() {
     private val _deleteLoading = MutableSharedFlow<Boolean>()
     val deleteLoading = _deleteLoading.asSharedFlow()
 
+    private val _ratingLoading = MutableSharedFlow<Boolean>()
+    val ratingLoading = _ratingLoading.asSharedFlow()
+
     fun setServiceRequest(
         context: Context,
         serviceRequest: ServiceRequest, requestCallback: ServiceRequestRepository.RequestCallback
@@ -88,6 +91,7 @@ class ServiceRequestViewModel : ViewModel() {
             requestCallback
         )
     }
+
     fun checkRequest(
         context: Context,
         requestCallback: ServiceRequestRepository.RequestCallback
@@ -109,12 +113,15 @@ class ServiceRequestViewModel : ViewModel() {
 
             when (deleteResult) {
                 is DeleteResult.Success -> {
-                    Toast.makeText(context, "Request cancelled successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Request cancelled successfully", Toast.LENGTH_SHORT)
+                        .show()
                 }
+
                 is DeleteResult.Failure -> {
                     // This also runs on the main thread, safe to show a Toast
                     Toast.makeText(context, deleteResult.message, Toast.LENGTH_SHORT).show()
                 }
+
                 else -> {
 
                 }
@@ -125,30 +132,66 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
+
+    fun rateOrSkip(context: Context, rate: Int = -1) {
+        viewModelScope.launch {
+            Log.d(TAG, "rateOrSkip: Started")
+            loading.value = true
+            Log.d(TAG, "rateOrSkip: Delay")
+            val deleteResult = withContext(Dispatchers.IO) {
+                rateOrSkipDatabase(context, rate)
+            }
+
+            when (deleteResult) {
+                is DeleteResult.Success -> {
+                    Toast.makeText(context, "Feedback given successfully", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is DeleteResult.Failure -> {
+                    // This also runs on the main thread, safe to show a Toast
+                    Toast.makeText(context, deleteResult.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {
+
+                }
+            }
+            Log.d(TAG, "rateOrSkip: End")
+            loading.value = false
+            _ratingLoading.emit(true)
+        }
+    }
+
+
     fun fetchRequests(customerId: String) {
         viewModelScope.launch {
             loading.value = true
             withContext(Dispatchers.IO) {
                 // Database credentials and URL
-                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
+                val databaseUrl =
+                    "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
                 val databaseUser = "admin"
                 val databasePassword = "admin123"
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")
-                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
-                        connection.createStatement().use { statement ->
-                            val resultSet = statement.executeQuery("SELECT * " +
-                                    "FROM service_request " +
-                                    "JOIN vehicle_model ON vehicle_model.id = service_request.vehicle_model_id " +
-                                    "JOIN service_provider ON service_provider.id = service_request.assigned_service_provider_id " +
-                                    "JOIN issue_category ON issue_category.id = service_request.issue_category_id " +
-                                    "WHERE service_request.customer_id = $customerId AND assigned_service_provider_id IS NOT NULL;")
-                            while (resultSet.next()) {
-                                requests.add(resultSetToRequest(resultSet))
+                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword)
+                        .use { connection ->
+                            connection.createStatement().use { statement ->
+                                val resultSet = statement.executeQuery(
+                                    "SELECT * " +
+                                            "FROM service_request " +
+                                            "JOIN vehicle_model ON vehicle_model.id = service_request.vehicle_model_id " +
+                                            "JOIN service_provider ON service_provider.id = service_request.assigned_service_provider_id " +
+                                            "JOIN issue_category ON issue_category.id = service_request.issue_category_id " +
+                                            "WHERE service_request.customer_id = $customerId AND assigned_service_provider_id IS NOT NULL;"
+                                )
+                                while (resultSet.next()) {
+                                    requests.add(resultSetToRequest(resultSet))
+                                }
                             }
                         }
-                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -195,23 +238,26 @@ class ServiceRequestViewModel : ViewModel() {
             loading.value = true
 
             withContext(Dispatchers.IO) {
-                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
+                val databaseUrl =
+                    "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
                 val databaseUser = "admin"
                 val databasePassword = "admin123"
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")
-                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword).use { connection ->
-                        connection.createStatement().use { statement ->
-                            val resultSet = statement.executeQuery("SELECT COUNT(*) AS request_count FROM service_request WHERE customer_id = '$customerId' AND assigned_service_provider_id IS NOT NULL")
-                            if (resultSet.next()) {
-                                requestCount = resultSet.getInt("request_count")
-                            } else {
-                                requestCount = 0
+                    DriverManager.getConnection(databaseUrl, databaseUser, databasePassword)
+                        .use { connection ->
+                            connection.createStatement().use { statement ->
+                                val resultSet =
+                                    statement.executeQuery("SELECT COUNT(*) AS request_count FROM service_request WHERE customer_id = '$customerId' AND assigned_service_provider_id IS NOT NULL")
+                                if (resultSet.next()) {
+                                    requestCount = resultSet.getInt("request_count")
+                                } else {
+                                    requestCount = 0
+                                }
+                                _requestCount.value = requestCount
                             }
-                            _requestCount.value  = requestCount
                         }
-                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -291,7 +337,8 @@ class ServiceRequestViewModel : ViewModel() {
         try {
             val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
-            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
             val username = "admin"
             val databasePassword = "admin123"
 
@@ -321,6 +368,54 @@ class ServiceRequestViewModel : ViewModel() {
                             return DeleteResult.Failure("No matching request found")
                         }
                     }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return DeleteResult.Failure("Error cancelling request")
+        }
+    }
+
+
+    private fun rateOrSkipDatabase(context: Context, rate: Int): DeleteResult {
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val TABLE_NAME = "service_request"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            DriverManager.getConnection(url, username, databasePassword).use { connection ->
+                val requestId = AppPreferences(context).getStringPreference("REQUEST_ID").toInt()
+                val customerId = AppPreferences(context).getStringPreference("CUSTOMER_ID").toInt()
+
+                val statusQuery = if (rate == -1) {
+                    "UPDATE service_request SET status = 5 WHERE service_request.id = ?"
+                } else {
+                    "UPDATE service_request SET status = 5, rating = ? WHERE service_request.id = ?"
+                }
+
+                connection.prepareStatement(statusQuery).use { preparedStatement ->
+
+                    if (rate == -1) {
+                        preparedStatement.setInt(1, requestId)
+                    } else {
+                        preparedStatement.setInt(1, rate)
+                        preparedStatement.setInt(2, requestId)
+                    }
+
+                    val id = preparedStatement.executeUpdate()
+
+//                        .use { resultSet ->
+//
+//
+//                        if (resultSet.next()) {
+                            return DeleteResult.Success
+//                        } else {
+//                            return DeleteResult.Failure("No matching request found")
+//                        }
                 }
             }
         } catch (e: Exception) {

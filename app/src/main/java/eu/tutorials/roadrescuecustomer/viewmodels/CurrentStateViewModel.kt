@@ -27,8 +27,10 @@ import java.util.TimeZone
 
 class CurrentStateViewModel : ViewModel() {
     private val _repository: CurrentStateRepository = CurrentStateRepository()
-    private val _isServiceRequested = mutableStateOf(_repository.getCurrentState().isServiceRequested)
-    private val _isReqServiceWindowOpened = mutableStateOf(_repository.getCurrentState().isReqServiceWindowOpened)
+    private val _isServiceRequested =
+        mutableStateOf(_repository.getCurrentState().isServiceRequested)
+    private val _isReqServiceWindowOpened =
+        mutableStateOf(_repository.getCurrentState().isReqServiceWindowOpened)
 
     val isServiceRequested: MutableState<Boolean> = _isServiceRequested
     val isReqServiceWindowOpened: MutableState<Boolean> = _isReqServiceWindowOpened
@@ -44,9 +46,11 @@ class CurrentStateViewModel : ViewModel() {
         _isReqServiceWindowOpened.value = _repository.getCurrentState().isReqServiceWindowOpened
     }
 
-    fun fetchLatestRequest(customerId: String) {
+    fun fetchLatestRequest(customerId: String, showLoading: Boolean = false) {
         viewModelScope.launch {
-            loading.value = true
+            if (showLoading) {
+                loading.value = true
+            }
             val fetchedLatestRequests = withContext(Dispatchers.IO) {
                 // Actual database operation to fetch vehicle types
                 fetchLatestRequestFromDatabase(customerId)
@@ -58,11 +62,13 @@ class CurrentStateViewModel : ViewModel() {
             _latestRequests.value = fetchedLatestRequests
             Log.d("TAG", "fetchLatestRequest: Customer ID : $customerId")
             Log.d("TAG", "fetchLatestRequest: Latest Records :: ${latestRequests.value.size}")
-            loading.value = false
+           if(showLoading) {
+               loading.value = false
+           }
         }
     }
 
-    fun clearRecentRequest(){
+    fun clearRecentRequest() {
         _latestRequests.value = emptyList()
     }
 
@@ -79,7 +85,11 @@ class CurrentStateViewModel : ViewModel() {
             val connection: Connection =
                 DriverManager.getConnection(url, username, databasePassword)
             val statement = connection.createStatement()
-            val resultSet: ResultSet = statement.executeQuery("SELECT *, CONVERT_TZ(request_timestamp, '+00:00', '+05:30') AS request_timestamp_ist FROM service_request WHERE customer_id = $customerId AND ((status = 1 AND CONVERT_TZ(request_timestamp, '+00:00', '+05:30') > NOW() - INTERVAL 3 MINUTE) OR status = 2) ORDER BY request_timestamp DESC LIMIT 1;")
+            val resultSet: ResultSet = statement.executeQuery(
+                """
+                SELECT *, CONVERT_TZ(request_timestamp, '+00:00', '+05:30') AS request_timestamp_ist FROM service_request JOIN vehicle_model ON vehicle_model.id = service_request.vehicle_model_id LEFT JOIN service_provider ON service_provider.id = service_request.assigned_service_provider_id JOIN issue_category ON issue_category.id = service_request.issue_category_id WHERE service_request.customer_id = $customerId AND ((service_request.status = 1 AND CONVERT_TZ(request_timestamp, '+00:00', '+05:30') > NOW() - INTERVAL 3 MINUTE) OR service_request.status BETWEEN 2 and 5) ORDER BY request_timestamp DESC LIMIT 1;
+            """.trimIndent()
+            )
 
             while (resultSet.next()) {
                 Log.d(
@@ -100,6 +110,11 @@ class CurrentStateViewModel : ViewModel() {
                 val rating = resultSet.getString("rating")
                 val date = resultSet.getString("request_timestamp")
                 val update = resultSet.getTimestamp("updated_at")
+                val approx_cost = resultSet.getInt("approx_cost")
+                val serviceProviderName = resultSet.getString("garage_name")
+                val model = resultSet.getString("model")
+                val issueCategory = resultSet.getString("category")
+
 
                 val serviceRequest = ServiceRequest(
                     id = id,
@@ -114,12 +129,16 @@ class CurrentStateViewModel : ViewModel() {
                     location = location,
                     paidAmount = paidAmount,
                     rating = rating,
-                    date =  date.toString()
-                    )
+                    date = date.toString(),
+                    approxCost = approx_cost.toString(),
+                    serviceProviderName = serviceProviderName ?: "",
+                    vehicleModelName = model ?: "",
+                    issueCategoryName = issueCategory ?: ""
+                )
                 latestRequests.add(serviceRequest)
             }
             connection.close()
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         Log.d("TAG", "fetchLatestRequestFromDatabase: Return Result ${latestRequests.size}")
