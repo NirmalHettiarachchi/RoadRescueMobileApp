@@ -144,6 +144,7 @@ fun App(
                     TrackLocationScreen(
                         currentStateViewModel,
                         locationViewModel,
+                        context
                     )
                 }
                 composable("activitiesscreen") {

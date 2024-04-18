@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +41,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import kotlinx.coroutines.launch
@@ -46,7 +50,21 @@ import kotlinx.coroutines.launch
 fun TrackLocationScreen(
     currentStateViewModel: CurrentStateViewModel,
     locationViewModel: LocationViewModel,
+    context: Context,
 ) {
+
+    LaunchedEffect(key1 = true) {
+        currentStateViewModel.fetchLatestRequest(
+            AppPreferences(context).getStringPreference(
+                "CUSTOMER_ID",
+                ""
+            ),
+            showLoading = true
+        )
+    }
+
+    val request = currentStateViewModel.latestRequests.collectAsState().value.firstOrNull()
+
     Column(
         backgroundModifier
             .verticalScroll(rememberScrollState()),
@@ -59,12 +77,12 @@ fun TrackLocationScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle1
             )
-            if (!currentStateViewModel.isServiceRequested.value) {
-                NoPendingActivityTrackLocationScreen()
-            } else {
+            if (request?.status?.toInt() == 2) {
                 PendingActivityTrackLocationScreen(
                     locationViewModel
                 )
+            } else {
+                NoPendingActivityTrackLocationScreen()
             }
         }
     }

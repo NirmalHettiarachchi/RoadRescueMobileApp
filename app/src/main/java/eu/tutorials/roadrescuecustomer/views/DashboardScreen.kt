@@ -639,7 +639,7 @@ fun ServiceProvidedDashboard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Service Provided...",
+                text = "Service Provided . . .",
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally),
