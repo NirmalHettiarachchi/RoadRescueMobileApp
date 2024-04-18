@@ -1,6 +1,8 @@
 package com.example.garage.views.TechnicianApp
 
+import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -22,9 +24,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -32,33 +31,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.garage.models.LocationUtils
+import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
+import com.example.garage.views.TrackLocation
 import com.example.garage.views.defaultBackground
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TechnicianCompleteJob(
     navController: NavController,
     navStatus: String,
-){
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel,
+    context: Context,
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit){
-        //callGetLocation()
-    }
 
 
     ModalNavigationDrawer(
@@ -85,6 +87,16 @@ fun TechnicianCompleteJob(
                 TechnicianFooter(navController, navStatus)
             }
         ) {
+
+            TrackLocation(
+                locationUtils = locationUtils,
+                locationViewModel = locationViewModel,
+                context = context
+            )
+
+
+            Log.d("latLong", "${locationViewModel.location.value?.latitude}")
+
             Column(
                 modifier = defaultBackground.padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,7 +125,10 @@ fun TechnicianCompleteJob(
                     ) {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ServiceRequest(navController = navController,modifier = Modifier.align(Alignment.CenterHorizontally))
+                    ServiceRequest(
+                        navController = navController,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -122,41 +137,48 @@ fun TechnicianCompleteJob(
                             .fillMaxWidth(0.95f)
                             .height(300.dp)
                             .align(Alignment.CenterHorizontally),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Green),
+                        shape = RoundedCornerShape(20.dp)
                     ) {
 
-                        val singapore = LatLng(1.35, 103.87)
-                        val cameraPositionState = rememberCameraPositionState {
-                            position = CameraPosition.fromLatLngZoom(singapore, 10f)
-                        }
+                        val currentLocation =
+                            locationViewModel.location.value?.latitude?.let { it1 ->
+                                locationViewModel.location.value?.longitude?.let { it2 ->
+                                    LatLng(
+                                        it1, it2
+                                    )
+                                }
+                            }
 
                         val uiSettings = remember {
                             MapUiSettings(myLocationButtonEnabled = true)
                         }
-                        val properties by remember {
-                            mutableStateOf(MapProperties(isMyLocationEnabled = true))
-                        }
 
-                        // Check for location permission
+                        if (currentLocation!=null) {
+                            val cameraPositionState = rememberCameraPositionState {
+                                position =
+                                    currentLocation.let { it1 ->
+                                        CameraPosition.fromLatLngZoom(
+                                            it1,
+                                            10f
+                                        )
+                                    }
+                            }
 
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = cameraPositionState,
+                                uiSettings = uiSettings
+                            ) {
+                                currentLocation?.let { it1 -> MarkerState(position = it1) }
+                                    ?.let { it2 ->
+                                        Marker(
+                                            state = it2,
+                                            title = "Singapore",
+                                            snippet = "Marker in Singapore"
+                                        )
+                                    }
+                            }
 
-
-                        GoogleMap(
-                            modifier = Modifier.fillMaxSize(),
-                            cameraPositionState = cameraPositionState,
-                            properties = MapProperties(
-                                isMyLocationEnabled = true,
-                                mapType = MapType.HYBRID,
-                                isTrafficEnabled = true
-                            ),
-                            uiSettings = uiSettings
-                        ) {
-                            Marker(
-                                state = MarkerState(position = singapore),
-                                title = "Singapore",
-                                snippet = "Marker in Singapore"
-                            )
                         }
 
                     }

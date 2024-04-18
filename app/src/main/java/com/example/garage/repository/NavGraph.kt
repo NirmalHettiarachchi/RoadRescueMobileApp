@@ -7,13 +7,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.garage.models.GarageTechnician
+import com.example.garage.models.LocationUtils
 import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.SharedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
@@ -35,10 +38,11 @@ import java.util.Date
 fun SetupNavGraph(
     navController: NavHostController
 ){
-
+    val context= LocalContext.current
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
-
+    val locationViewModel:LocationViewModel= viewModel()
+    val locationUtils:LocationUtils=LocationUtils(context)
 
     NavHost(
         navController = navController,
@@ -152,7 +156,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianCompleteJob.route
         ){
-            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob")
+            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel,context=context)
         }
 
     }
