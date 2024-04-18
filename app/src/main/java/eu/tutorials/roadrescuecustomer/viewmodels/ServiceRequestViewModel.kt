@@ -180,12 +180,13 @@ class ServiceRequestViewModel : ViewModel() {
                         .use { connection ->
                             connection.createStatement().use { statement ->
                                 val resultSet = statement.executeQuery(
-                                    "SELECT * " +
+                                    "SELECT *, CONVERT_TZ(request_timestamp, '+00:00', '+05:30') AS request_timestamp_ist " +
                                             "FROM service_request " +
                                             "JOIN vehicle_model ON vehicle_model.id = service_request.vehicle_model_id " +
                                             "JOIN service_provider ON service_provider.id = service_request.assigned_service_provider_id " +
                                             "JOIN issue_category ON issue_category.id = service_request.issue_category_id " +
-                                            "WHERE service_request.customer_id = $customerId AND assigned_service_provider_id IS NOT NULL;"
+                                            "WHERE service_request.customer_id = $customerId AND assigned_service_provider_id IS NOT NULL " +
+                                            "ORDER BY request_timestamp DESC;"
                                 )
                                 while (resultSet.next()) {
                                     requests.add(resultSetToRequest(resultSet))
@@ -224,11 +225,12 @@ class ServiceRequestViewModel : ViewModel() {
             location = rs.getString("location"),
             paidAmount = rs.getString("paid_amount"),
             rating = rs.getString("rating"),
-            date = rs.getString("request_timestamp"),
+            date = rs.getString("request_timestamp_ist"),
             vehicleModelName = rs.getString("model"),
             serviceProviderName = rs.getString("garage_name"),
             issueCategoryName = rs.getString("category"),
-            approxCost = rs.getString("approx_cost")
+            approxCost = rs.getString("approx_cost"),
+            reqAmount = rs.getString("requested_amount")
         )
     }
 

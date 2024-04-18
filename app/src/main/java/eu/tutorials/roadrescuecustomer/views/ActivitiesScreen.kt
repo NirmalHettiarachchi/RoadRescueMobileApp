@@ -166,10 +166,10 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
     val formattedTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
 
     val statusText = when (serviceRequest.status.toInt()) {
-        1, 2 -> "Pending"
-        3 -> "Completed"
-        4 -> "Canceled by you"
-        else -> "Canceled by the service provider"
+        1, 2, 3 -> "Pending"
+        4, 5 -> "Completed"
+        6 -> "Canceled by the service provider"
+        else -> "Canceled by the customer support"
     }
 
     if(showMoreInfoWindow) {
@@ -246,7 +246,7 @@ fun ServiceRequestCard(serviceRequest: ServiceRequest) {
                     .weight(1f)
                     .padding(8.dp, 0.dp)
             )
-            Text(text = ":LKR ${serviceRequest.paidAmount}", style = textStyle4, modifier = Modifier.weight(1f))
+            Text(text = ":LKR ${serviceRequest.reqAmount ?: "0.00"}", style = textStyle4, modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -360,7 +360,7 @@ fun MoreInfoActivityWindow(serviceRequest: ServiceRequest, formattedDate: String
                             .weight(1f)
                             .padding(8.dp, 0.dp)
                     )
-                    Text(text = ":LKR ${serviceRequest.paidAmount}", style = textStyle4, modifier = Modifier.weight(1f))
+                    Text(text = ":LKR ${serviceRequest.reqAmount ?: "0.00"}", style = textStyle4, modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
