@@ -82,6 +82,7 @@ fun DashboardScreen(
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     context: Context,
+    navController: NavHostController
 ) {
 
     var loading by remember {
@@ -218,13 +219,15 @@ fun DashboardScreen(
                         AssignedActivityDashboard(
                             request = request,
                             serviceRequestViewModel = serviceRequestViewModel,
-                            currentStateViewModel = currentStateViewModel
+                            currentStateViewModel = currentStateViewModel,
+                            navController = navController
                         )
                     } else if (request?.status?.toInt() == 3) {
                         ServiceProvidedDashboard(
                             request = request,
                             serviceRequestViewModel = serviceRequestViewModel,
-                            currentStateViewModel = currentStateViewModel
+                            currentStateViewModel = currentStateViewModel,
+                            navController = navController
                         )
                     } else if (request?.status?.toInt() == 4) {
                         RateScreen(
@@ -513,7 +516,8 @@ private fun Timer(
 fun AssignedActivityDashboard(
     request: ServiceRequest,
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel
+    serviceRequestViewModel: ServiceRequestViewModel,
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
@@ -604,7 +608,7 @@ fun AssignedActivityDashboard(
                 btnName = "Track",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-
+                navController.navigate("tracklocationscreen")
             }
 //            Spacer(modifier = Modifier.height(16.dp))
 
@@ -612,7 +616,7 @@ fun AssignedActivityDashboard(
                 btnName = "Any Issue",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-
+                navController.navigate("helpscreen")
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -631,7 +635,8 @@ fun AssignedActivityDashboard(
 fun ServiceProvidedDashboard(
     request: ServiceRequest,
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel
+    serviceRequestViewModel: ServiceRequestViewModel,
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
@@ -722,7 +727,7 @@ fun ServiceProvidedDashboard(
                 btnName = "Any Issue",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-
+                navController.navigate("helpscreen")
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

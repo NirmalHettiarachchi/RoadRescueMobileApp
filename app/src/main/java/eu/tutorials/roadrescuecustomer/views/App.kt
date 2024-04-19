@@ -126,6 +126,7 @@ fun App(
                         locationUtils = locationUtils,
                         locationViewModel = locationViewModel,
                         context = context,
+                        navController = navController
                     )
                 }
                 composable("loginscreen") {
