@@ -58,6 +58,7 @@ import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
@@ -147,47 +148,55 @@ fun GarageDashboard(
             Log.d("response null", "null")
         }
 
-            // fetch services requests
-        val serviceResponse=fetchServiceRequests(viewModel)
 
-        if (serviceResponse != null) {
-            if (serviceResponse.status == 200) {
-                requestServices=serviceResponse.data!!.toString()
-                showServiceRequests=true
-            }else if (serviceResponse.status == 400) {
-                title = serviceResponse.status.toString()
-                message = serviceResponse.message.toString()
-                buttonOneName = "Ok"
-                buttonTwoName = "null"
-                showMessageDialog = true
 
-            } else if (serviceResponse.status == 404) {
-                title = serviceResponse.status.toString()
-                message = serviceResponse.message.toString()
-                buttonOneName = "Ok"
-                buttonTwoName = "null"
-                showMessageDialog = true
+            // fetch services requests every 1 minutes
+        while (true) {
+            requestServices=""
+            val serviceResponse=fetchServiceRequests(viewModel)
 
-            } else if (serviceResponse.status == 500) {
-                title = serviceResponse.status.toString()
-                message = serviceResponse.message.toString()
+            if (serviceResponse != null) {
+                if (serviceResponse.status == 200) {
+                    requestServices=serviceResponse.data!!.toString()
+                    showServiceRequests=true
+                }else if (serviceResponse.status == 400) {
+                    title = serviceResponse.status.toString()
+                    message = serviceResponse.message.toString()
+                    buttonOneName = "Ok"
+                    buttonTwoName = "null"
+                    showMessageDialog = true
+
+                } else if (serviceResponse.status == 404) {
+                    title = serviceResponse.status.toString()
+                    message = serviceResponse.message.toString()
+                    buttonOneName = "Ok"
+                    buttonTwoName = "null"
+                    showMessageDialog = true
+
+                } else if (serviceResponse.status == 500) {
+                    title = serviceResponse.status.toString()
+                    message = serviceResponse.message.toString()
+                    buttonOneName = "Ok"
+                    buttonTwoName = "null"
+                    showMessageDialog = true
+                } else if (serviceResponse.status == 508) {
+                    title = serviceResponse.status.toString()
+                    message = serviceResponse.message.toString()
+                    buttonOneName = "null"
+                    buttonTwoName = "null"
+                    showMessageDialog = true
+                }
+            }else{
+                title = "401"
+                message = "Cannot call the sever"
                 buttonOneName = "Ok"
-                buttonTwoName = "null"
-                showMessageDialog = true
-            } else if (serviceResponse.status == 508) {
-                title = serviceResponse.status.toString()
-                message = serviceResponse.message.toString()
-                buttonOneName = "null"
                 buttonTwoName = "null"
                 showMessageDialog = true
             }
-        }else{
-            title = "401"
-            message = "Cannot call the sever"
-            buttonOneName = "Ok"
-            buttonTwoName = "null"
-            showMessageDialog = true
+            delay(1000 * 60)
         }
+
+
 
     }
 
@@ -307,36 +316,35 @@ fun GarageDashboard(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Load are service requests
-                    // custommer request load karanna one
+                    // customer request load karanna one
                     if(showServiceRequests){
-                        val jsonArray=JSONArray(requestServices)
+                        if (requestServices.isNotEmpty()) {
+                            val jsonArray=JSONArray(requestServices)
+                            for (i in 0 until jsonArray.length()) {
+                                val jsonObject = jsonArray.getJSONObject(i)
+                                val issue = jsonObject.getString("issue")
+                                val customerContactNumber = jsonObject.getString("customerContactNumber")
+                                val approx_cost = jsonObject.getDouble("approx_cost")
+                                val requestTime = jsonObject.getString("requestTimeStamp")
+                                val description = jsonObject.getString("description")
+                                val indicatorLightStatus = jsonObject.getString("indicatorLightStatus")
 
-                        for (i in 0 until jsonArray.length()) {
-                            val jsonObject = jsonArray.getJSONObject(i)
+                                Log.d("issue", "$issue ")
+                                Log.d("customerContactNumber", "$customerContactNumber ")
+                                Log.d("approx_cost", "$approx_cost ")
+                                Log.d("requestTimeStamp", "$requestTime ")
+                                Log.d("indicatorLightStatus", "$indicatorLightStatus ")
+                                var serviceRequest=ServicesRequestModel(customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
 
-                            val issue = jsonObject.getString("issue")
-                            val customerContactNumber = jsonObject.getString("customerContactNumber")
-                            val approx_cost = jsonObject.getDouble("approx_cost")
-                            val requestTime = jsonObject.getString("requestTimeStamp")
-                            val description = jsonObject.getString("description")
-                            val indicatorLightStatus = jsonObject.getString("indicatorLightStatus")
+                                ServiceRequest(
+                                    serviceRequest,
+                                    technicians,
+                                    Modifier.align(Alignment.CenterHorizontally)
+                                )
 
-                            Log.d("issue", "$issue ")
-                            Log.d("customerContactNumber", "$customerContactNumber ")
-                            Log.d("approx_cost", "$approx_cost ")
-                            Log.d("requestTimeStamp", "$requestTime ")
-                            Log.d("indicatorLightStatus", "$indicatorLightStatus ")
-                             var serviceRequest=ServicesRequestModel(customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
-
-                            ServiceRequest(
-                                serviceRequest,
-                                technicians,
-                                Modifier.align(Alignment.CenterHorizontally)
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
-
                     }
                 }
 
@@ -397,8 +405,6 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
     return response
 }
 
-
-// meke data tika load karanna one custommerge trigger eka dala
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -596,7 +602,7 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<St
 
 
                             CommonButton(
-                                btnName = "Accept",
+                                btnName = "Assign",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
 

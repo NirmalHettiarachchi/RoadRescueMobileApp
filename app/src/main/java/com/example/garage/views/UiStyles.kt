@@ -114,8 +114,8 @@ val cardDefaultModifier=Modifier
     .fillMaxHeight(0.95f)
 
  val closerButtonStyles=Modifier
-     .background(Color(0xFF253555), shape = RoundedCornerShape(20.dp))
-     .border(BorderStroke(2.dp, Color(0xFFE8EAEC)), shape = RoundedCornerShape(20.dp))
+     .background(Color.Transparent, shape = RoundedCornerShape(20.dp))
+     .border(BorderStroke(2.dp, Color(0xB5D32222)), shape = RoundedCornerShape(20.dp))
 
 fun changeStatusType(technician: GarageTechnician): String {
     return if (technician.getTechStatus()==1){

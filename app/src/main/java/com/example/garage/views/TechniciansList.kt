@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -479,6 +480,8 @@ fun TechniciansLoadStretcher(
                         verticalArrangement = Arrangement.Center
                     ) {
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -486,7 +489,14 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Delete.!", color = Color.Red, style = textStyle5)
+//                            Text(text = "Delete!", color = Color.Red, style = textStyle5)
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "delete icon",
+                                modifier = closerButtonStyles.size(64.dp),
+                                tint = Color(0xB5D32222),
+
+                            )
                         }
 
 
