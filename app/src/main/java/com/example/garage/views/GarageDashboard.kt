@@ -88,14 +88,6 @@ fun GarageDashboard(
     var requestServices by remember { mutableStateOf("") }
     var garageDetailsBackend = Garage()
 
-    var technicians = emptyList<String>()
-
-    /* LaunchedEffect(Unit){
-        while (true) {
-            getData()
-            delay(5000)
-        }
-    }*/
 
     LaunchedEffect(Unit) {
         val response = loadGarageDetails(viewModel)
@@ -213,18 +205,8 @@ fun GarageDashboard(
             val garageRating = jsonObject.getString("garageRating").toFloat()
             val garageType = jsonObject.getString("garageType")
             val garageProfileImageRef = jsonObject.getString("imageRef")
-            val availableTechnicians = jsonObject.getJSONArray("availableTechnicians")
 
-            for (i in 0 until availableTechnicians.length()) {
-                val jsonObject = availableTechnicians.getJSONObject(i)
-                val techId = jsonObject.getString("techId")
-                val techFName = jsonObject.getString("f_name")
-                val techLName = jsonObject.getString("l_name")
 
-                technicians += "$techId-$techFName $techLName"
-            }
-
-            Log.d("availableTechnicians", "$availableTechnicians ")
 
             garageDetailsBackend.setGarageName(garageName)
             garageDetailsBackend.setOwnerName(ownerName)
@@ -338,8 +320,8 @@ fun GarageDashboard(
 
                                 ServiceRequest(
                                     serviceRequest,
-                                    technicians,
-                                    Modifier.align(Alignment.CenterHorizontally)
+                                    Modifier.align(Alignment.CenterHorizontally),
+                                    viewModel
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -408,10 +390,18 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<String>, modifier: Modifier) {
+fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,viewModel: MainViewModel) {
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val phoneNumber = serviceRequest.getCustomerContactNumber()
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
+    var showMessageDialog by remember { mutableStateOf(false) }
+
+    var techniciansList = emptyList<String>()
 
     Card(
         modifier = modifier
@@ -543,9 +533,106 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<St
 
             CommonButton(
                 btnName = "Accept",
-                modifier = Modifier.align(Alignment.CenterVertically),
-                onClickButton = { showDialog = true }
-            )
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+
+                coroutineScope.launch {
+                    var technicianResponce: ResponseObject? = null
+                    when (serviceRequest.getIssue()) {
+                        "Mechanical Issues" -> {
+                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "Other")
+                        }
+
+                        "Electrical Issues" -> {
+                            technicianResponce = loadTechniciansGroupByIssue(
+                                viewModel,
+                                "Electrical System Troubleshooting"
+                            )
+                        }
+
+                        "Engine Problems" -> {
+                            technicianResponce =
+                                loadTechniciansGroupByIssue(viewModel, "Engine Maintenance")
+                        }
+
+                        "Fuel Issues" -> {
+                            technicianResponce =
+                                loadTechniciansGroupByIssue(viewModel, "Oil System Maintenance")
+                        }
+
+                        "Exhaust Issues" -> {
+                            technicianResponce =
+                                loadTechniciansGroupByIssue(viewModel, "Engine Maintenance")
+                        }
+
+                        "Cooling Problems" -> {
+                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "HVAC")
+                        }
+
+                        "Other" -> {
+                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "Other")
+                        }
+                    }
+
+                    if (technicianResponce != null) {
+                        if (technicianResponce.status == 200) {
+
+                            val filterTechnicians = technicianResponce.data!!.toString()
+
+                            val jsonArray = JSONArray(filterTechnicians)
+
+                            for (i in 0 until jsonArray.length()) {
+                                val jsonObject = jsonArray.getJSONObject(i)
+                                val techId = jsonObject.getString("techId")
+                                val techFName = jsonObject.getString("f_name")
+                                val techLName = jsonObject.getString("l_name")
+
+                                techniciansList += "$techId-$techFName $techLName"
+                            }
+
+                        } else if (technicianResponce.status == 400) {
+                            title = technicianResponce.status.toString()
+                            message = technicianResponce.message.toString()
+                            buttonOneName = "Ok"
+                            buttonTwoName = "null"
+                            showMessageDialog = true
+
+                        } else if (technicianResponce.status == 404) {
+                            title = technicianResponce.status.toString()
+                            message = technicianResponce.message.toString()
+                            buttonOneName = "Ok"
+                            buttonTwoName = "null"
+                            showMessageDialog = true
+
+                        } else if (technicianResponce.status == 500) {
+                            title = technicianResponce.status.toString()
+                            message = technicianResponce.message.toString()
+                            buttonOneName = "Ok"
+                            buttonTwoName = "null"
+                            showMessageDialog = true
+                        } else if (technicianResponce.status == 508) {
+                            title = technicianResponce.status.toString()
+                            message = technicianResponce.message.toString()
+                            buttonOneName = "null"
+                            buttonTwoName = "null"
+                            showMessageDialog = true
+                        } else {
+                            title = technicianResponce.status.toString()
+                            message = technicianResponce.message.toString()
+                            buttonOneName = "Ok"
+                            buttonTwoName = "null"
+                            showMessageDialog = true
+                        }
+                    } else {
+                        title = "401"
+                        message = "Cannot call the sever"
+                        buttonOneName = "Ok"
+                        buttonTwoName = "null"
+                        showMessageDialog = true
+                    }
+                }
+                showDialog = true
+            }
 
             if (showDialog) {
                 Dialog(
@@ -590,8 +677,9 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<St
 
                             // Dropdown load
 
-                           val option= CommonDropdown(
-                                optionList = technicianList,
+
+                            val option= CommonDropdown(
+                                optionList = techniciansList,
                                 defaultSelection = "Technician "
                             )
 
@@ -638,6 +726,40 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, technicianList: List<St
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
+
+    if (showMessageDialog) {
+        sweetAlertDialog(
+            title = title,
+            message = message,
+            buttonOneName = buttonOneName,
+            buttonTwoName = buttonTwoName,
+            onConfirm = {
+                showMessageDialog = false
+            }
+        )
+    }
+}
+
+suspend fun loadTechniciansGroupByIssue(viewModel: MainViewModel,issueCategory:String):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.getTechnicians("$issueCategory-1", "filterTechByIssue") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    } catch (e: SocketTimeoutException) {
+        // handle
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+
+    return response
+
 }
 
 

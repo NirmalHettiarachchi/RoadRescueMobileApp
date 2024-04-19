@@ -489,7 +489,6 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-//                            Text(text = "Delete!", color = Color.Red, style = textStyle5)
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "delete icon",
