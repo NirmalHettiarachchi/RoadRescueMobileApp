@@ -103,6 +103,10 @@ fun DashboardScreen(
         mutableStateOf(false)
     }
 
+    var isChangeAutomatic by remember {
+        mutableStateOf(false)
+    }
+
     var waitingTime by remember {
         mutableLongStateOf(0L)
     }
@@ -153,8 +157,17 @@ fun DashboardScreen(
 
         val seconds1 = TimeUnit.MILLISECONDS.toSeconds(duration)
 
-        if (minutes <= 3 && currentStateViewModel.latestRequests.collectAsState().value.first().status.toInt() <= 4) {
+        if(isChangeAutomatic){
+            currentStateViewModel.setCurrentState(
+                false,
+                isReqServiceWindowOpened = false
+            )
+        }
+
+        if (minutes <= 3 && currentStateViewModel.latestRequests.collectAsState().value.first().status.toInt() == 1) {
             showPending = true
+        } else {
+            showPending = false
         }
     } else {
         showPending = false
@@ -174,6 +187,8 @@ fun DashboardScreen(
                 style = textStyle1
             )
             if (!currentStateViewModel.isServiceRequested.value && !showPending) {
+                Log.d("TAG", "DashboardScreen: Step 1")
+
                 if (currentStateViewModel.isReqServiceWindowOpened.value) {
                     RequestServiceScreen(
                         onDismiss = {
@@ -186,16 +201,55 @@ fun DashboardScreen(
                         context = context
                     )
                 } else {
-                    NoPendingActivityDashboard(
-                        currentStateViewModel = currentStateViewModel,
-                        serviceRequestViewModel = serviceRequestViewModel,
-                        locationUtils = locationUtils,
-                        locationViewModel = locationViewModel,
-                        context = context
-                    )
+                    if (request?.status?.toInt() == 2) {
+                        LaunchedEffect(key1 = true) {
+                            while (true) {
+                                currentStateViewModel.fetchLatestRequest(
+                                    AppPreferences(context).getStringPreference(
+                                        "CUSTOMER_ID",
+                                        ""
+                                    ),
+                                    showLoading = false
+                                )
+                                isChangeAutomatic = true
+                                delay(10000)
+                            }
+                        }
+                        AssignedActivityDashboard(
+                            request = request,
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            currentStateViewModel = currentStateViewModel
+                        )
+                    } else if (request?.status?.toInt() == 3) {
+                        ServiceProvidedDashboard(
+                            request = request,
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            currentStateViewModel = currentStateViewModel
+                        )
+                    } else if (request?.status?.toInt() == 4) {
+                        RateScreen(
+                            request = request,
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            onRate = {
+                                currentStateViewModel.setCurrentState(
+                                    false,
+                                    isReqServiceWindowOpened = false
+                                )
+                                currentStateViewModel.clearRecentRequest()
+                                showPending = false
+                            })
+                    } else {
+                        isChangeAutomatic = false
+                        NoPendingActivityDashboard(
+                            currentStateViewModel = currentStateViewModel,
+                            serviceRequestViewModel = serviceRequestViewModel,
+                            locationUtils = locationUtils,
+                            locationViewModel = locationViewModel,
+                            context = context
+                        )
+                    }
                 }
             } else {
-
 
                 if (request?.status?.toInt() == 1) {
                     LaunchedEffect(key1 = true) {
@@ -207,6 +261,7 @@ fun DashboardScreen(
                                 ),
                                 showLoading = false
                             )
+                            isChangeAutomatic = true
                             delay(10000)
                         }
                     }
@@ -223,46 +278,7 @@ fun DashboardScreen(
                         currentStateViewModel.clearRecentRequest()
                         showPending = false
                     }
-                } else if (request?.status?.toInt() == 2) {
-                    LaunchedEffect(key1 = true) {
-                        while (true) {
-                            currentStateViewModel.fetchLatestRequest(
-                                AppPreferences(context).getStringPreference(
-                                    "CUSTOMER_ID",
-                                    ""
-                                ),
-                                showLoading = false
-                            )
-                            delay(10000)
-                        }
-                    }
-                    AssignedActivityDashboard(
-                        request = request,
-                        serviceRequestViewModel = serviceRequestViewModel,
-                        currentStateViewModel = currentStateViewModel
-                    )
-                } else if (request?.status?.toInt() == 3) {
-                    ServiceProvidedDashboard(
-                        request = request,
-                        serviceRequestViewModel = serviceRequestViewModel,
-                        currentStateViewModel = currentStateViewModel
-                    )
-                } else if (request?.status?.toInt() == 4) {
-                    RateScreen(
-                        serviceRequestViewModel = serviceRequestViewModel,
-                        onRate = {
-                            currentStateViewModel.setCurrentState(
-                                false,
-                                isReqServiceWindowOpened = false
-                            )
-                            currentStateViewModel.clearRecentRequest()
-                            showPending = false
-                        })
-                } else {
-                    currentStateViewModel.clearRecentRequest()
-                    showPending = false
                 }
-
             }
             HelpBox()
         }
@@ -339,7 +355,8 @@ fun PendingActivityDashboard(
         if (minutes1 <= 3) {
             Timer(waitingTime = wt) {
                 serviceRequestViewModel.deleteRequest(
-                    context
+                    context,
+                    request.id.toInt()
                 )
             }
         }
@@ -463,7 +480,8 @@ fun PendingActivityDashboard(
             ) {
                 if (System.currentTimeMillis() < endTimeMillis) {
                     serviceRequestViewModel.deleteRequest(
-                        context
+                        context,
+                        request.id.toInt()
                     )
                 } else {
                     //todo
@@ -474,7 +492,7 @@ fun PendingActivityDashboard(
     }
     if (showCostDetailWindow) {
         MoreInfoWindow(
-            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+            "The cost provided is an approximation based on the issue category you have provided." +
                     " The actual amount may vary.",
             onDismiss = { showCostDetailWindow = false }
         )
@@ -520,7 +538,7 @@ fun AssignedActivityDashboard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "${request.serviceProviderName} is Assigned",
+                text = "${request.serviceProviderName} is Assigned . . .",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -601,7 +619,7 @@ fun AssignedActivityDashboard(
     }
     if (showCostDetailWindow) {
         MoreInfoWindow(
-            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+            "The cost provided is an approximation based on the issue category you have provided." +
                     " The actual amount may vary.",
             onDismiss = { showCostDetailWindow = false }
         )
@@ -711,7 +729,7 @@ fun ServiceProvidedDashboard(
     }
     if (showCostDetailWindow) {
         MoreInfoWindow(
-            "The cost provided is an approximation based on the issue category, vehicle type, and fuel type you have provided." +
+            "The cost provided is an approximation based on the issue category you have provided." +
                     " The actual amount may vary.",
             onDismiss = { showCostDetailWindow = false }
         )

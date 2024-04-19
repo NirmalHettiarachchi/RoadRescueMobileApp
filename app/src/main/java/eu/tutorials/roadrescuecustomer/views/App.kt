@@ -143,7 +143,6 @@ fun App(
                 composable("tracklocationscreen") {
                     TrackLocationScreen(
                         currentStateViewModel,
-                        locationViewModel,
                         context
                     )
                 }

@@ -35,10 +35,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.models.ServiceRequest
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
 fun RateScreen(
+    request: ServiceRequest,
     serviceRequestViewModel: ServiceRequestViewModel,
     onRate: () -> Unit){
     val context = LocalContext.current
@@ -71,7 +73,7 @@ fun RateScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Provide you feedback...",
+                text = "Provide your feedback . . .",
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally),
@@ -177,13 +179,13 @@ fun RateScreen(
                 btnName = "Submit",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                serviceRequestViewModel.rateOrSkip(context,stars)
+                serviceRequestViewModel.rateOrSkip(context,stars, requestId = request.id.toInt())
             }
             CommonButton(
                 btnName = "Skip",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                serviceRequestViewModel.rateOrSkip(context)
+                serviceRequestViewModel.rateOrSkip(context, requestId = request.id.toInt())
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

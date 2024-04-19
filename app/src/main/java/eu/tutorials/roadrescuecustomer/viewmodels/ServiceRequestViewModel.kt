@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
@@ -102,13 +103,13 @@ class ServiceRequestViewModel : ViewModel() {
         )
     }
 
-    fun deleteRequest(context: Context) {
+    fun deleteRequest(context: Context, requestId: Int) {
         viewModelScope.launch {
             Log.d(TAG, "deleteRequest: Started")
             loading.value = true
             Log.d(TAG, "deleteRequest: Delay")
             val deleteResult = withContext(Dispatchers.IO) {
-                deleteRequestFromDatabase(context)
+                deleteRequestFromDatabase(context, requestId)
             }
 
             when (deleteResult) {
@@ -133,13 +134,13 @@ class ServiceRequestViewModel : ViewModel() {
     }
 
 
-    fun rateOrSkip(context: Context, rate: Int = -1) {
+    fun rateOrSkip(context: Context, rate: Int = -1, requestId: Int) {
         viewModelScope.launch {
             Log.d(TAG, "rateOrSkip: Started")
             loading.value = true
             Log.d(TAG, "rateOrSkip: Delay")
             val deleteResult = withContext(Dispatchers.IO) {
-                rateOrSkipDatabase(context, rate)
+                rateOrSkipDatabase(context, rate, requestId)
             }
 
             when (deleteResult) {
@@ -335,7 +336,7 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
-    private fun deleteRequestFromDatabase(context: Context): DeleteResult {
+    private fun deleteRequestFromDatabase(context: Context, requestId : Int): DeleteResult {
         try {
             val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
@@ -346,7 +347,7 @@ class ServiceRequestViewModel : ViewModel() {
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
-                val requestId = AppPreferences(context).getStringPreference("REQUEST_ID").toInt()
+//                val requestId = AppPreferences(context).getStringPreference("REQUEST_ID").toInt()
                 val customerId = AppPreferences(context).getStringPreference("CUSTOMER_ID").toInt()
 
                 val statusQuery = "SELECT status, customer_Id FROM $TABLE_NAME WHERE id = ?"
@@ -379,7 +380,8 @@ class ServiceRequestViewModel : ViewModel() {
     }
 
 
-    private fun rateOrSkipDatabase(context: Context, rate: Int): DeleteResult {
+    @SuppressLint("SuspiciousIndentation")
+    private fun rateOrSkipDatabase(context: Context, rate: Int, requestId: Int): DeleteResult {
         try {
             val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
@@ -390,8 +392,6 @@ class ServiceRequestViewModel : ViewModel() {
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
-                val requestId = AppPreferences(context).getStringPreference("REQUEST_ID").toInt()
-                val customerId = AppPreferences(context).getStringPreference("CUSTOMER_ID").toInt()
 
                 val statusQuery = if (rate == -1) {
                     "UPDATE service_request SET status = 5 WHERE service_request.id = ?"

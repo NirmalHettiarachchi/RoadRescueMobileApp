@@ -109,7 +109,7 @@ fun NoActivityActivitiesScreen() {
         ) {
             Spacer(modifier = Modifier.height(128.dp))
             Text(
-                text = "You don't have any activities yet",
+                text = "There are no activities to show!",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )

@@ -1,6 +1,8 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.maps.android.compose.GoogleMap
@@ -49,7 +52,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun TrackLocationScreen(
     currentStateViewModel: CurrentStateViewModel,
-    locationViewModel: LocationViewModel,
     context: Context,
 ) {
 
@@ -79,7 +81,9 @@ fun TrackLocationScreen(
             )
             if (request?.status?.toInt() == 2) {
                 PendingActivityTrackLocationScreen(
-                    locationViewModel
+                    request.location,
+                    request.serviceProviderName,
+                    LocalContext.current
                 )
             } else {
                 NoPendingActivityTrackLocationScreen()
@@ -104,7 +108,12 @@ fun NoPendingActivityTrackLocationScreen() {
         ) {
             Spacer(modifier = Modifier.height(128.dp))
             Text(
-                text = "No any accepted pending service requests!",
+                text = "There are no pending ",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Text(
+                text = "service requests to track!",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -115,7 +124,9 @@ fun NoPendingActivityTrackLocationScreen() {
 
 @Composable
 fun PendingActivityTrackLocationScreen(
-    locationViewModel: LocationViewModel,
+    latLong: String,
+    serviceProviderName: String,
+    context: Context
 ) {
     Card(
         modifier = cardModifier,
@@ -131,7 +142,7 @@ fun PendingActivityTrackLocationScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "A technician from Tech Garage is ",
+                text = "A technician from $serviceProviderName is ",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -149,7 +160,7 @@ fun PendingActivityTrackLocationScreen(
             Spacer(modifier = Modifier.height(16.dp))
             //displayLocation
             LocationDisplay(
-                locationViewModel = locationViewModel,
+                latLong,
                 modifier = Modifier
                     .border(width = 2.dp, color = Color.White)
                     .size(320.dp)
@@ -158,7 +169,11 @@ fun PendingActivityTrackLocationScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_DIAL)
+                    intent.data = Uri.parse("tel:+94768879830")
+                    context.startActivity(intent)
+                          },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 border = BorderStroke(width = 2.dp, color = Color.White),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
@@ -176,14 +191,16 @@ fun PendingActivityTrackLocationScreen(
 
 @Composable
 fun LocationDisplay(
-    locationViewModel: LocationViewModel,
+    latLongStr: String,
     modifier: Modifier
 ) {
-    val location = locationViewModel.location.value
+    val latitude = extractLatitude(latLongStr)
+    val longitude = extractLongitude(latLongStr)
 
-    if (location != null) {
+    if (latitude != null && longitude != null) {
 //        Text("Location: ${location.latitude} ${location.longitude}")
-        val curLocation = LatLng(location.latitude, location.longitude)
+//        Text("$latitude $longitude")
+        val curLocation = LatLng(latitude, longitude)
 
         val cameraPosition = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(curLocation, 15f)
@@ -205,4 +222,16 @@ fun LocationDisplay(
     } else {
         //
     }
+}
+
+fun extractLatitude(input: String): Double? {
+    val pattern = "latitude=([\\d.+-]+)".toRegex()
+    val matchResult = pattern.find(input)
+    return matchResult?.groupValues?.get(1)?.toDouble()
+}
+
+fun extractLongitude(input: String): Double? {
+    val pattern = "longitude=([\\d.+-]+)".toRegex()
+    val matchResult = pattern.find(input)
+    return matchResult?.groupValues?.get(1)?.toDouble()
 }
