@@ -437,7 +437,7 @@ fun PendingActivityDashboard(
                 ) {
                     Text(
                         text = "Cost: LKR ${
-                            AppPreferences(context).getStringPreference("COST")
+                            request.approxCost
                         }",
                         style = textStyle2,
                     )
