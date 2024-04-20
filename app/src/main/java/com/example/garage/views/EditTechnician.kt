@@ -147,7 +147,7 @@ fun EditTechnician(
         if (technicianDetails?.techProfileRef!="0") {
             bitmap.value=getSaveImage(technicianDetails?.techProfileRef)
         }
-        val response=loadExpertiseArias(viewModel,coroutineScope)
+        val response=loadExpertiseArias(viewModel)
         if (response != null) {
             if(response?.status==200){
 

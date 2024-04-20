@@ -147,6 +147,8 @@ class MainViewModel : ViewModel() {
                         deferred.completeExceptionally(t)
                     }
 
+
+
                 })
 
             } catch (e: Exception) {
@@ -360,11 +362,6 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch{
             try {
 
-                val garageData = garageService.getGarageData("search", "1")
-
-
-
-
                 val call = garageService.updateGarage(UpdateGarage(
                     garage.getGarageId(),
                     garage.getGarageName(),
@@ -406,5 +403,95 @@ class MainViewModel : ViewModel() {
         deferred.await()
     }
 
+    suspend fun getGarageServiceRequest(
+        searchId:String,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.getServiceRequests(searchId,option)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+
+    suspend fun assignTechnicianForService(
+        serviceRequestId:Int,
+        serviceProviderId:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.updateServiceRequest(id = serviceRequestId, serviceProviderId =serviceProviderId)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
 
 }

@@ -68,8 +68,6 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.R
-import com.example.garage.models.Garage
-import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageProfileViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
@@ -80,26 +78,18 @@ import org.json.JSONArray
 
 @Composable
 fun GarageProfile(
-    garageId: String?,
-    garageName: String?,
-    garageContactNumber: String?,
-    garageStatus: String?,
-    garageRating: String?,
-    garageType: String?,
-    garageEmail: String?,
-    garageOwner: String?,
-    garageProfileImageRef:String?,
     navController: NavController,
     navyStatus: String,
-    garageSharedViewModel: GarageSharedViewModel,
+    garageSharedViewModel: GarageSharedViewModel
 ) {
+
+    var garageData = garageSharedViewModel.garage
 
     var garageRatings by remember { mutableStateOf("") }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val context= LocalContext.current
     var img: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
     var bitmap= remember { mutableStateOf(img) }
 
@@ -108,23 +98,11 @@ fun GarageProfile(
 
         garageRatings="not insert the rating"
     }else{
-        if (garageRating != null) {
-            garageRatings=garageRating
+        if (garageData?.garageRating != null) {
+            garageRatings=garageData.garageRating
         }
     }
 
-
-    val processGarage = Garage(
-        garageId!!,
-        garageName!!,
-        garageOwner!!,
-        garageContactNumber!!,
-        garageStatus!!,
-        garageEmail!!,
-        garageRating?.toFloat()!!,
-        garageType!!,
-        garageProfileImageRef!!
-    )
 
 
 
@@ -143,11 +121,11 @@ fun GarageProfile(
     var buttonTwoName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        if (garageProfileImageRef!="0") {
-            bitmap.value=getSaveImage(garageProfileImageRef)
+        if (garageData?.garageProfileImageRef!="0") {
+            bitmap.value=getSaveImage(garageData?.garageProfileImageRef)
         }
         Log.d("image",img.toString())
-        val response=loadExpertiseArias(viewModel,coroutineScope)
+        val response=loadExpertiseArias(viewModel)
         if (response != null) {
             if(response?.status==200){
 
@@ -295,7 +273,7 @@ fun GarageProfile(
                                     .align(Alignment.Bottom)
                                     .background(Color(0xFF253555), shape = RoundedCornerShape(4.dp))
                                     .clickable {
-                                        val garageData = GarageCommonDetails(
+                                        /*val garageData = GarageCommonDetails(
                                             processGarage.getGarageId(),
                                             processGarage.getGarageName(),
                                             processGarage.getGarageContactNumber(),
@@ -307,8 +285,10 @@ fun GarageProfile(
                                             processGarage.getGarageType(),
                                             processGarage.getOwnerName(),
                                             processGarage.getGarageProfilePicRef()
-                                        )
-                                        garageSharedViewModel.garageCommonDetails(garageData)
+                                        )*/
+                                        /*if (garageData != null) {
+                                            tempViewModel.garageCommonDetails(garageData)
+                                        }*/
                                         navController.navigate(route = Screen.GarageProfileEdit.route)
                                     }
                             )
@@ -330,10 +310,10 @@ fun GarageProfile(
                                                     fontSize = 50.sp
                                                 )
                                             ) {
-                                                append(garageName[0].toString())
+                                                garageData?.garageName?.get(0)?.let { it1 -> append(it1.toString()) }!!
                                             }
 
-                                            append(garageName.substring(1))
+                                            append(garageData?.garageName?.substring(1))
 
                                             withStyle(
                                                 style = SpanStyle(
@@ -364,9 +344,9 @@ fun GarageProfile(
                                     )
 
 
-                                    if (garageRating!=null){
+                                    garageData?.garageOwner?.let { it1 ->
                                         Text(
-                                            text = garageOwner,
+                                            text = it1,
                                             color = Color(0xB3000000),
                                             fontWeight = FontWeight.ExtraBold,
                                             fontSize = 20.sp
@@ -393,7 +373,7 @@ fun GarageProfile(
                                     .clickable {
                                         val intent = Intent(
                                             Intent.ACTION_DIAL,
-                                            Uri.parse("tel:${garageContactNumber}")
+                                            Uri.parse("tel:${garageData?.garageContactNumber}")
                                         )
                                         context.startActivity(intent)
                                     },
@@ -406,9 +386,9 @@ fun GarageProfile(
                                     tint = Color.White
                                 )
 
-                                if (garageContactNumber != null) {
+                                if (garageData?.garageContactNumber != null) {
                                     Text(
-                                        text = garageContactNumber,
+                                        text = garageData.garageContactNumber,
                                         color = Color(0xB3000000),
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(36.dp, 0.dp)
@@ -421,7 +401,7 @@ fun GarageProfile(
                                     .weight(1f)
                                     .fillMaxSize()
                                     .clickable {
-                                        garageEmail?.let { email ->
+                                        garageData?.garageEmail?.let { email ->
                                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                                 data = Uri.parse("mailto:$email")
                                             }
@@ -440,9 +420,9 @@ fun GarageProfile(
                                     tint = Color.White
                                 )
 
-                                if (garageEmail != null) {
+                                if (garageData?.garageEmail != null) {
                                     Text(
-                                        text = garageEmail,
+                                        text = garageData.garageEmail,
                                         color = Color(0xB3000000),
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(36.dp, 0.dp),

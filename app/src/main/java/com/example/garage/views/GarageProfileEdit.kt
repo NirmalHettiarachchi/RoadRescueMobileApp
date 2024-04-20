@@ -141,6 +141,7 @@ fun GarageProfileEdit(
 
 
     LaunchedEffect(Unit) {
+        Log.d("TAG profileEdit", "${garageData?.garageProfileImageRef}")
         if (garageData?.garageProfileImageRef!="0") {
             bitmap.value=getSaveGarageImage(garageData?.garageProfileImageRef)
         }
@@ -231,7 +232,10 @@ fun GarageProfileEdit(
                                         .background(Color.Unspecified)
                                         .clip(CircleShape)
                                         .clickable { }
-                                        .border(BorderStroke(2.dp, Color.Unspecified), shape = CircleShape),
+                                        .border(
+                                            BorderStroke(2.dp, Color.Unspecified),
+                                            shape = CircleShape
+                                        ),
                                     contentDescription = "Garage Pitcher",
                                     contentScale = ContentScale.Crop,
                                 )
@@ -255,7 +259,9 @@ fun GarageProfileEdit(
 
                         Text(
                             text = "Garage Name",
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,160.dp,0.dp),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 160.dp, 0.dp),
                             style = textStyle2
                         )
 
@@ -272,7 +278,9 @@ fun GarageProfileEdit(
 
                         Text(
                             text = "Owner Name",
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,168.dp,0.dp),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 168.dp, 0.dp),
                             style = textStyle2
                         )
 
@@ -285,7 +293,9 @@ fun GarageProfileEdit(
 
                         Text(
                             text = "Garage Status",
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,155.dp,0.dp),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 155.dp, 0.dp),
                             style = textStyle2
                         )
 
@@ -298,7 +308,9 @@ fun GarageProfileEdit(
 
                         Text(
                             text = "Contact number",
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,140.dp,0.dp),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 140.dp, 0.dp),
                             style = textStyle2
                         )
 
@@ -311,7 +323,9 @@ fun GarageProfileEdit(
 
                         Text(
                             text = "Email",
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,200.dp,0.dp),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 200.dp, 0.dp),
                             style = textStyle2
                         )
 
@@ -455,15 +469,6 @@ fun GarageProfileEdit(
                     .fillMaxSize()
             ) {
 
-                var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-                val photoPickerLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.PickVisualMedia(),
-                    onResult = {
-                        selectedImageUri = it
-                    }
-                )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -509,7 +514,9 @@ fun GarageProfileEdit(
 
                 Text(
                     text = "Garage Name",
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,160.dp,0.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 0.dp, 160.dp, 0.dp),
                     style = textStyle2
                 )
 
@@ -526,7 +533,9 @@ fun GarageProfileEdit(
 
                 Text(
                     text = "Owner Name",
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,168.dp,0.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 0.dp, 168.dp, 0.dp),
                     style = textStyle2
                 )
 
@@ -539,7 +548,9 @@ fun GarageProfileEdit(
 
                 Text(
                     text = "Garage Status",
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,155.dp,0.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 0.dp, 155.dp, 0.dp),
                     style = textStyle2
                 )
 
@@ -552,7 +563,9 @@ fun GarageProfileEdit(
 
                 Text(
                     text = "Contact number",
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,140.dp,0.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 0.dp, 140.dp, 0.dp),
                     style = textStyle2
                 )
 
@@ -565,7 +578,9 @@ fun GarageProfileEdit(
 
                 Text(
                     text = "Email",
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(0.dp,0.dp,200.dp,0.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(0.dp, 0.dp, 200.dp, 0.dp),
                     style = textStyle2
                 )
 
@@ -789,7 +804,6 @@ fun saveImageGarage(context: Context, tempBitmap: Bitmap, garageId: String?):Str
 
 fun getSaveGarageImage(techImageRef:String?): Bitmap {
     var bitmap: Bitmap = BitmapFactory.decodeResource(Resources.getSystem(),android.R.drawable.ic_menu_report_image)
-    Log.d("img 2 ","$bitmap")
     val directory= File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             .toString()+ File.separator+"RodaRescue")

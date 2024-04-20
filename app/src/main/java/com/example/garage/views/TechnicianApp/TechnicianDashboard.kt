@@ -144,7 +144,7 @@ fun TechnicianDashboard(
 fun ServiceRequest(navController: NavController,modifier: Modifier) {
 
     val garageDetails = ServicesRequestModel(
-        "Nirmal Dakshina", "date",
+        15,"Nirmal Dakshina", "date",
         "Tire Punch", "Need help as soon as possible", 25000.00,"paka"
     )
     val phoneNumber = "0716788537"

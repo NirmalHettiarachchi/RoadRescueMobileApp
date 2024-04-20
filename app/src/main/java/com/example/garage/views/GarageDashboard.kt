@@ -206,8 +206,6 @@ fun GarageDashboard(
             val garageType = jsonObject.getString("garageType")
             val garageProfileImageRef = jsonObject.getString("imageRef")
 
-
-
             garageDetailsBackend.setGarageName(garageName)
             garageDetailsBackend.setOwnerName(ownerName)
             garageDetailsBackend.setGarageContactNumber(garageContactNumber)
@@ -217,29 +215,29 @@ fun GarageDashboard(
             garageDetailsBackend.setGarageType(garageType)
             garageDetailsBackend.setGarageProfilePicRef(garageProfileImageRef)
 
+
+            // Sheared garage common details using Parcelize
+            val garageCommonDetails = GarageCommonDetails(
+                "1",
+                garageDetailsBackend.getGarageName(),
+                garageDetailsBackend.getGarageContactNumber(),
+                garageDetailsBackend.getGarageStatus(),
+                garageDetailsBackend.getGarageEmail(),
+                garageDetailsBackend.getGarageRating().toString(),
+                garageDetailsBackend.getGarageType(),
+                garageDetailsBackend.getOwnerName(),
+                garageDetailsBackend.getGarageProfilePicRef()
+            )
+            garageSharedViewModel.garageCommonDetails(garageCommonDetails)
+
+
         } catch (e: JSONException) {
             e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
         }
 
     }
 
-    // Sheared garage common details using Parcelize
-    val garageCommonDetails = GarageCommonDetails(
-        "1",
-        garageDetailsBackend.getGarageName(),
-        garageDetailsBackend.getGarageContactNumber(),
-        garageDetailsBackend.getGarageStatus(),
-        garageDetailsBackend.getGarageEmail(),
-        garageDetailsBackend.getGarageRating().toString(),
-        garageDetailsBackend.getGarageType(),
-        garageDetailsBackend.getOwnerName(),
-        garageDetailsBackend.getGarageProfilePicRef()
-    )
 
-    navController.currentBackStackEntry?.savedStateHandle?.set(
-        key = "garageDetails",
-        value = garageCommonDetails
-    )
 
 
     ModalNavigationDrawer(
@@ -310,13 +308,10 @@ fun GarageDashboard(
                                 val requestTime = jsonObject.getString("requestTimeStamp")
                                 val description = jsonObject.getString("description")
                                 val indicatorLightStatus = jsonObject.getString("indicatorLightStatus")
+                                val serviceRequestId = jsonObject.getInt("serviceRequestId")
 
-                                Log.d("issue", "$issue ")
-                                Log.d("customerContactNumber", "$customerContactNumber ")
-                                Log.d("approx_cost", "$approx_cost ")
-                                Log.d("requestTimeStamp", "$requestTime ")
-                                Log.d("indicatorLightStatus", "$indicatorLightStatus ")
-                                var serviceRequest=ServicesRequestModel(customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
+
+                                var serviceRequest=ServicesRequestModel(serviceRequestId,customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
 
                                 ServiceRequest(
                                     serviceRequest,
@@ -353,7 +348,7 @@ suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
     var response: ResponseObject? = null
 
     try {
-        viewModel.getGarageDetails("1", "getServices") { responseObject ->
+        viewModel.getGarageServiceRequest("1", "getServices") { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {
@@ -403,6 +398,7 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
 
     var techniciansList = emptyList<String>()
 
+    
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -537,47 +533,47 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
             ) {
 
                 coroutineScope.launch {
-                    var technicianResponce: ResponseObject? = null
+                    var technicianResponse: ResponseObject? = null
                     when (serviceRequest.getIssue()) {
                         "Mechanical Issues" -> {
-                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "Other")
+                            technicianResponse = loadTechniciansGroupByIssue(viewModel, "Other")
                         }
 
                         "Electrical Issues" -> {
-                            technicianResponce = loadTechniciansGroupByIssue(
+                            technicianResponse = loadTechniciansGroupByIssue(
                                 viewModel,
                                 "Electrical System Troubleshooting"
                             )
                         }
 
                         "Engine Problems" -> {
-                            technicianResponce =
+                            technicianResponse =
                                 loadTechniciansGroupByIssue(viewModel, "Engine Maintenance")
                         }
 
                         "Fuel Issues" -> {
-                            technicianResponce =
+                            technicianResponse =
                                 loadTechniciansGroupByIssue(viewModel, "Oil System Maintenance")
                         }
 
                         "Exhaust Issues" -> {
-                            technicianResponce =
+                            technicianResponse =
                                 loadTechniciansGroupByIssue(viewModel, "Engine Maintenance")
                         }
 
                         "Cooling Problems" -> {
-                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "HVAC")
+                            technicianResponse = loadTechniciansGroupByIssue(viewModel, "HVAC")
                         }
 
                         "Other" -> {
-                            technicianResponce = loadTechniciansGroupByIssue(viewModel, "Other")
+                            technicianResponse = loadTechniciansGroupByIssue(viewModel, "Other")
                         }
                     }
 
-                    if (technicianResponce != null) {
-                        if (technicianResponce.status == 200) {
+                    if (technicianResponse != null) {
+                        if (technicianResponse.status == 200) {
 
-                            val filterTechnicians = technicianResponce.data!!.toString()
+                            val filterTechnicians = technicianResponse.data!!.toString()
 
                             val jsonArray = JSONArray(filterTechnicians)
 
@@ -590,35 +586,35 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
                                 techniciansList += "$techId-$techFName $techLName"
                             }
 
-                        } else if (technicianResponce.status == 400) {
-                            title = technicianResponce.status.toString()
-                            message = technicianResponce.message.toString()
+                        } else if (technicianResponse.status == 400) {
+                            title = technicianResponse.status.toString()
+                            message = technicianResponse.message.toString()
                             buttonOneName = "Ok"
                             buttonTwoName = "null"
                             showMessageDialog = true
 
-                        } else if (technicianResponce.status == 404) {
-                            title = technicianResponce.status.toString()
-                            message = technicianResponce.message.toString()
+                        } else if (technicianResponse.status == 404) {
+                            title = technicianResponse.status.toString()
+                            message = technicianResponse.message.toString()
                             buttonOneName = "Ok"
                             buttonTwoName = "null"
                             showMessageDialog = true
 
-                        } else if (technicianResponce.status == 500) {
-                            title = technicianResponce.status.toString()
-                            message = technicianResponce.message.toString()
+                        } else if (technicianResponse.status == 500) {
+                            title = technicianResponse.status.toString()
+                            message = technicianResponse.message.toString()
                             buttonOneName = "Ok"
                             buttonTwoName = "null"
                             showMessageDialog = true
-                        } else if (technicianResponce.status == 508) {
-                            title = technicianResponce.status.toString()
-                            message = technicianResponce.message.toString()
+                        } else if (technicianResponse.status == 508) {
+                            title = technicianResponse.status.toString()
+                            message = technicianResponse.message.toString()
                             buttonOneName = "null"
                             buttonTwoName = "null"
                             showMessageDialog = true
                         } else {
-                            title = technicianResponce.status.toString()
-                            message = technicianResponce.message.toString()
+                            title = technicianResponse.status.toString()
+                            message = technicianResponse.message.toString()
                             buttonOneName = "Ok"
                             buttonTwoName = "null"
                             showMessageDialog = true
@@ -654,7 +650,10 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.End
                             ) {
-                                IconButton(onClick = { showDialog = false }) {
+                                IconButton(onClick = {
+                                    techniciansList= emptyList()
+                                    showDialog = false
+                                }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "close icon",
@@ -688,33 +687,17 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
 
                             // accept button load
 
+                            Log.d("dropDownValue", "$option")
 
                             CommonButton(
                                 btnName = "Assign",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
-
-/*
-//                                    garageViewModel.fetchBackend()
-                                    Log.d("rsp","request is ok ")
-
-//                                    val  viewState by garageViewModel.backendState
-
-                                    when{
-
-                                        viewState!!.loading -> {
-                                            // loading  wanna mona hari danna
-                                            Log.d("loading","${viewState?.loading}")
-                                        }
-
-                                        viewState?.error !=null ->{
-                                            viewState?.error!!.message?.let { Log.d("err", "it") }
-                                        }
-
-                                        viewState?.response !=null -> {
-                                            Log.d("data final","${viewState?.response!!.data}")
-                                        }
-                                    }*/
+                                    val serviceProviderId="1"
+                                    val parts = option.toString().split("-")
+                                    coroutineScope.launch {
+                                        assignTechnicianForService(serviceRequest.getServiceRequestId(),serviceProviderId,parts[0])
+                                    }
 
                                 }
                             )
@@ -738,6 +721,32 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
             }
         )
     }
+}
+
+
+
+suspend fun assignTechnicianForService(
+    serviceRequestId: Int, serviceProviderId: String,
+    technicianId: String
+):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+       /* viewModel.getTechnicians("$issueCategory-1", "filterTechByIssue") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }*/
+    } catch (e: SocketTimeoutException) {
+        // handle
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+
+    return response
 }
 
 suspend fun loadTechniciansGroupByIssue(viewModel: MainViewModel,issueCategory:String):ResponseObject? {

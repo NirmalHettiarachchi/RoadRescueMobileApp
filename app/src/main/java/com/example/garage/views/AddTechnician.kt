@@ -44,7 +44,6 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.MainViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.net.SocketTimeoutException
@@ -71,9 +70,11 @@ fun AddTechnician(
 
 
     LaunchedEffect(Unit) {
-        val response=loadExpertiseArias(viewModel,coroutineScope)
+        Log.d("TAG 1", "AddTechnician: 1")
+        val response=loadExpertiseArias(viewModel)
+
         if (response != null) {
-            if(response?.status==200){
+            if(response.status ==200){
 
                 expertiseAriasList= response.data!!.toString()
                 showExpertiseArias=true
@@ -119,6 +120,7 @@ fun AddTechnician(
             showDialog.value=true
             Log.d("response null","null")
         }
+       // delay(1000*30)
     }
 
     ModalNavigationDrawer(
@@ -358,11 +360,13 @@ fun AddTechnician(
 
 }
 
-suspend fun loadExpertiseArias(viewModel: MainViewModel, coroutineScope: CoroutineScope): ResponseObject? {
+suspend fun loadExpertiseArias(viewModel: MainViewModel): ResponseObject? {
     var response: ResponseObject? =null
-
+    Log.d("TAG 2", "AddTechnician: 2")
     try {
+        Log.d("TAG 3", "AddTechnician: 3")
         viewModel.getExpertiseArias("","expertise"){responseObject ->
+            Log.d("TAG 8", "AddTechnician: 8")
             if (responseObject!=null){
                 response=responseObject
             }else{

@@ -115,7 +115,11 @@ val cardDefaultModifier=Modifier
 
  val closerButtonStyles=Modifier
      .background(Color.Transparent, shape = RoundedCornerShape(20.dp))
-     .border(BorderStroke(2.dp, Color(0xB5D32222)), shape = RoundedCornerShape(20.dp))
+     .border(BorderStroke(2.dp, Color(0xFF253555)), shape = RoundedCornerShape(20.dp))
+
+val deleteIconStyles=Modifier
+    .background(Color.Transparent, shape = RoundedCornerShape(20.dp))
+    .border(BorderStroke(2.dp, Color(0xB5D32222)), shape = RoundedCornerShape(20.dp))
 
 fun changeStatusType(technician: GarageTechnician): String {
     return if (technician.getTechStatus()==1){

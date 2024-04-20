@@ -1,6 +1,7 @@
 package com.example.garage.models
 
 class ServicesRequestModel(
+    private var _serviceRequestId: Int,
     private var _customerContactNumber: String,
     private var _time: String,
     private var _issue: String,
@@ -9,6 +10,14 @@ class ServicesRequestModel(
     private var _indicatorLightStatus: String,
 
     ) {
+
+    fun getServiceRequestId(): Int {
+        return this._serviceRequestId
+    }
+
+    fun setServiceRequestId(serviceRequestId: Int) {
+        this._serviceRequestId=serviceRequestId
+    }
 
     fun getCustomerContactNumber(): String {
         return this._customerContactNumber

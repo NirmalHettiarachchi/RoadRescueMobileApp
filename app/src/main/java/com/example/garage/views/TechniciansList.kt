@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
@@ -432,7 +431,6 @@ fun TechniciansLoadStretcher(
                         techProfileRef = technician.getTechImageRef()
                     )
 
-                    Log.d("imgRef-1", technician.getTechImageRef())
 
                     sharedViewModel.techData(technicianData)
                     navController.navigate(route = Screen.EditTechnician.route)
@@ -492,7 +490,7 @@ fun TechniciansLoadStretcher(
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "delete icon",
-                                modifier = closerButtonStyles.size(64.dp),
+                                modifier = deleteIconStyles.size(64.dp),
                                 tint = Color(0xB5D32222),
 
                             )
@@ -603,17 +601,6 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.End
                         ) {
 
-                            IconButton(onClick = {
-                                showInfoDialog = false
-                                navController.navigate(route = Screen.EditTechnician.route)
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit icon",
-                                    modifier = closerButtonStyles,
-                                    tint = Color.White
-                                )
-                            }
 
                             IconButton(onClick = { showInfoDialog = false }) {
                                 Icon(
@@ -786,7 +773,8 @@ fun TechniciansLoadStretcher(
                                         text = temp,
                                         color = Color.Black,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier
+                                        modifier = Modifier,
+                                        maxLines = 2
                                     )
                                 }
                             }
