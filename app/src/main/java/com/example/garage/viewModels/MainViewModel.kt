@@ -450,15 +450,17 @@ class MainViewModel : ViewModel() {
 
 
     suspend fun assignTechnicianForService(
+        option: String,
         serviceRequestId:Int,
         serviceProviderId:String,
+        technicianId:String,
         onResponseReceived: (ResponseObject?) -> Unit
     ){
         val deferred = CompletableDeferred<ResponseObject>()
 
         viewModelScope.launch {
             try {
-                val call = garageService.updateServiceRequest(id = serviceRequestId, serviceProviderId =serviceProviderId)
+                val call = garageService.updateServiceRequest(option = option,serviceId = serviceRequestId, serviceProviderId =serviceProviderId, technicianId = technicianId)
                 call.enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                         if (response.isSuccessful) {

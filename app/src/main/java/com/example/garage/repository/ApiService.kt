@@ -18,7 +18,7 @@ import retrofit2.http.Query
 
 
 
-private val ipV4Address="10.22.162.54"
+private val ipV4Address="192.168.28.117"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
@@ -55,5 +55,10 @@ interface ApiService {
     @GET("service")
     fun getServiceRequests(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
     @PUT("service")
-    fun updateServiceRequest(@Query("id")id:Int,@Query("serviceProviderId")serviceProviderId:String): Call<ResponseBody>
+    fun updateServiceRequest(
+        @Query("option") option:String,
+        @Query("serviceId")serviceId:Int,
+        @Query("serviceProviderId")serviceProviderId:String,
+        @Query("technicianId")technicianId:String
+        ): Call<ResponseBody>
 }

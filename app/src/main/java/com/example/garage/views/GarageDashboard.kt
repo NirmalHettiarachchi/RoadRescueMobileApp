@@ -56,6 +56,7 @@ import com.example.garage.models.Garage
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.GarageCommonDetails
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.delay
@@ -314,6 +315,7 @@ fun GarageDashboard(
                                 var serviceRequest=ServicesRequestModel(serviceRequestId,customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
 
                                 ServiceRequest(
+                                    navController,
                                     serviceRequest,
                                     Modifier.align(Alignment.CenterHorizontally),
                                     viewModel
@@ -385,7 +387,7 @@ suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,viewModel: MainViewModel) {
+fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestModel, modifier: Modifier,viewModel: MainViewModel) {
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -395,7 +397,8 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
     var showMessageDialog by remember { mutableStateOf(false) }
-
+    var showDialog by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(false) }
     var techniciansList = emptyList<String>()
 
     
@@ -408,7 +411,7 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
 
         ) {
 
-        var showDialog by remember { mutableStateOf(false) }
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -694,9 +697,58 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
                                     val serviceProviderId="1"
-                                    val parts = option.toString().split("-")
+                                    Log.d("TAG test assign button is work", "ServiceRequest: work assign button")
                                     coroutineScope.launch {
-                                        assignTechnicianForService(serviceRequest.getServiceRequestId(),serviceProviderId,parts[0])
+                                        val responseObject= assignTechnicianForService(viewModel,serviceRequest.getServiceRequestId(),serviceProviderId,option.toString())
+
+                                        if (responseObject!=null) {
+                                            if(responseObject.status==200){
+                                                title="Success"
+                                                message= responseObject.message.toString()
+                                                buttonOneName="null"
+                                                buttonTwoName="null"
+                                                showAlert=true
+
+                                            } else if (responseObject.status == 400) {
+                                                title = responseObject.status.toString()
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "Ok"
+                                                buttonTwoName = "null"
+                                                showAlert = true
+
+                                            } else if (responseObject.status == 404) {
+                                                title = responseObject.status.toString()
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "Ok"
+                                                buttonTwoName = "null"
+                                                showAlert = true
+
+                                            } else if (responseObject.status == 500) {
+                                                title = responseObject.status.toString()
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "Ok"
+                                                buttonTwoName = "null"
+                                                showAlert = true
+                                            } else if (responseObject.status == 508) {
+                                                title = responseObject.status.toString()
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "null"
+                                                buttonTwoName = "null"
+                                                showAlert = true
+                                            } else {
+                                                title = responseObject.status.toString()
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "Ok"
+                                                buttonTwoName = "null"
+                                                showAlert = true
+                                            }
+                                        }else{
+                                            title = "401"
+                                            message = "Cannot call the sever"
+                                            buttonOneName = "Ok"
+                                            buttonTwoName = "null"
+                                            showAlert = true
+                                        }
                                     }
 
                                 }
@@ -721,24 +773,39 @@ fun ServiceRequest(serviceRequest: ServicesRequestModel, modifier: Modifier,view
             }
         )
     }
+
+    if (showAlert) {
+        sweetAlertDialog(
+            title = title,
+            message = message,
+            buttonOneName = buttonOneName,
+            buttonTwoName = buttonTwoName,
+            onConfirm = {
+                showMessageDialog = false
+                navController.navigate(route = Screen.GarageDashboard.route)
+            }
+        )
+    }
 }
 
 
 
 suspend fun assignTechnicianForService(
-    serviceRequestId: Int, serviceProviderId: String,
+    viewModel: MainViewModel,
+    serviceRequestId: Int,
+    serviceProviderId: String,
     technicianId: String
 ):ResponseObject? {
     var response: ResponseObject? = null
 
     try {
-       /* viewModel.getTechnicians("$issueCategory-1", "filterTechByIssue") { responseObject ->
+        viewModel.assignTechnicianForService("assignTechnician",serviceRequestId,serviceProviderId,technicianId) { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {
                 response = ResponseObject(400, "response is null", null)
             }
-        }*/
+        }
     } catch (e: SocketTimeoutException) {
         // handle
         response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
