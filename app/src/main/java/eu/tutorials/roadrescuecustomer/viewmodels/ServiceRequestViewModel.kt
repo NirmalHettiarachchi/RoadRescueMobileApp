@@ -1,10 +1,12 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +14,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.stripe.android.PaymentConfiguration
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
+import com.stripe.android.paymentsheet.PaymentSheetResultCallback
+import eu.tutorials.roadrescuecustomer.data.api.ApiInterface
+import eu.tutorials.roadrescuecustomer.data.api.ApiUtilities
+import eu.tutorials.roadrescuecustomer.data.model.PaymentResponse
 import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
 import eu.tutorials.roadrescuecustomer.models.FuelType
 import eu.tutorials.roadrescuecustomer.models.Issues
@@ -21,6 +30,7 @@ import eu.tutorials.roadrescuecustomer.models.VehicleMake
 import eu.tutorials.roadrescuecustomer.models.VehicleModel
 import eu.tutorials.roadrescuecustomer.models.VehicleType
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
+import eu.tutorials.roadrescuecustomer.views.getActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,6 +47,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.log
 
 class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
@@ -74,6 +85,9 @@ class ServiceRequestViewModel : ViewModel() {
     private val _requestCount = MutableStateFlow(0) // Initial value
     val requestCount: StateFlow<Int> = _requestCount
 
+    private val _payment = MutableSharedFlow<PaymentResponse>()
+    val payment = _payment.asSharedFlow()
+
     val loading = mutableStateOf(false)
 
     private val _deleteLoading = MutableSharedFlow<Boolean>()
@@ -81,6 +95,15 @@ class ServiceRequestViewModel : ViewModel() {
 
     private val _ratingLoading = MutableSharedFlow<Boolean>()
     val ratingLoading = _ratingLoading.asSharedFlow()
+
+    private val _paymentDone = MutableSharedFlow<Boolean>()
+    val paymentDone = _paymentDone.asSharedFlow()
+
+    private val _showError = MutableSharedFlow<String>()
+    val showError = _showError.asSharedFlow()
+
+
+    private var apiInterface = ApiUtilities.getApiInterface()
 
     fun setServiceRequest(
         context: Context,
@@ -91,6 +114,58 @@ class ServiceRequestViewModel : ViewModel() {
             serviceRequest,
             requestCallback
         )
+    }
+    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+//        To handle it here in Checkout ViewModel
+        when (paymentSheetResult) {
+            is PaymentSheetResult.Canceled -> {
+                Log.d(TAG, "paymentSheetResult - Canceled")
+
+            }
+
+            is PaymentSheetResult.Failed -> {
+                Log.d(TAG, "paymentSheetResult - Error: ${paymentSheetResult.error}")
+            }
+
+            is PaymentSheetResult.Completed -> {
+                // Display for example, an order confirmation screen
+                Log.d(TAG, "paymentSheetResult - Completed")
+            }
+        }
+    }
+    fun initStipePayment(
+        amount: Int,
+        description: String,
+        name: String
+    ) {
+        viewModelScope.launch {
+
+            val response = apiInterface.getPaymentDetail(
+                amount,
+                description,
+                name
+            )
+            if (response.isSuccessful) {
+                Log.d(TAG, "initStipePayment: paymentIntent ${response.body()?.paymentIntent}")
+                Log.d(TAG, "initStipePayment: customer ${response.body()?.customer}")
+                Log.d(TAG, "initStipePayment: ephemeralKey ${response.body()?.ephemeralKey}")
+                Log.d(TAG, "initStipePayment: publishableKey ${response.body()?.publishableKey}")
+                Log.d(TAG, "initStipePayment: ${response.message()}")
+
+
+                if (response.body() != null) {
+                    if(response.body()?.status == 200){
+                        _payment.emit(response.body()!!)
+                    }else{
+                        _showError.emit("Payment Error Retry Please!")
+                    }
+                }else{
+                    _showError.emit("Payment Error Retry Please!")
+                }
+            } else {
+                Log.d(TAG, "initStipePayment: Response Failed")
+            }
+        }
     }
 
     fun checkRequest(
@@ -161,6 +236,37 @@ class ServiceRequestViewModel : ViewModel() {
             Log.d(TAG, "rateOrSkip: End")
             loading.value = false
             _ratingLoading.emit(true)
+        }
+    }
+
+
+    fun paymentDone(context: Context, requestId: Int) {
+        viewModelScope.launch {
+            Log.d(TAG, "paymentDone: Started")
+            loading.value = true
+            Log.d(TAG, "paymentDone: Delay")
+            val deleteResult = withContext(Dispatchers.IO) {
+                paymentDoneDatabase(requestId)
+            }
+
+            when (deleteResult) {
+                is DeleteResult.Success -> {
+                    Toast.makeText(context, "Payment done successfully", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is DeleteResult.Failure -> {
+                    // This also runs on the main thread, safe to show a Toast
+                    Toast.makeText(context, deleteResult.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {
+
+                }
+            }
+            Log.d(TAG, "paymentDone: End")
+            loading.value = false
+            _paymentDone.emit(true)
         }
     }
 
@@ -336,7 +442,7 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
-    private fun deleteRequestFromDatabase(context: Context, requestId : Int): DeleteResult {
+    private fun deleteRequestFromDatabase(context: Context, requestId: Int): DeleteResult {
         try {
             val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
@@ -414,7 +520,7 @@ class ServiceRequestViewModel : ViewModel() {
 //
 //
 //                        if (resultSet.next()) {
-                            return DeleteResult.Success
+                    return DeleteResult.Success
 //                        } else {
 //                            return DeleteResult.Failure("No matching request found")
 //                        }
@@ -423,6 +529,34 @@ class ServiceRequestViewModel : ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
             return DeleteResult.Failure("Error cancelling request")
+        }
+    }
+
+    private fun paymentDoneDatabase(requestId: Int): DeleteResult {
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val TABLE_NAME = "service_request"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            DriverManager.getConnection(url, username, databasePassword).use { connection ->
+
+                val statusQuery =
+                    "UPDATE service_request SET status = 4 WHERE service_request.id = ?"
+
+                connection.prepareStatement(statusQuery).use { preparedStatement ->
+                    preparedStatement.setInt(1, requestId)
+
+                    preparedStatement.executeUpdate()
+                    return DeleteResult.Success
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return DeleteResult.Failure("Error")
         }
     }
 

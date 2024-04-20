@@ -81,4 +81,8 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.google.firebase:firebase-auth:16.0.5")
+
+    //Stipe
+    implementation("com.stripe:stripe-android:20.41.0")
+    implementation("com.stripe:stripe-java:23.0.0")
 }

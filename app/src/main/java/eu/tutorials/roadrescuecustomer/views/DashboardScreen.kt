@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.stripe.android.paymentsheet.PaymentSheetResult
+import com.stripe.android.paymentsheet.rememberPaymentSheet
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.R
@@ -74,6 +76,7 @@ import java.util.Date
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @Composable
 fun DashboardScreen(
@@ -641,7 +644,43 @@ fun ServiceProvidedDashboard(
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
 
+    val paymentSheet = rememberPaymentSheet{paymentSheetResult->
+        Log.d("TAG", "PaymentMethodDialog: ${paymentSheetResult}")
+        when(paymentSheetResult) {
+            is PaymentSheetResult.Canceled -> {
+                print("Canceled")
+
+            }
+            is PaymentSheetResult.Failed -> {
+                print("Error: ${paymentSheetResult.error}")
+            }
+            is PaymentSheetResult.Completed -> {
+                Log.d("TAG", "PaymentMethodDialog: Payment Done.....")
+                serviceRequestViewModel.paymentDone(
+                    context,
+                    request.id.toInt()
+                )
+            }
+        }
+    }
+
+
     val loading by serviceRequestViewModel.loading
+
+    LaunchedEffect(key1 = Unit) {
+        serviceRequestViewModel.paymentDone.collect {result->
+            if(result){
+                currentStateViewModel.fetchLatestRequest(
+                    AppPreferences(context).getStringPreference(
+                        "CUSTOMER_ID",
+                        ""
+                    ),
+                    showLoading = false
+                )
+            }
+        }
+    }
+
 
 
     CircularProgressBar(isDisplayed = loading)
@@ -718,7 +757,14 @@ fun ServiceProvidedDashboard(
             }
 
             if (showPaymentDialog) {
-                PaymentMethodDialog(serviceRequestViewModel) {
+                PaymentMethodDialog(
+                    paymentSheet,
+                    request,
+                    serviceRequestViewModel,
+                    onPaymentDone = {
+
+                    }
+                ) {
                     showPaymentDialog = false
                 }
             }
