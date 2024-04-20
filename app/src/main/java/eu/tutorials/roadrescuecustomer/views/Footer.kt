@@ -33,7 +33,8 @@ fun Footer(
     navigationToDashboardScreen: () -> Unit,
     navigationToProfileScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
-    navigationToActivitiesScreen: () -> Unit
+    navigationToActivitiesScreen: () -> Unit,
+    navigationToInstructionsScreen: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -46,7 +47,7 @@ fun Footer(
         AnimatedIcon(painterId = R.drawable.book_fill, onClick = navigationToActivitiesScreen)
         AnimatedIcon(painterId = R.drawable.compass_fill, onClick = navigationToTrackLocationScreen)
         AnimatedIcon(painterId = R.drawable.home, onClick = navigationToDashboardScreen)
-        AnimatedIcon(painterId = R.drawable.chat_fill, onClick = {})
+        AnimatedIcon(painterId = R.drawable.chat_fill, onClick = navigationToInstructionsScreen)
         AnimatedIcon(painterId = R.drawable.user_fill, onClick = navigationToProfileScreen)
 //        Icon(
 //            painter = painterResource(id = R.drawable.compass_fill),

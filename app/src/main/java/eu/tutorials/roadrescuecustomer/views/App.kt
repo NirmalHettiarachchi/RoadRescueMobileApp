@@ -53,6 +53,7 @@ fun App(
     val navigationToProfileScreen = { navController.navigate("profilescreen") }
     val navigationToTrackLocationScreen = { navController.navigate("trackLocationscreen") }
     val navigationToActivitiesScreen = { navController.navigate("activitiesscreen") }
+    val navigationToInstructionsScreen = { navController.navigate("instructionsscreen") }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -104,7 +105,8 @@ fun App(
                         navigationToDashboardScreen = navigationToDashboardScreen,
                         navigationToProfileScreen = navigationToProfileScreen,
                         navigationToTrackLocationScreen = navigationToTrackLocationScreen,
-                        navigationToActivitiesScreen = navigationToActivitiesScreen
+                        navigationToActivitiesScreen = navigationToActivitiesScreen,
+                        navigationToInstructionsScreen = navigationToInstructionsScreen
                     )
                 }
             }
@@ -155,6 +157,9 @@ fun App(
                 }
                 composable("settingsscreen") {
                     SettingsScreen(loginViewModel, context, profileViewModel, navController, currentStateViewModel, serviceRequestViewModel)
+                }
+                composable("instructionsscreen") {
+                    InstructionsScreen()
                 }
             }
         }
