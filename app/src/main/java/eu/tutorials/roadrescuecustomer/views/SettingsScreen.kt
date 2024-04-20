@@ -84,9 +84,6 @@ fun SettingsScreen(
 fun SettingsBox(loginViewModel: LoginViewModel, mainActivity: MainActivity, profileViewModel: ProfileViewModel, navHostController: NavHostController,
                 currentStateViewModel: CurrentStateViewModel,
                 serviceRequestViewModel: ServiceRequestViewModel) {
-    var showManagePaymentMethodsWindow by remember {
-        mutableStateOf(false)
-    }
 
     var showChangePhoneNumWindow by remember {
         mutableStateOf(false)
@@ -109,16 +106,8 @@ fun SettingsBox(loginViewModel: LoginViewModel, mainActivity: MainActivity, prof
             FillDetailsButton(detailButtonName = "Change Phone Number") {
                 showChangePhoneNumWindow = true
             }
-            FillDetailsButton(detailButtonName = "Manage Payment Methods") {
-                showManagePaymentMethodsWindow = true
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-    if(showManagePaymentMethodsWindow) {
-        ManagePaymentMethodsWindow {
-            showManagePaymentMethodsWindow = false
         }
     }
 
@@ -127,79 +116,4 @@ fun SettingsBox(loginViewModel: LoginViewModel, mainActivity: MainActivity, prof
             showChangePhoneNumWindow = false
         }
     }
-}
-
-@Composable
-fun ManagePaymentMethodsWindow(onDismiss: ()->Unit) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        shape = RoundedCornerShape(10),
-        modifier = Modifier
-            .border(2.dp, Color.White, shape = RoundedCornerShape(10))
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp)
-            ),
-        tonalElevation = 16.dp,
-        containerColor = Color(0xFFDCE4EC),
-        confirmButton = {
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Manage Payment Methods",
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF253555),
-                    style = textStyle2
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                TextField("Name on Card", "", 250)
-                TextField("Card Number", "", 250)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    TextField(labelName = "Expiry Date", value = "", width = 50)
-                    TextField(labelName = "CVV", value = "", width = 50)
-                }
-            }
-        }
-    )
-}
-
-@Composable
-fun TextField(labelName: String, value: String?, width: Int): String {
-    var fieldValue by remember { mutableStateOf(value) }
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 12.dp)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        OutlinedTextField(
-            value = fieldValue ?: "",
-            onValueChange = { fieldValue = it },
-            modifier = Modifier
-                .height(50.dp)
-                .border(2.dp, Color.White, shape = RoundedCornerShape(50))
-                .shadow(6.dp, shape = RoundedCornerShape(50))
-                .background(Color.White)
-                .width(width.dp),
-            textStyle = textStyle2,
-            placeholder = {
-                Text(
-                    text = labelName,
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            },
-            singleLine = true
-        )
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    return fieldValue ?: ""
 }

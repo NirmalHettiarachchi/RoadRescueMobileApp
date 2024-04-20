@@ -92,6 +92,8 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
 
                 newPhoneNumber = AuthField("New Phone Number", "", true)
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 AuthFieldBtn(
                     onClickButton = {
 
@@ -179,6 +181,8 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
 
                 otp = AuthField("Enter the OTP", "", false)
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 AuthCommonButton(
                     btnName = "Confirm",
                     Modifier
@@ -209,7 +213,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                             isReqServiceWindowOpened = false
                                         )
                                         serviceRequestViewModel.clearData()
-                                        Toast.makeText(context, "Phone number changed successfully. You will be logged out", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Phone number changed successfully", Toast.LENGTH_SHORT).show()
                                         loading = false
                                     } else {
                                         loading = false
