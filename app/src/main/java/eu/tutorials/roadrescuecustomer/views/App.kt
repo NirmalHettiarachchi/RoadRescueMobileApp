@@ -154,7 +154,7 @@ fun App(
                     HelpScreen(customerSupportTicketViewModel)
                 }
                 composable("settingsscreen") {
-                    SettingsScreen()
+                    SettingsScreen(loginViewModel, context, profileViewModel, navController, currentStateViewModel, serviceRequestViewModel)
                 }
             }
         }

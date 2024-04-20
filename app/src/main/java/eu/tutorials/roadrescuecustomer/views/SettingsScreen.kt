@@ -47,10 +47,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    loginViewModel: LoginViewModel,
+    mainActivity: MainActivity,
+    profileViewModel: ProfileViewModel,
+    navHostController: NavHostController,
+    currentStateViewModel: CurrentStateViewModel,
+    serviceRequestViewModel: ServiceRequestViewModel
+)
+{
     Column(
         backgroundModifier
             .verticalScroll(rememberScrollState()),
@@ -63,14 +75,20 @@ fun SettingsScreen() {
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle1
             )
-            SettingsBox()
+            SettingsBox(loginViewModel, mainActivity, profileViewModel, navHostController, currentStateViewModel, serviceRequestViewModel)
         }
     }
 }
 
 @Composable
-fun SettingsBox() {
+fun SettingsBox(loginViewModel: LoginViewModel, mainActivity: MainActivity, profileViewModel: ProfileViewModel, navHostController: NavHostController,
+                currentStateViewModel: CurrentStateViewModel,
+                serviceRequestViewModel: ServiceRequestViewModel) {
     var showManagePaymentMethodsWindow by remember {
+        mutableStateOf(false)
+    }
+
+    var showChangePhoneNumWindow by remember {
         mutableStateOf(false)
     }
 
@@ -89,7 +107,7 @@ fun SettingsBox() {
             Spacer(modifier = Modifier.height(16.dp))
 
             FillDetailsButton(detailButtonName = "Change Phone Number") {
-                //todo
+                showChangePhoneNumWindow = true
             }
             FillDetailsButton(detailButtonName = "Manage Payment Methods") {
                 showManagePaymentMethodsWindow = true
@@ -101,6 +119,12 @@ fun SettingsBox() {
     if(showManagePaymentMethodsWindow) {
         ManagePaymentMethodsWindow {
             showManagePaymentMethodsWindow = false
+        }
+    }
+
+    if(showChangePhoneNumWindow) {
+        ChangePhoneNumWindow (loginViewModel, mainActivity, profileViewModel, navHostController, currentStateViewModel, serviceRequestViewModel){
+            showChangePhoneNumWindow = false
         }
     }
 }
@@ -155,26 +179,26 @@ fun TextField(labelName: String, value: String?, width: Int): String {
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-            OutlinedTextField(
-                value = fieldValue ?: "",
-                onValueChange = { fieldValue = it },
-                modifier = Modifier
-                    .height(50.dp)
-                    .border(2.dp, Color.White, shape = RoundedCornerShape(50))
-                    .shadow(6.dp, shape = RoundedCornerShape(50))
-                    .background(Color.White)
-                    .width(width.dp),
-                textStyle = textStyle2,
-                placeholder = {
-                    Text(
-                        text = labelName,
-                        fontSize = 14.sp,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                singleLine = true
-            )
+        OutlinedTextField(
+            value = fieldValue ?: "",
+            onValueChange = { fieldValue = it },
+            modifier = Modifier
+                .height(50.dp)
+                .border(2.dp, Color.White, shape = RoundedCornerShape(50))
+                .shadow(6.dp, shape = RoundedCornerShape(50))
+                .background(Color.White)
+                .width(width.dp),
+            textStyle = textStyle2,
+            placeholder = {
+                Text(
+                    text = labelName,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            singleLine = true
+        )
     }
     Spacer(modifier = Modifier.height(8.dp))
     return fieldValue ?: ""
