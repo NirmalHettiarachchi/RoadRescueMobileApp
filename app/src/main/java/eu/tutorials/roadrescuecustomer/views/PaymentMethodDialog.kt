@@ -62,11 +62,16 @@ fun PaymentMethodDialog(
     val activity = LocalContext.current as ComponentActivity
 
     LaunchedEffect(key1 = Unit) {
-        serviceRequestViewModel.initStipePayment(
-            amount = request.reqAmount?.toDouble()?.roundToInt() ?: 0,
-            description = request.description,
-            name = AppPreferences(context).getStringPreference("NAME", "")
-        )
+        val amount = request.reqAmount?.toDouble()?.roundToInt() ?: 0
+        if(amount >= 0) {
+            serviceRequestViewModel.initStipePayment(
+                amount = amount,
+                description = request.description,
+                name = AppPreferences(context).getStringPreference("NAME", "")
+            )
+        }else{
+            Toast.makeText(context,"Please enter amount",Toast.LENGTH_LONG).show()
+        }
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -146,7 +151,7 @@ fun PaymentMethodDialog(
 
                 Button(
                     onClick = {
-                        serviceRequestViewModel.paymentDone(context, request.id.toInt())
+                        serviceRequestViewModel.checkForStatus(request.id.toInt())
                     },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     border = BorderStroke(width = 2.dp, color = Color.White),
