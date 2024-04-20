@@ -50,7 +50,7 @@ fun PaymentMethodDialog(
     paymentSheet: PaymentSheet,
     request: ServiceRequest,
     serviceRequestViewModel: ServiceRequestViewModel,
-    onPaymentDone : () -> Unit,
+    onStatusChanged : () -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -67,6 +67,17 @@ fun PaymentMethodDialog(
             description = request.description,
             name = AppPreferences(context).getStringPreference("NAME", "")
         )
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        serviceRequestViewModel.status.collect {status->
+            if(status == 4){
+                onDismiss()
+                onStatusChanged()
+            }else{
+                Toast.makeText(context,"Please make payment",Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -134,7 +145,9 @@ fun PaymentMethodDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = {  },
+                    onClick = {
+                        serviceRequestViewModel.paymentDone(context, request.id.toInt())
+                    },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     border = BorderStroke(width = 2.dp, color = Color.White),
                     modifier = Modifier

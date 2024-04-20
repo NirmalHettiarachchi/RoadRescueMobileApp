@@ -103,6 +103,9 @@ class ServiceRequestViewModel : ViewModel() {
     val showError = _showError.asSharedFlow()
 
 
+    private val _status = MutableSharedFlow<Int>()
+    val status = _status.asSharedFlow()
+
     private var apiInterface = ApiUtilities.getApiInterface()
 
     fun setServiceRequest(
@@ -139,7 +142,7 @@ class ServiceRequestViewModel : ViewModel() {
         name: String
     ) {
         viewModelScope.launch {
-
+            loading.value = true
             val response = apiInterface.getPaymentDetail(
                 amount,
                 description,
@@ -159,11 +162,14 @@ class ServiceRequestViewModel : ViewModel() {
                     }else{
                         _showError.emit("Payment Error Retry Please!")
                     }
+                    loading.value = false
                 }else{
                     _showError.emit("Payment Error Retry Please!")
+                    loading.value = false
                 }
             } else {
                 Log.d(TAG, "initStipePayment: Response Failed")
+                loading.value = false
             }
         }
     }
@@ -394,6 +400,20 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
+
+    fun checkForStatus(requestId : Int) {
+
+        viewModelScope.launch {
+            loading.value = true
+            val status = withContext(Dispatchers.IO) {
+                // Actual database operation to fetch vehicle types
+                checkRequestStatus(requestId)
+            }
+            _status.emit(status)
+            loading.value = false
+        }
+    }
+
     fun fetchIssues() {
         viewModelScope.launch {
             loading.value = true
@@ -591,6 +611,34 @@ class ServiceRequestViewModel : ViewModel() {
             e.printStackTrace()
         }
         return issueList
+    }
+
+
+    private fun checkRequestStatus(requestId : Int): Int {
+        var status  = 0
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery("SELECT * FROM service_request WHERE service_request.id = $requestId")
+
+            while (resultSet.next()) {
+                val st = resultSet.getInt("status")
+                status = st
+            }
+            connection.close()
+            return status
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return status
     }
 
     private fun getVehicleTypesFromDatabase(): List<VehicleType> {

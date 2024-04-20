@@ -761,8 +761,14 @@ fun ServiceProvidedDashboard(
                     paymentSheet,
                     request,
                     serviceRequestViewModel,
-                    onPaymentDone = {
-
+                    onStatusChanged = {
+                        currentStateViewModel.fetchLatestRequest(
+                            AppPreferences(context).getStringPreference(
+                                "CUSTOMER_ID",
+                                ""
+                            ),
+                            showLoading = true
+                        )
                     }
                 ) {
                     showPaymentDialog = false
