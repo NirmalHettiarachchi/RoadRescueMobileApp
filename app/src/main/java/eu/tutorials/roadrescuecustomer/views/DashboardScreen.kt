@@ -283,7 +283,6 @@ fun DashboardScreen(
                     }
                 }
             }
-            HelpBox()
         }
     }
 }
@@ -310,6 +309,7 @@ fun NoPendingActivityDashboard(
         locationViewModel,
         context
     )
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Composable

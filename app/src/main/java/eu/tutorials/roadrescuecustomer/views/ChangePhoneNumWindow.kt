@@ -80,7 +80,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Change Registered Phone Number",
+                    text = "Change registered phone number",
                     style = textStyle2
                 )
                 Text(
