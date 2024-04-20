@@ -46,9 +46,13 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                          currentStateViewModel: CurrentStateViewModel,
                          serviceRequestViewModel: ServiceRequestViewModel,
                          onDismiss: () -> Unit) {
+
     var newPhoneNumber by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     val context = LocalContext.current
+
+    var loading by remember { mutableStateOf(false) }
+    CircularProgressBar(isDisplayed = loading)
 
     var mAuth: FirebaseAuth? = null
     mAuth = FirebaseAuth.getInstance()
@@ -79,6 +83,11 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                     text = "Change Registered Phone Number",
                     style = textStyle2
                 )
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "(You will be logged out)",
+                    style = textStyle5
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 newPhoneNumber = AuthField("New Phone Number", "", true)
@@ -87,7 +96,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                     onClickButton = {
 
                         if (newPhoneNumber.isNotEmpty() && newPhoneNumber.trim().length == 12 && newPhoneNumber.trim().startsWith("+94")) {
-//                        showLoading
+                            loading = true
                             loginViewModel.checkPhoneNumberExists(
                                 Customer(
                                     null,
@@ -108,6 +117,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                                         s: String,
                                                         forceResendingToken: PhoneAuthProvider.ForceResendingToken
                                                     ) {
+                                                        loading = false
                                                         otpid = s
                                                         Log.d("TAG", "onCodeSent: OTP Received $s")
                                                         Toast.makeText(
@@ -121,6 +131,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                                     override fun onVerificationCompleted(
                                                         phoneAuthCredential: PhoneAuthCredential
                                                     ) {
+                                                        loading = false
                                                         mAuth?.signInWithCredential(phoneAuthCredential)
                                                             ?.addOnCompleteListener(
                                                                 mainActivity
@@ -138,6 +149,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                                     }
 
                                                     override fun onVerificationFailed(e: FirebaseException) {
+                                                        loading = false
                                                         Toast.makeText(
                                                             context,
                                                             e.message,
@@ -148,6 +160,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                                     }
                                                 })
                                         } else {
+                                            loading = false
                                             MainScope().launch {
                                                 Toast.makeText(
                                                     context,
@@ -173,6 +186,7 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                         .padding(10.dp)
                 ) {
                     if (otp.isNotEmpty()) {
+                        loading = true
                         val credential =
                             otpid.let { PhoneAuthProvider.getCredential(it, otp) }
                         if (credential != null) {
@@ -196,11 +210,14 @@ fun ChangePhoneNumWindow(loginViewModel: LoginViewModel,
                                         )
                                         serviceRequestViewModel.clearData()
                                         Toast.makeText(context, "Phone number changed successfully. You will be logged out", Toast.LENGTH_SHORT).show()
+                                        loading = false
                                     } else {
+                                        loading = false
                                         Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                         }else{
+                            loading = false
                             Log.d("TAG", "LoginBox: Credential Null")
                         }
                     } else {
