@@ -115,7 +115,7 @@ class CurrentStateViewModel : ViewModel() {
                 val serviceProviderName = resultSet.getString("garage_name")
                 val model = resultSet.getString("model")
                 val issueCategory = resultSet.getString("category")
-
+                val serviceProviderPhoneNum = resultSet.getString("phone_number")
 
                 val serviceRequest = ServiceRequest(
                     id = id,
@@ -135,7 +135,8 @@ class CurrentStateViewModel : ViewModel() {
                     serviceProviderName = serviceProviderName ?: "",
                     vehicleModelName = model ?: "",
                     issueCategoryName = issueCategory ?: "",
-                    reqAmount = requestCost ?: ""
+                    reqAmount = requestCost ?: "",
+                    serviceProviderPhoneNum = serviceProviderPhoneNum ?: ""
                 )
                 latestRequests.add(serviceRequest)
             }

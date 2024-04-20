@@ -83,6 +83,7 @@ fun TrackLocationScreen(
                 PendingActivityTrackLocationScreen(
                     request.location,
                     request.serviceProviderName,
+                    request.serviceProviderPhoneNum,
                     LocalContext.current
                 )
             } else {
@@ -126,6 +127,7 @@ fun NoPendingActivityTrackLocationScreen() {
 fun PendingActivityTrackLocationScreen(
     latLong: String,
     serviceProviderName: String,
+    serviceProviderPhoneNum: String?,
     context: Context
 ) {
     Card(
@@ -171,7 +173,7 @@ fun PendingActivityTrackLocationScreen(
             Button(
                 onClick = {
                     val intent = Intent(Intent.ACTION_DIAL)
-                    intent.data = Uri.parse("tel:+94768879830")
+                    intent.data = Uri.parse("tel:$serviceProviderPhoneNum")
                     context.startActivity(intent)
                           },
                 modifier = Modifier.align(Alignment.CenterHorizontally),

@@ -33,7 +33,8 @@ data class ServiceRequest(
     var serviceProviderName: String = "",
     var issueCategoryName: String = "",
     var approxCost: String = "",
-    var reqAmount: String? = null
+    var reqAmount: String? = null,
+    var serviceProviderPhoneNum: String? = null
 )
 
 class ServiceRequestRepository {
