@@ -50,4 +50,15 @@ interface ApiService {
     @PUT("technician")
     fun updateTechnician(@Body technician: UpdateTechnician):Call<ResponseBody>
 
+
+    @Headers("Content-Type: application/json")
+    @GET("service")
+    fun getServiceRequests(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
+    @PUT("service")
+    fun updateServiceRequest(
+        @Query("option") option:String,
+        @Query("serviceId")serviceId:Int,
+        @Query("serviceProviderId")serviceProviderId:String,
+        @Query("technicianId")technicianId:String
+        ): Call<ResponseBody>
 }

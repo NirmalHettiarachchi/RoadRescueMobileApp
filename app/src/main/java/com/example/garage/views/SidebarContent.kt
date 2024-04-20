@@ -2,7 +2,6 @@ package com.example.garage.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,10 +14,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -31,13 +33,12 @@ fun SidebarContent(menuClicked:()->Unit){
 
     Column(
 
-        verticalArrangement = Arrangement.SpaceBetween,
 
         modifier = Modifier
 
             .fillMaxHeight()
 
-            .width(240.dp)
+            .width(250.dp)
 
             .background(Color(0xFF253555))
 
@@ -46,62 +47,63 @@ fun SidebarContent(menuClicked:()->Unit){
         Column {
 
             Icon(
-
                 imageVector = Icons.Filled.Menu,
-
                 tint = Color.White,
-
                 modifier = Modifier
-
                     .padding(16.dp)
-
                     .size(30.dp)
-
                     .clickable {
-
                         menuClicked()
-
                     },
-
                 contentDescription = "Localized Description"
-
             )
 
-            Divider()
+            Spacer(modifier = Modifier
+                .background(Color.White)
+                .height(2.dp))
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f)
+        ) {
+            var garageOpenClosedStatus by remember { mutableStateOf("Closed") }
 
-            Spacer(
+            SidebarButton(buttonName=garageOpenClosedStatus,verticalPadding=8, onClick = {
+                garageOpenClosedStatus=chaneState(garageOpenClosedStatus)
+            })
 
-                modifier = Modifier
+            SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {})
 
-                    .background(Color.White)
+            SidebarButton(buttonName="Help",verticalPadding=8, onClick = {})
 
-                    .height(2.dp)
-
-            )
+            SidebarButton(buttonName="Settings",verticalPadding=8, onClick = {})
 
         }
 
-        SidebarButton(buttonName="Help",verticalPadding=8)
-
-        SidebarButton(buttonName="Setting",verticalPadding=8)
-
+        SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {})
     }
-
-    SidebarButton(buttonName="Log Out",verticalPadding=16)
 
 }
 
+fun chaneState(garageOpenClosedStatus: String):String {
+    var stastus=""
+    if (garageOpenClosedStatus == "Closed") {
+        stastus="Open"
+    }else{
+        stastus="Closed"
+    }
+    return stastus
+}
 
 
 @Composable
 
-fun SidebarButton(buttonName:String,verticalPadding:Int){
+fun SidebarButton(buttonName:String,verticalPadding:Int,onClick:()->Unit){
 
     Button(
 
-        onClick = { },
-
-
+        onClick = onClick ,
 
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
 

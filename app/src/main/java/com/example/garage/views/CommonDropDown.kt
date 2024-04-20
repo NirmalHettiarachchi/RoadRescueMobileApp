@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ fun CommonDropdown(
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(defaultSelection) }
 
+
     Box(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -48,7 +50,7 @@ fun CommonDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = true },
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.Center,
 
             ) {
 
@@ -68,9 +70,10 @@ fun CommonDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .fillMaxWidth(0.8f).fillMaxHeight(0.2f)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color.White, )
+                .fillMaxWidth(0.7f)
+                .fillMaxHeight(0.2f)
+                .clip(RoundedCornerShape(5.dp))
+                .background(Color(0xFFF0F0ED))
                 .border(BorderStroke(1.dp, Color.Unspecified))
                 .align(Alignment.CenterStart)
 
@@ -83,9 +86,13 @@ fun CommonDropdown(
                         selectedOption = option
                         expanded = false
                     },
-                    text = { Text(text = "$option", style = textStyle4, color = Color.Black) },
-                    modifier = Modifier.fillMaxWidth()
+                    text = { Text(text = "$option", style = textStyle4, color = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF0F0ED))
+                        .align(Alignment.CenterHorizontally)
                 )
+                HorizontalDivider()
             }
         }
 

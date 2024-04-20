@@ -118,16 +118,18 @@ fun sweetAlertDialog(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
 
-                    if (buttonOneName.equals("null") || buttonTwoName.equals("null")){
+                    if (buttonOneName!="null" || buttonTwoName.equals("null")){
 
                         Button(
                             modifier = Modifier.width(8.dp),
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Gray)
                         ) {
+
                             if (buttonOneName != null) {
                                 Text(text = buttonOneName)
                             }
+
                         }
                     }else{
                         Button(
@@ -135,9 +137,7 @@ fun sweetAlertDialog(
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Green)
                         ) {
-                            if (buttonOneName != null) {
-                                Text(text = buttonOneName)
-                            }
+                            Text(text = buttonOneName)
                         }
 
                         Spacer(modifier = Modifier.width(5.dp))

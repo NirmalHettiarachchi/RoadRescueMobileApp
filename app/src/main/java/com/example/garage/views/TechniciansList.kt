@@ -22,16 +22,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,7 +73,9 @@ fun TechniciansList(
     navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel,
 ) {
 
-    val viewModel= viewModel<MainViewModel>()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val viewModel = viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
     var showLoadTechnicians by remember { mutableStateOf(false) }
     var showMessageDialog by remember { mutableStateOf(false) }
@@ -79,232 +86,270 @@ fun TechniciansList(
     var buttonOneName by remember { mutableStateOf("") }
     var buttonTwoName by remember { mutableStateOf("") }
     var techList by remember { mutableStateOf("") }
-    var techDetails= GarageTechnician()
+
 
     LaunchedEffect(Unit) {
 
-        val response=loadAllTechnicians(viewModel)
+        val response = loadAllTechnicians(viewModel)
+        Log.d("res double checked", response.toString())
         if (response != null) {
-            if(response.status ==200){
+            if (response.status == 200) {
 
-                techList= response.data!!.toString()
-//                showProgressBar=false
-                showLoadTechnicians=true
+                techList = response.data!!.toString()
+                showLoadTechnicians = true
 
-            }else if(response.status==400){
-                title=response.status.toString()
-                message= response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showMessageDialog=true
+            } else if (response.status == 400) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
 
-            }else if(response.status==404){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showMessageDialog=true
+            } else if (response.status == 404) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
 
-            }else if(response.status==500){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showMessageDialog=true
-            }else if(response.status==508){
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="null"
-                buttonTwoName="null"
-                showMessageDialog=true
-            }else{
-                title=response.status.toString()
-                message=response.message.toString()
-                buttonOneName="Ok"
-                buttonTwoName="null"
-                showMessageDialog=true
+            } else if (response.status == 500) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            } else if (response.status == 508) {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "null"
+                buttonTwoName = "null"
+                showMessageDialog = true
+            } else {
+                title = response.status.toString()
+                message = response.message.toString()
+                buttonOneName = "Ok"
+                buttonTwoName = "null"
+                showMessageDialog = true
             }
-        }else{
-            title="401"
-            message="Cannot call the sever"
-            buttonOneName="Ok"
-            buttonTwoName="null"
-            showMessageDialog=true
-            Log.d("response null","null")
+        } else {
+            title = "401"
+            message = "Cannot call the sever"
+            buttonOneName = "Ok"
+            buttonTwoName = "null"
+            showMessageDialog = true
+            Log.d("response null", "null")
         }
 
     }
 
 
-
-    Column (
-        modifier = defaultBackground,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-
-
-
-        Header(menuClicked = {})
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row (modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center){
-
-                CommonButton(
-                    btnName = "Add Technician",
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .width(156.dp)
-                        .height(50.dp),
-                    onClickButton = {
-                        navController.navigate(route = Screen.AddTechnician.route)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                content = {
+                    SidebarContent() {
+                        scope.launch {
+                            drawerState.close()
+                        }
                     }
-                )
+                }
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Card(
-            modifier = cardDefaultModifier
-                .align(Alignment.CenterHorizontally),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
-            border = BorderStroke(width = 2.dp, Color.White), 
-        ) {
-
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.09f)
-                    .background(Color(0xFFD9D9D9)),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1f),
-                    contentAlignment = Alignment.Center){
-
-                    Text(text = "Name", style = textStyle1, modifier = Modifier)
-
+    ) {
+        Scaffold(
+            topBar = {
+                Header {
+                    scope.launch { drawerState.open() }
                 }
-
-
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(0.8f),
-                    contentAlignment = Alignment.Center){
-
-                    Text(text = "Status", style = textStyle1, modifier = Modifier)
-
-                }
-
-                Box (
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(1.3f),
-                    contentAlignment = Alignment.Center){
-
-                    Text(text = "", style = textStyle1, modifier = Modifier)
-
-                }
+            },
+            bottomBar = {
+                Footer(navController, navyStatus)
             }
-
-
-
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                modifier = defaultBackground.padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                // load all technicians in the table
-                if (showLoadTechnicians){
 
-                    val jsonArray= JSONArray(techList)
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    for (i in 0 until jsonArray.length()){
-                        val jsonObject=jsonArray.getJSONObject(i)
-                        val techId=jsonObject.getString("techId")
-                        val techFirstName=jsonObject.getString("techFirstName")
-                        val techLastName=jsonObject.getString("techLastName")
-                        val techStatus=jsonObject.getString("techStatus")
-                        val techContactNumber=jsonObject.getString("techContactNumb")
-                        val techProfileRef=jsonObject.getString("techProfilePicRef")
-                        val techExpertiseList=jsonObject.getString("expertiseList")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
 
-                        val contentString = techExpertiseList.substring(1, techExpertiseList.length - 1)
-                        val resultList = contentString.split(", ")
+                    CommonButton(
+                        btnName = "Add Technician",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .width(156.dp)
+                            .height(50.dp),
+                        onClickButton = {
+                            navController.navigate(route = Screen.AddTechnician.route)
+                        }
+                    )
+                }
 
+                Spacer(modifier = Modifier.height(16.dp))
 
-                        techDetails.setTechId(techId)
-                        techDetails.setTechFirstName(techFirstName)
-                        techDetails.setTechLastName(techLastName)
-                        techDetails.setTechContactNumber(techContactNumber)
-                        techDetails.setTechImageRef(techProfileRef)
-                        techDetails.setTechExpertiseAreas(resultList)
+                Card(
+                    modifier = cardDefaultModifier
+                        .align(Alignment.CenterHorizontally),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+                    border = BorderStroke(width = 2.dp, Color.White),
+                ) {
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.09f)
+                            .background(Color(0xFFD9D9D9)),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                        if (techStatus.equals("Available")){
-                            techDetails.setTechStatus(1)
-                        }else{
-                            techDetails.setTechStatus(0)
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            Text(text = "Name", style = textStyle1, modifier = Modifier)
+
                         }
 
-                        TechniciansLoadStretcher(techDetails,navController,navyStatus,coroutineScope,viewModel,sharedViewModel)
-                        Divider()
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(0.8f),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            Text(text = "Status", style = textStyle1, modifier = Modifier)
+
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(1.3f),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            Text(text = "", style = textStyle1, modifier = Modifier)
+
+                        }
+                    }
+
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+
+                        val list: MutableList<GarageTechnician> =
+                            emptyList<GarageTechnician>().toMutableList()
+
+//                        val coroutineScope = CoroutineScope(Dispatchers.Main)
+
+
+
+                        // load all technicians in the table
+                        if (showLoadTechnicians) {
+
+                            val jsonArray = JSONArray(techList)
+
+
+
+                            for (i in 0 until jsonArray.length()) {
+                                val jsonObject = jsonArray.getJSONObject(i)
+                                val techId = jsonObject.getString("techId")
+                                val techFirstName = jsonObject.getString("techFirstName")
+                                val techLastName = jsonObject.getString("techLastName")
+                                val techStatus = jsonObject.getString("techStatus")
+                                val techContactNumber = jsonObject.getString("techContactNumb")
+                                val techProfileRef = jsonObject.getString("techProfilePicRef")
+                                val techExpertiseList = jsonObject.getString("expertiseList")
+
+                                val contentString =
+                                    techExpertiseList.substring(1, techExpertiseList.length - 1)
+                                val resultList = contentString.split(", ")
+
+
+                                val techDetails = GarageTechnician()
+                                techDetails.setTechId(techId)
+                                techDetails.setTechFirstName(techFirstName)
+                                techDetails.setTechLastName(techLastName)
+                                techDetails.setTechContactNumber(techContactNumber)
+                                techDetails.setTechImageRef(techProfileRef)
+                                techDetails.setTechExpertiseAreas(resultList)
+
+                                if (techStatus.equals("Available")) {
+                                    techDetails.setTechStatus(1)
+                                } else {
+                                    techDetails.setTechStatus(0)
+                                }
+
+                                TechniciansLoadStretcher(
+                                    techDetails,
+                                    navController,
+                                    navyStatus,
+                                    coroutineScope,
+                                    viewModel,
+                                    sharedViewModel
+                                )
+                                HorizontalDivider()
+                            }
+                        }
+                    }
+
+
+                    // load response message
+                    if (showMessageDialog) {
+                        sweetAlertDialog(
+                            title = title,
+                            message = message,
+                            buttonOneName = buttonOneName,
+                            buttonTwoName = buttonTwoName,
+                            onConfirm = {
+                                showMessageDialog = false
+                            }
+                        )
                     }
 
                 }
+
+                Spacer(modifier = Modifier.height(26.dp))
+
             }
-
-//            if (showProgressBar){
-//                circularIndicatorProgressBar()
-//            }
-
-            // load response message
-            if (showMessageDialog){
-                sweetAlertDialog(
-                    title = title,
-                    message = message,
-                    buttonOneName = buttonOneName,
-                    buttonTwoName = buttonTwoName,
-                    onConfirm = {
-                        showMessageDialog=false
-                    }
-                )
-            }
-
         }
-
-        Spacer(modifier = Modifier.height(26.dp))
-
-        Footer(navController,navyStatus)
     }
+
+
 }
-
-
-
 
 
 @Composable
 fun TechniciansLoadStretcher(
     technician: GarageTechnician,
     navController: NavController,
-    navyStatus:String,
+    navyStatus: String,
     coroutineScope: CoroutineScope,
     viewModel: MainViewModel,
-    sharedViewModel: SharedViewModel
-){
-    Row (
+    sharedViewModel: SharedViewModel,
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         var showMessageDialog by remember { mutableStateOf(false) }
         var showDeleteDialog by remember { mutableStateOf(false) }
         var showInfoDialog by remember { mutableStateOf(false) }
@@ -315,44 +360,59 @@ fun TechniciansLoadStretcher(
         var buttonOneName by remember { mutableStateOf("") }
         var buttonTwoName by remember { mutableStateOf("") }
 
-        Box (
+        Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f)
                 .padding(8.dp, 0.dp),
-            contentAlignment = Alignment.Center){
+            contentAlignment = Alignment.Center
+        ) {
 
-            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(), textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+            Text(
+                text = technician.getTechFirstName() + " " + technician.getTechLastName(),
+                textAlign = TextAlign.Center,
+                fontSize = 17.sp,
+                color = Color.Black,
+                modifier = Modifier,
+                maxLines = 2
+            )
 
         }
 
-        Box (
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterVertically)
                 .weight(0.8f),
             contentAlignment = Alignment.Center
-        ){
+        ) {
 
-            Text(text = changeStatusType(technician),textAlign = TextAlign.Center, fontSize = 17.sp, color = Color.Black, modifier = Modifier, maxLines = 2)
+            Text(
+                text = changeStatusType(technician),
+                textAlign = TextAlign.Center,
+                fontSize = 17.sp,
+                color = Color.Black,
+                modifier = Modifier,
+                maxLines = 2
+            )
 
         }
 
-        Box (
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1.3f),
-        ){
-            Row (
+        ) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
-            ){
+            ) {
 
-                IconButton(onClick = { showDeleteDialog=true }) {
+                IconButton(onClick = { showDeleteDialog = true }) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
-                        contentDescription =null,
+                        contentDescription = null,
                         modifier = Modifier
                             .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
@@ -370,12 +430,14 @@ fun TechniciansLoadStretcher(
                         techLastName = technician.getTechLastName(),
                         techProfileRef = technician.getTechImageRef()
                     )
+
+
                     sharedViewModel.techData(technicianData)
                     navController.navigate(route = Screen.EditTechnician.route)
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
-                        contentDescription =null,
+                        contentDescription = null,
                         modifier = Modifier
                             .background(Color(0x006DBCE9), shape = CircleShape)
                             .weight(1f)
@@ -384,7 +446,7 @@ fun TechniciansLoadStretcher(
                     )
                 }
 
-                IconButton(onClick = { showInfoDialog=true }) {
+                IconButton(onClick = { showInfoDialog = true }) {
                     Icon(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = null,
@@ -400,11 +462,11 @@ fun TechniciansLoadStretcher(
 
         // Delete Dialog
 
-        if (showDeleteDialog){
+        if (showDeleteDialog) {
             Dialog(
-                onDismissRequest = {  },
+                onDismissRequest = { },
                 content = {
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .fillMaxHeight(0.35f)
@@ -414,7 +476,9 @@ fun TechniciansLoadStretcher(
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
-                    ){
+                    ) {
+
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Row(
                             modifier = Modifier
@@ -423,7 +487,13 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Delete.!",color = Color.Red, style = textStyle5)
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "delete icon",
+                                modifier = deleteIconStyles.size(64.dp),
+                                tint = Color(0xB5D32222),
+
+                            )
                         }
 
 
@@ -434,8 +504,11 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Do you want to delete the user account with the name " +
-                                    "${technician.getTechFirstName()+" "+technician.getTechLastName()} ? ",style = textStyleDefault)
+                            Text(
+                                text = "Do you want to delete the user account with the name " +
+                                        "${technician.getTechFirstName() + " " + technician.getTechLastName()} ? ",
+                                style = textStyleDefault
+                            )
                         }
 
                         Row(
@@ -446,49 +519,54 @@ fun TechniciansLoadStretcher(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            CommonButton(btnName = "Cancel", modifier = Modifier, onClickButton = {showDeleteDialog=false})
+                            CommonButton(
+                                btnName = "Cancel",
+                                modifier = Modifier,
+                                onClickButton = { showDeleteDialog = false })
 
                             CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
                                 // handle technician delete operation
 
-                                showDeleteDialog=false
+                                showDeleteDialog = false
 
                                 coroutineScope.launch {
                                     try {
-                                        viewModel.delTechnician(technician.getTechId().substringAfter('-')){responseObject ->
-                                            if (responseObject != null){
-                                                if (responseObject.status==200){
+                                        viewModel.delTechnician(
+                                            technician.getTechId().substringAfter('-')
+                                        ) { responseObject ->
+                                            if (responseObject != null) {
+                                                if (responseObject.status == 200) {
                                                     title = "Success"
                                                     message = responseObject.message.toString()
                                                     buttonOneName = "null"
                                                     buttonTwoName = "null"
-                                                    showMessageDialog=true
-                                                }else if (responseObject.status==400){
+                                                    showMessageDialog = true
+                                                } else if (responseObject.status == 400) {
                                                     title = "Failed"
                                                     message = responseObject.message.toString()
                                                     buttonOneName = "null"
                                                     buttonTwoName = "null"
-                                                    showMessageDialog=true
-                                                }else if (responseObject.status==500){
-                                                    title=responseObject.message.toString()
+                                                    showMessageDialog = true
+                                                } else if (responseObject.status == 500) {
+                                                    title = responseObject.message.toString()
                                                     message = responseObject.data.toString()
                                                     buttonOneName = "null"
                                                     buttonTwoName = "null"
                                                 }
                                             }
                                         }
-                                    }catch (e:SocketTimeoutException){
-                                        showMessageDialog=true
-                                        title="TimeOut"
-                                        message= e.message.toString()
-                                        buttonOneName= "null"
-                                        buttonTwoName="null"
-                                    }catch (e:Exception){
-                                        showMessageDialog=true
-                                        title="Failed"
-                                        message= e.message.toString()
-                                        buttonOneName= "Ok"
-                                        buttonTwoName="null"
+                                    } catch (e: SocketTimeoutException) {
+                                        showMessageDialog = true
+                                        title = "TimeOut"
+                                        message = e.message.toString()
+                                        buttonOneName = "null"
+                                        buttonTwoName = "null"
+                                    } catch (e: Exception) {
+                                        showMessageDialog = true
+                                        title = "Failed"
+                                        message = e.message.toString()
+                                        buttonOneName = "Ok"
+                                        buttonTwoName = "null"
                                     }
 
                                 }
@@ -499,15 +577,15 @@ fun TechniciansLoadStretcher(
 
                     }
                 }
-                )
+            )
         }
 
         // more info
-        if (showInfoDialog){
+        if (showInfoDialog) {
             Dialog(
-                onDismissRequest = { showInfoDialog=false  },
+                onDismissRequest = { showInfoDialog = false },
                 content = {
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .fillMaxHeight(0.35f)
@@ -516,30 +594,21 @@ fun TechniciansLoadStretcher(
                                 shape = RoundedCornerShape(20.dp)
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                    ){
+                    ) {
 
-                        Row (
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
-                        ){
+                        ) {
 
-                            IconButton(onClick = {
-                                showInfoDialog=false
-                                navController.navigate(route = Screen.EditTechnician.route)
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit icon",
-                                    modifier = closerButtonStyles,
-                                    tint = Color.White
-                                )
-                            }
 
-                            IconButton(onClick = { showInfoDialog=false  }) {
+                            IconButton(onClick = { showInfoDialog = false }) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "close icon",
-                                    modifier = closerButtonStyles.clickable { showInfoDialog=false  },
+                                    modifier = closerButtonStyles.clickable {
+                                        showInfoDialog = false
+                                    },
                                     tint = Color.White
                                 )
                             }
@@ -553,21 +622,27 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                ) {
-                                    append("•  ")
-                                }
-                                append("Tech Id ")
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    ) {
+                                        append("•  ")
+                                    }
+                                    append("Tech Id ")
 
-                            }, color = Color.Black, modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechId(),color = Color.Black, modifier = Modifier.weight(1f))
+                                }, color = Color.Black, modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp, 0.dp)
+                            )
+                            Text(
+                                text = technician.getTechId(),
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -578,21 +653,27 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                ) {
-                                    append("•  ")
-                                }
-                                append("Name ")
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    ) {
+                                        append("•  ")
+                                    }
+                                    append("Name ")
 
-                            }, color = Color.Black, modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechFirstName()+" "+technician.getTechLastName(),color = Color.Black,modifier = Modifier.weight(1f))
+                                }, color = Color.Black, modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp, 0.dp)
+                            )
+                            Text(
+                                text = technician.getTechFirstName() + " " + technician.getTechLastName(),
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -603,21 +684,27 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                ) {
-                                    append("•  ")
-                                }
-                                append("Contact ")
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    ) {
+                                        append("•  ")
+                                    }
+                                    append("Contact ")
 
-                            }, color = Color.Black, modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp, 0.dp))
-                            Text(text = technician.getTechContactNumber(),color = Color.Black, modifier = Modifier.weight(1f))
+                                }, color = Color.Black, modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp, 0.dp)
+                            )
+                            Text(
+                                text = technician.getTechContactNumber(),
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -628,21 +715,27 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                ) {
-                                    append("•  ")
-                                }
-                                append("Status ")
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    ) {
+                                        append("•  ")
+                                    }
+                                    append("Status ")
 
-                            }, color = Color.Black, modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp, 0.dp))
-                            Text(text = changeStatusType(technician),color = Color.Black, modifier = Modifier.weight(1f))
+                                }, color = Color.Black, modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp, 0.dp)
+                            )
+                            Text(
+                                text = changeStatusType(technician),
+                                color = Color.Black,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -653,28 +746,36 @@ fun TechniciansLoadStretcher(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                ) {
-                                    append("•  ")
-                                }
-                                append("Expertise Areas")
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    ) {
+                                        append("•  ")
+                                    }
+                                    append("Expertise Areas")
 
-                            }, color = Color.Black, modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp, 0.dp))
-                            Column (
+                                }, color = Color.Black, modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp, 0.dp)
+                            )
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f)
-                            ){
+                            ) {
                                 //Check ExpertiseAreas list isEmpty and list load
-                                technician.getTechExpertiseAreas().forEach { temp->
-                                    Text(text = temp,color = Color.Black, textAlign = TextAlign.Center,modifier = Modifier)
+                                technician.getTechExpertiseAreas().forEach { temp ->
+                                    Text(
+                                        text = temp,
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier,
+                                        maxLines = 2
+                                    )
                                 }
                             }
                         }
@@ -685,14 +786,14 @@ fun TechniciansLoadStretcher(
         }
 
         // load response message
-        if (showMessageDialog){
+        if (showMessageDialog) {
             sweetAlertDialog(
                 title = title,
                 message = message,
                 buttonOneName = buttonOneName,
                 buttonTwoName = buttonTwoName,
                 onConfirm = {
-                    showMessageDialog=false
+                    showMessageDialog = false
                     navController.navigate(route = Screen.TechnicianList.route)
                 }
             )
@@ -704,27 +805,22 @@ fun TechniciansLoadStretcher(
 
 
 suspend fun loadAllTechnicians(viewModel: MainViewModel): ResponseObject? {
-    var response: ResponseObject? =null
+    var response: ResponseObject? = null
 
     try {
-        viewModel.getTechnicians("","getAll"){responseObject ->
-            if (responseObject!=null){
-                response=responseObject
-            }else{
-                response= ResponseObject(400,"response is null",null)
+        viewModel.getTechnicians("", "getAll") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
             }
         }
-    }catch (e:SocketTimeoutException){
+    } catch (e: SocketTimeoutException) {
         // handle
-        response=ResponseObject(508,"Request time out.\n Please try again.",e.localizedMessage)
-    }catch (e:Exception){
-        response=ResponseObject(404 ,"Exception error.",e.localizedMessage)
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
     }
 
     return response
 }
-
-
-
-
-//    var techList by remember { mutableStateOf(Any()) }
