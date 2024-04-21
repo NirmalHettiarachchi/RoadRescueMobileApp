@@ -182,7 +182,7 @@ fun PendingActivityTrackLocationScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
             ) {
                 Text(
-                    text = "Contact Technician",
+                    text = "Contact Service Provider",
                     style = textStyle3
                 )
             }

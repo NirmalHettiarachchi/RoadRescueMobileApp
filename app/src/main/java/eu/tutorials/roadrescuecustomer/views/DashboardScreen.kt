@@ -326,7 +326,7 @@ fun PendingActivityDashboard(
     val context = LocalContext.current
     var showCostDetailWindow by remember { mutableStateOf(false) }
 
-    var pendingRequest by remember { mutableStateOf("Requesting Service . . .") }
+    var pendingRequest by remember { mutableStateOf("Requesting service . . .") }
 
     val loading by serviceRequestViewModel.loading
 
@@ -545,7 +545,7 @@ fun AssignedActivityDashboard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "${request.serviceProviderName} is Assigned . . .",
+                text = "${request.serviceProviderName} is assigned . . .",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -701,7 +701,7 @@ fun ServiceProvidedDashboard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Service Provided . . .",
+                text = "Service provided . . .",
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally),

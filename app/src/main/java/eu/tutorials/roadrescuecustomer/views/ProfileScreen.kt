@@ -81,6 +81,7 @@ fun ProfileScreen(
                 utilFun()
                 ProfileBox(profileViewModel, serviceRequestViewModel)
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -189,10 +190,6 @@ fun ProfileBox(profileViewModel: ProfileViewModel, serviceRequestViewModel: Serv
                     isEditing = true
                 }
             } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
                     CommonButton("Save", Modifier) {
                         if (newName.isNotEmpty()) {
                             profileViewModel.updateProfile(
@@ -204,7 +201,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel, serviceRequestViewModel: Serv
                             isEditing = false
                         }
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+//                    Spacer(modifier = Modifier.height(8.dp))
                     //Cancel Button
                     CommonButton("Cancel", Modifier) {
                         newName =
@@ -213,7 +210,6 @@ fun ProfileBox(profileViewModel: ProfileViewModel, serviceRequestViewModel: Serv
                             AppPreferences(context).getStringPreference("EMAIL", "")
                         isEditing = false
                     }
-                }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }

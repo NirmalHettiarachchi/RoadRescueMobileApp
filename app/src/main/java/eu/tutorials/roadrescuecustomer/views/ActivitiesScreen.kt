@@ -90,6 +90,7 @@ fun ActivitiesScreen(serviceRequestViewModel: ServiceRequestViewModel) {
                 WithActivityActivitiesScreen(serviceRequestViewModel)
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 

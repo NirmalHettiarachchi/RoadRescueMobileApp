@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,13 +35,23 @@ fun InstructionsScreen() {
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle1
             )
-            WithInstructionScreen("Your phone should be connected to the internet.")
-            WithInstructionScreen("Complete all required details to request the service.")
-            WithInstructionScreen("If the issue is not listed, select 'Other' from the options. The same applies to the vehicle.")
-            WithInstructionScreen("If a garage does not accept your request within three minutes, the system will automatically cancel it.")
-            WithInstructionScreen("To contact the service provider, use the 'Contact Technician' option on the track location screen.")
-            WithInstructionScreen("Make the payment in cash or by card after receiving the service.")
-            WithInstructionScreen("If you experience any issues, please contact support.")
+            Card(
+                modifier = cardModifier,
+                border = BorderStroke(width = 2.dp, Color.White),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                WithInstructionScreen("Your phone should be connected to the internet.")
+                WithInstructionScreen("Complete all required details to request the service.")
+                WithInstructionScreen("If the issue is not listed, select 'Other' from the options. The same applies to the vehicle.")
+                WithInstructionScreen("If a garage does not accept your request within three minutes, the system will automatically cancel it.")
+                WithInstructionScreen("To contact the service provider, use the 'Contact Service Provider' option on the track location screen.")
+                WithInstructionScreen("Make the payment in cash or by card after receiving the service.")
+                WithInstructionScreen("If you experience any issues, please contact support.")
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -71,6 +82,7 @@ fun NoInstructionScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WithInstructionScreen(instruction: String) {
     Card(
@@ -78,7 +90,8 @@ fun WithInstructionScreen(instruction: String) {
         border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = {}
     ) {
         Box(
             contentAlignment = Alignment.Center, // Center content within the Box
