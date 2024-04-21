@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,6 +64,8 @@ fun TrackLocationScreen(
     currentStateViewModel: CurrentStateViewModel,
     context: Context,
 ) {
+    val loading by currentStateViewModel.loading
+    CircularProgressBar(isDisplayed = loading)
 
     LaunchedEffect(key1 = true) {
         currentStateViewModel.fetchLatestRequest(
@@ -88,7 +91,7 @@ fun TrackLocationScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle1
             )
-            if (request?.status?.toInt() == 2) {
+            if (request?.status?.toInt() == 2 || request?.status?.toInt() == 3 || request?.status?.toInt() == 4) {
                 PendingActivityTrackLocationScreen(
                     request.location,
                     request.serviceProviderName,
@@ -163,12 +166,6 @@ fun PendingActivityTrackLocationScreen(
                 style = textStyle2
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = "ETA: 14 Minutes",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = textStyle2
-            )
-            Spacer(modifier = Modifier.height(16.dp))
             //displayLocation
             LocationDisplay(
                 latLong,
