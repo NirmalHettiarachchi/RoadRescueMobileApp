@@ -3,9 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+<<<<<<< HEAD:CustomerApp/app/src/main/AndroidManifest.xml
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+=======
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+
+>>>>>>> 12d934a82ad8ead52339348246aadb3a9dfa091f:app/src/main/AndroidManifest.xml
 
     <application
         android:allowBackup="true"
@@ -32,7 +41,11 @@
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
+<<<<<<< HEAD:CustomerApp/app/src/main/AndroidManifest.xml
             android:value="@string/google_maps_key"
+=======
+            android:value="AIzaSyD4rjU7Em93BrkTIssrpXGEEb7jq4YM7MM"
+>>>>>>> 12d934a82ad8ead52339348246aadb3a9dfa091f:app/src/main/AndroidManifest.xml
             />
     </application>
 
