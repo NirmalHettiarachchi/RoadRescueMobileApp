@@ -1,0 +1,45 @@
+{
+  "project_info": {
+<<<<<<< HEAD:CustomerApp/app/google-services.json
+    "project_number": "1081702453853",
+    "project_id": "rescue-app-2189a",
+    "storage_bucket": "rescue-app-2189a.appspot.com"
+=======
+    "project_number": "15670009675",
+    "project_id": "garage-c6544",
+    "storage_bucket": "garage-c6544.appspot.com"
+>>>>>>> 12d934a82ad8ead52339348246aadb3a9dfa091f:app/google-services.json
+  },
+  "client": [
+    {
+      "client_info": {
+<<<<<<< HEAD:CustomerApp/app/google-services.json
+        "mobilesdk_app_id": "1:1081702453853:android:ef3de8ce25f76bbcc873b4",
+        "android_client_info": {
+          "package_name": "eu.tutorials.roadrescuecustomer"
+=======
+        "mobilesdk_app_id": "1:15670009675:android:47e09a6fcb9a86bfe652ce",
+        "android_client_info": {
+          "package_name": "com.example.garage"
+>>>>>>> 12d934a82ad8ead52339348246aadb3a9dfa091f:app/google-services.json
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+<<<<<<< HEAD:CustomerApp/app/google-services.json
+          "current_key": "AIzaSyC5xdSI3ycdNxKxpX1SKX78PddsZqpQSH0"
+=======
+          "current_key": "AIzaSyDKLxRVSqVEr5ZRKuUzPudCeWG5TCzQi3U"
+>>>>>>> 12d934a82ad8ead52339348246aadb3a9dfa091f:app/google-services.json
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
