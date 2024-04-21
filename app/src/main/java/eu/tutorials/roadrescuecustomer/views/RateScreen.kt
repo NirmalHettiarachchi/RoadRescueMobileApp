@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -179,7 +180,11 @@ fun RateScreen(
                 btnName = "Submit",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                serviceRequestViewModel.rateOrSkip(context,stars, requestId = request.id.toInt())
+                if(stars > 0) {
+                    serviceRequestViewModel.rateOrSkip(context,stars, requestId = request.id.toInt())
+                } else {
+                    Toast.makeText(context, "Select a rating", Toast.LENGTH_SHORT)
+                }
             }
             CommonButton(
                 btnName = "Skip",

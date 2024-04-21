@@ -151,7 +151,7 @@ fun PaymentMethodDialog(
 
                 Button(
                     onClick = {
-                        serviceRequestViewModel.checkForStatus(request.id.toInt())
+                        serviceRequestViewModel.paymentDone(context, request.id.toInt())
                     },
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     border = BorderStroke(width = 2.dp, color = Color.White),
