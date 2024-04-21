@@ -181,7 +181,7 @@ fun GarageDashboard(
                 }
             }else{
                 title = "401"
-                message = "Cannot call the sever"
+                message = "Can not call the sever"
                 buttonOneName = "Ok"
                 buttonTwoName = "null"
                 showMessageDialog = true
@@ -246,7 +246,7 @@ fun GarageDashboard(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent() {
+                    SidebarContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -682,7 +682,8 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
 
                             val option= CommonDropdown(
                                 optionList = techniciansList,
-                                defaultSelection = "Technician "
+                                defaultSelection = "Technician ",
+                                Modifier
                             )
 
 

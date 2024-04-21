@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,15 +41,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.ResponseObject
 import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.MainViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -60,12 +65,20 @@ fun TechnicianDashboard(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val viewModel:MainViewModel= viewModel()
+
+    LaunchedEffect(Unit){
+        loadServices(viewModel)
+    }
+
+
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent() {
+                    SidebarContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -137,6 +150,25 @@ fun TechnicianDashboard(
             }
 
         }}
+}
+
+fun loadServices(viewModel: MainViewModel):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        /*viewModel.getGarageServiceRequest("1", "getServices") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }*/
+    }catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garage.models.Garage
 import com.example.garage.models.GarageTechnician
+import com.example.garage.models.IssueSupportTicket
+import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.UpdateGarage
@@ -304,6 +306,10 @@ class MainViewModel : ViewModel() {
     }
 
 
+
+
+
+
     //---------------------------------------------------------Garage Section---------------------------------------------------------------
 
     suspend fun getGarageDetails(
@@ -508,6 +514,102 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val call = garageService.getGarageData(searchId,option)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+    suspend fun getCustomerSupport(
+        searchId:String,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit)
+    {
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.getGarageData(searchId,option)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+    suspend fun sendSupportTicket(
+        supportTicket: IssueSupportTicket,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.postSupportTicket(
+                    NewSupportTicket(
+                        supportTicket.getSpId(),
+                        supportTicket.getTitle(),
+                        supportTicket.getDescription(),option
+                    )
+                )
                 call.enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                         if (response.isSuccessful) {

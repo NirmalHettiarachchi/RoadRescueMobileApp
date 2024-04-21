@@ -25,11 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.garage.repository.Screen
+import kotlin.system.exitProcess
 
 
 @Composable
 
-fun SidebarContent(menuClicked:()->Unit){
+fun SidebarContent(
+    navController: NavController,
+    menuClicked:()->Unit
+){
+
 
     Column(
 
@@ -73,15 +80,30 @@ fun SidebarContent(menuClicked:()->Unit){
                 garageOpenClosedStatus=chaneState(garageOpenClosedStatus)
             })
 
-            SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {})
+            SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {
+                navController.navigate(Screen.Activities.route)
+            })
 
-            SidebarButton(buttonName="Help",verticalPadding=8, onClick = {})
+            SidebarButton(buttonName="Help",verticalPadding=8, onClick = {
+                navController.navigate(Screen.HelpScreen.route)
+            })
 
-            SidebarButton(buttonName="Settings",verticalPadding=8, onClick = {})
+            SidebarButton(buttonName="Settings",verticalPadding=8, onClick = {
+                navController.navigate(Screen.SettingsScreen.route)
+            })
 
         }
 
-        SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {})
+        SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {
+
+            // Handle logout logic here
+            // For example, clear session data and navigate to login screen
+//            clearSessionData()
+//            navigateToLoginScreen()
+
+            // Stop the application execution
+            exitProcess(0)
+        })
     }
 
 }

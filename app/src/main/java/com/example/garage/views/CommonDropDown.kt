@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CommonDropdown(
-    optionList:List<Any>,defaultSelection:Any
+    optionList:List<Any>,defaultSelection:Any,modifier: Modifier
 ): Any {
 
     var expanded by remember { mutableStateOf(false) }
@@ -38,7 +38,7 @@ fun CommonDropdown(
 
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(0.9f)
             .fillMaxHeight(0.2f)
             .background(Color.White, shape = RoundedCornerShape(20.dp))
@@ -50,7 +50,7 @@ fun CommonDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = true },
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceAround,
 
             ) {
 

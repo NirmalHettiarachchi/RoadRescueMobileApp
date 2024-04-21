@@ -18,15 +18,18 @@ import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.SharedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
+import com.example.garage.views.ChangePhoneNumWindow
 import com.example.garage.views.EditTechnician
 import com.example.garage.views.GarageDashboard
 import com.example.garage.views.GarageProfile
 import com.example.garage.views.GarageProfileEdit
+import com.example.garage.views.HelpBox
 import com.example.garage.views.LoginScreen
 import com.example.garage.views.RegisterScreen
+import com.example.garage.views.SettingsScreen
 import com.example.garage.views.TechnicianApp.TechnicianCompleteJob
 import com.example.garage.views.TechnicianApp.TechnicianDashboard
-import com.example.garage.views.TechnicianProfile
+import com.example.garage.views.TechnicianApp.TechnicianProfile
 import com.example.garage.views.TechniciansList
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -141,6 +144,16 @@ fun SetupNavGraph(
             TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel,context=context)
         }
 
+        composable(route=Screen.SettingsScreen.route) {
+            SettingsScreen(navController) }
+
+        composable(route=Screen.ChangePhoneNumberScreen.route){
+              ChangePhoneNumWindow(navController = navController, onDismiss = {})
+        }
+
+        composable(route=Screen.HelpScreen.route){
+            HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel)
+        }
     }
 }
 

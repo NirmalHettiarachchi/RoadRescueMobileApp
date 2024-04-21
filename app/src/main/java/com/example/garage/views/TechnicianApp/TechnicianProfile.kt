@@ -1,4 +1,4 @@
-package com.example.garage.views
+package com.example.garage.views.TechnicianApp
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,6 +43,15 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.garage.R
 import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.views.CommonButton
+import com.example.garage.views.CommonDropdown
+import com.example.garage.views.CommonTextField
+import com.example.garage.views.Footer
+import com.example.garage.views.Header
+import com.example.garage.views.cardDefaultModifier
+import com.example.garage.views.defaultBackground
+import com.example.garage.views.textStyle1
+import com.example.garage.views.textStyle4
 
 @Composable
 fun TechnicianProfile(
@@ -168,7 +177,7 @@ fun TechnicianProfile(
 
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    CommonDropdown(optionList = expertiseAreas, defaultSelection = "Expertise Areas")
+                    CommonDropdown(optionList = expertiseAreas, defaultSelection = "Expertise Areas",Modifier)
 
                     Spacer(modifier = Modifier.height(4.dp))
 

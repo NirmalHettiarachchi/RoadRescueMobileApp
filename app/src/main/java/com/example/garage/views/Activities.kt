@@ -129,7 +129,7 @@ fun Activities(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent() {
+                    SidebarContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -544,7 +544,7 @@ fun ActivityCard(
                                 }, color = Color.Black, modifier = Modifier
                                     .weight(1f)
                                     .padding(8.dp, 0.dp))
-                                Text(text = activityModel.getDescription(),color = Color.Black, modifier = Modifier.weight(1f), maxLines = 3)
+                                Text(text = if(activityModel.getDescription().isEmpty()) "No Description" else activityModel.getDescription(),color = Color.Black, modifier = Modifier.weight(1f), maxLines = 3)
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))

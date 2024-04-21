@@ -46,7 +46,6 @@ fun Footer(
                 },
             tint = Color.White,
             contentDescription = "footer technician"
-
         )
 
 

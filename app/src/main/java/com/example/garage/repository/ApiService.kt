@@ -1,5 +1,6 @@
 package com.example.garage.repository
 
+import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
 import com.example.garage.models.UpdateGarage
 import com.example.garage.models.UpdateTechnician
@@ -18,7 +19,7 @@ import retrofit2.http.Query
 
 
 
-private val ipV4Address="10.22.162.54"
+private val ipV4Address="192.168.28.117"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
@@ -30,6 +31,9 @@ interface ApiService {
     @GET("garage")
     fun getGarageData(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
 
+    @Headers("Content-Type: application/json")
+    @POST("garage")
+    fun postSupportTicket(@Body issueTicket: NewSupportTicket): Call<ResponseBody>
 
     @Headers("Content-Type: application/json")
     @PUT("garage")

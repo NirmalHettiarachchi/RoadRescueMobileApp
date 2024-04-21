@@ -196,7 +196,7 @@ fun GarageProfile(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent() {
+                    SidebarContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }

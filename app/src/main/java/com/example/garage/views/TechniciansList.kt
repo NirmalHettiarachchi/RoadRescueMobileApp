@@ -148,7 +148,7 @@ fun TechniciansList(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent() {
+                    SidebarContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }

@@ -43,3 +43,14 @@ data class UpdateGarage(
     val imageRef: String,
 )
 
+data class NewSupportTicket(
+    @SerializedName("garageId")
+    val garageId: String,
+    @SerializedName("title")
+    val title: String,
+    @SerializedName("description")
+    val description: String,
+    @SerializedName("option")
+    val option: String
+)
+

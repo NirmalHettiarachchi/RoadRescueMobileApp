@@ -68,7 +68,6 @@ fun TrackLocationScreen(
                             //locationViewModel
                         )
                     }
-                    HelpBox()
                 }
                 // Footer(navigationToDashboardScreen,navigationToProfileScreen)
             }
