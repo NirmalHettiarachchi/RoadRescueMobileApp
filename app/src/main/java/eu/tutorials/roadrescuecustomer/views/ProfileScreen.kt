@@ -239,7 +239,7 @@ fun profileField(labelName: String, value: String?, isEditing: Boolean = false):
         Column {
             Text(
                 text = labelName,
-                style = textStyle2,
+                style = textStyle5,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -274,7 +274,7 @@ fun ProfileFieldButton(labelName: String, value: String, onClickButton: () -> Un
         Column {
             Text(
                 text = labelName,
-                style = textStyle2,
+                style = textStyle5,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Card(
