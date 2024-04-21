@@ -738,7 +738,7 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                                             } else {
                                                 title = responseObject.status.toString()
                                                 message = responseObject.message.toString()
-                                                buttonOneName = "Ok"
+                                                buttonOneName = "null"
                                                 buttonTwoName = "null"
                                                 showAlert = true
                                             }

@@ -12,9 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.garage.models.GarageTechnician
 import com.example.garage.models.LocationUtils
-import com.example.garage.viewModels.GarageActivityDetails
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.SharedViewModel
@@ -86,11 +84,9 @@ fun SetupNavGraph(
         }
         
         composable(
-            route="${Screen.Activities.route}/${GarageTechnician().getTechId()}/" +
-                    "${GarageTechnician().getTechFirstName()}/${GarageTechnician().getTechLastName()}"
+            route=Screen.Activities.route
         ){
-            Activities(activityDetails = GarageActivityDetails(currentTime,currentDate, "Gayan","Axio 2017",
-                "T-002",3000f,"I need to replace a tire on my car","Thiran Sasanka") ,navController, "activities",sharedViewModel = sharedViewModel)
+            Activities(navController, "activities")
         }
 
         composable(
@@ -108,11 +104,6 @@ fun SetupNavGraph(
         composable(
             route=Screen.GarageProfile.route
         ){
-
-            val result=navController.previousBackStackEntry?.savedStateHandle?.get<GarageCommonDetails>("garageDetails")
-
-
-
             GarageProfile(
                 navController = navController,
                 navyStatus = "dasdewa",

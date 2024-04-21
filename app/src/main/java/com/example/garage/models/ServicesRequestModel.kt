@@ -7,7 +7,7 @@ class ServicesRequestModel(
     private var _issue: String,
     private var _description: String,
     private var _serviceFee: Double,
-    private var _indicatorLightStatus: String,
+    private var _indicatorLightStatus: String
 
     ) {
 

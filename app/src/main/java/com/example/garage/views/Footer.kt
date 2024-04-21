@@ -1,6 +1,5 @@
 package com.example.garage.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.garage.R
 import com.example.garage.repository.Screen
-import com.example.garage.repository.TechData
 
 @Composable
 fun Footer(
@@ -84,13 +82,6 @@ fun Footer(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-                    Log.d("ane hutto ",navStatus)
-                    val technicianData = TechData(
-                        techId = navStatus,
-                        techFirstName = "",
-                        techLastName = "technician.getTechLastName()",
-                        techProfileRef = "technician.getTechImageRef()"
-                    )
                     navController.navigate(route = Screen.GarageProfile.route)
                 }
             ,
