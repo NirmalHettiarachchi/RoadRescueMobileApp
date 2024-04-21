@@ -1,8 +1,12 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,20 +34,25 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
@@ -196,28 +205,43 @@ fun LocationDisplay(
     latLongStr: String,
     modifier: Modifier
 ) {
+    val mapReady = remember { mutableStateOf(false) }
+
     val latitude = extractLatitude(latLongStr)
     val longitude = extractLongitude(latLongStr)
 
+    val latitude2 = 6.994833270682517
+    val longitude2 = 79.87625012425737
+
     if (latitude != null && longitude != null) {
-//        Text("Location: ${location.latitude} ${location.longitude}")
-//        Text("$latitude $longitude")
         val curLocation = LatLng(latitude, longitude)
+        val techLocation = LatLng(latitude2, longitude2)
 
         val cameraPosition = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(curLocation, 15f)
+            position = CameraPosition.fromLatLngZoom(curLocation, 10f)
         }
         Box(
             modifier = modifier
         ) {
             GoogleMap(
-                modifier = Modifier.fillMaxSize(), // Ensure the map fills the entire Box
-                cameraPositionState = cameraPosition
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPosition,
+                onMapLoaded = { mapReady.value = true }
             ) {
-                Marker(
-                    state = MarkerState(position = curLocation),
-                    title = "Your Location"
-                )
+                if (mapReady.value) {
+                    Marker(
+                        state = MarkerState(position = curLocation),
+                        title = "Your location"
+                    )
+                    val techIconBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.tech_icon)
+                    val resizedTechIcon = resizeBitmap(techIconBitmap, 90, 90)
+                    val techIcon = BitmapDescriptorFactory.fromBitmap(resizedTechIcon)
+                    Marker(
+                        state = MarkerState(position = techLocation),
+                        title = "Technician's location",
+                        icon = techIcon
+                    )
+                }
             }
         }
 
@@ -236,4 +260,8 @@ fun extractLongitude(input: String): Double? {
     val pattern = "longitude=([\\d.+-]+)".toRegex()
     val matchResult = pattern.find(input)
     return matchResult?.groupValues?.get(1)?.toDouble()
+}
+
+fun resizeBitmap(source: Bitmap, width: Int, height: Int): Bitmap {
+    return Bitmap.createScaledBitmap(source, width, height, false)
 }
