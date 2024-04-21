@@ -25,6 +25,7 @@ import eu.tutorials.roadrescuecustomer.models.LocationUtils
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
@@ -41,6 +42,7 @@ fun App(
     registerViewModel: RegisterViewModel,
     loginViewModel: LoginViewModel,
     customerSupportTicketViewModel: CustomerSupportTicketViewModel,
+    navigationViewModel: NavigationViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()
@@ -86,7 +88,7 @@ fun App(
                                 }
                             }
 
-                        }, navController, context, currentStateViewModel, serviceRequestViewModel)
+                        }, navController, context, currentStateViewModel, serviceRequestViewModel, navigationViewModel)
                     }
                 )
             }
@@ -106,7 +108,8 @@ fun App(
                         navigationToProfileScreen = navigationToProfileScreen,
                         navigationToTrackLocationScreen = navigationToTrackLocationScreen,
                         navigationToActivitiesScreen = navigationToActivitiesScreen,
-                        navigationToInstructionsScreen = navigationToInstructionsScreen
+                        navigationToInstructionsScreen = navigationToInstructionsScreen,
+                        navigationViewModel = navigationViewModel
                     )
                 }
             }
@@ -127,6 +130,7 @@ fun App(
                         serviceRequestViewModel = serviceRequestViewModel,
                         locationUtils = locationUtils,
                         locationViewModel = locationViewModel,
+                        navigationViewModel = navigationViewModel,
                         context = context,
                         navController = navController
                     )

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 
 @Composable
@@ -35,7 +36,8 @@ fun SidebarContent(
     navHostController: NavHostController,
     context: Context,
     currentStateViewModel: CurrentStateViewModel,
-    serviceRequestViewModel: ServiceRequestViewModel
+    serviceRequestViewModel: ServiceRequestViewModel,
+    navigationViewModel: NavigationViewModel
 ){
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -65,10 +67,12 @@ fun SidebarContent(
             SidebarButton(buttonName = "Help", verticalPadding = 8) {
                 navHostController.navigate("helpscreen")
                 menuClicked(false)
+                navigationViewModel.selectFooterIcon(null)
             }
             SidebarButton(buttonName = "Settings", verticalPadding = 8) {
                 navHostController.navigate("settingsscreen")
                 menuClicked(false)
+                navigationViewModel.selectFooterIcon(null)
             }
         }
         SidebarButton(buttonName = "Log Out", verticalPadding = 16) {

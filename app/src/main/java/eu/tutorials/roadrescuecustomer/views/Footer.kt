@@ -1,5 +1,6 @@
 package eu.tutorials.roadrescuecustomer.views
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 
 @Composable
 fun Footer(
@@ -34,8 +36,18 @@ fun Footer(
     navigationToProfileScreen: () -> Unit,
     navigationToTrackLocationScreen: () -> Unit,
     navigationToActivitiesScreen: () -> Unit,
-    navigationToInstructionsScreen: () -> Unit
+    navigationToInstructionsScreen: () -> Unit,
+    navigationViewModel: NavigationViewModel
 ) {
+
+    val selectedIcon = remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(key1 = true) {
+        navigationViewModel.selectedFooterIcon.observeForever { icon ->
+            selectedIcon.value = icon
+        }
+    }
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -44,11 +56,26 @@ fun Footer(
             .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
             .background(color = Color(0xFF253555))
     ) {
-        AnimatedIcon(painterId = R.drawable.book_fill, onClick = navigationToActivitiesScreen)
-        AnimatedIcon(painterId = R.drawable.compass_fill, onClick = navigationToTrackLocationScreen)
-        AnimatedIcon(painterId = R.drawable.home, onClick = navigationToDashboardScreen)
-        AnimatedIcon(painterId = R.drawable.chat_fill, onClick = navigationToInstructionsScreen)
-        AnimatedIcon(painterId = R.drawable.user_fill, onClick = navigationToProfileScreen)
+        AnimatedIcon(painterId = R.drawable.book_fill, isSelected = selectedIcon.value == R.drawable.book_fill, onClick = {
+            navigationToActivitiesScreen()
+            navigationViewModel.selectFooterIcon(R.drawable.book_fill)
+        })
+        AnimatedIcon(painterId = R.drawable.compass_fill, isSelected = selectedIcon.value == R.drawable.compass_fill, onClick = {
+            navigationToTrackLocationScreen()
+            navigationViewModel.selectFooterIcon(R.drawable.compass_fill)
+        })
+        AnimatedIcon(painterId = R.drawable.home, isSelected = selectedIcon.value == R.drawable.home, onClick = {
+            navigationToDashboardScreen()
+            navigationViewModel.selectFooterIcon(R.drawable.home)
+        })
+        AnimatedIcon(painterId = R.drawable.chat_fill, isSelected = selectedIcon.value == R.drawable.chat_fill, onClick = {
+            navigationToInstructionsScreen()
+            navigationViewModel.selectFooterIcon(R.drawable.chat_fill)
+        })
+        AnimatedIcon(painterId = R.drawable.user_fill, isSelected = selectedIcon.value == R.drawable.user_fill, onClick = {
+            navigationToProfileScreen()
+            navigationViewModel.selectFooterIcon(R.drawable.user_fill)
+        })
 //        Icon(
 //            painter = painterResource(id = R.drawable.compass_fill),
 //            modifier = Modifier
@@ -89,6 +116,7 @@ fun Footer(
 @Composable
 fun AnimatedIcon(
     painterId: Int,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
     var isPressed by remember { mutableStateOf(false) }
@@ -101,9 +129,14 @@ fun AnimatedIcon(
         ), label = ""
     )
 
+    val iconColor = animateColorAsState(
+        targetValue = if (isSelected) Color(0xFFF4C9FF) else Color.White, label = ""
+    )
+
     Icon(
         painter = painterResource(id = painterId),
         contentDescription = null,
+        tint = iconColor.value,
         modifier = Modifier
             .padding(16.dp)
             .size(40.dp)

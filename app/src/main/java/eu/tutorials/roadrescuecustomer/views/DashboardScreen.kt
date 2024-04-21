@@ -66,6 +66,7 @@ import eu.tutorials.roadrescuecustomer.models.ServiceRequest
 import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -84,6 +85,7 @@ fun DashboardScreen(
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
+    navigationViewModel: NavigationViewModel,
     context: Context,
     navController: NavHostController
 ) {
@@ -223,6 +225,7 @@ fun DashboardScreen(
                             request = request,
                             serviceRequestViewModel = serviceRequestViewModel,
                             currentStateViewModel = currentStateViewModel,
+                            navigationViewModel = navigationViewModel,
                             navController = navController
                         )
                     } else if (request?.status?.toInt() == 3) {
@@ -230,6 +233,7 @@ fun DashboardScreen(
                             request = request,
                             serviceRequestViewModel = serviceRequestViewModel,
                             currentStateViewModel = currentStateViewModel,
+                            navigationViewModel = navigationViewModel,
                             navController = navController
                         )
                     } else if (request?.status?.toInt() == 4) {
@@ -520,6 +524,7 @@ fun AssignedActivityDashboard(
     request: ServiceRequest,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
+    navigationViewModel: NavigationViewModel,
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -612,6 +617,7 @@ fun AssignedActivityDashboard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 navController.navigate("tracklocationscreen")
+                navigationViewModel.selectFooterIcon(R.drawable.compass_fill)
             }
 //            Spacer(modifier = Modifier.height(16.dp))
 
@@ -620,6 +626,7 @@ fun AssignedActivityDashboard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 navController.navigate("helpscreen")
+                navigationViewModel.selectFooterIcon(null)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -639,6 +646,7 @@ fun ServiceProvidedDashboard(
     request: ServiceRequest,
     currentStateViewModel: CurrentStateViewModel,
     serviceRequestViewModel: ServiceRequestViewModel,
+    navigationViewModel: NavigationViewModel,
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -780,6 +788,7 @@ fun ServiceProvidedDashboard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 navController.navigate("helpscreen")
+                navigationViewModel.selectFooterIcon(null)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
