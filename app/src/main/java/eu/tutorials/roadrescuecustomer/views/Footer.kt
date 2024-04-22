@@ -143,7 +143,10 @@ fun AnimatedIcon(
 ) {
 //    var isPressed by remember { mutableStateOf(false) }
 
-    val iconPainter = painterResource(id = if (isSelected) selectedPainterId else unselectedPainterId)
+    val selectedPainter = remember(selectedPainterId) { selectedPainterId }
+    val unselectedPainter = remember(unselectedPainterId) { unselectedPainterId }
+
+    val iconPainter = if (isSelected) painterResource(id = selectedPainter) else painterResource(id = unselectedPainter)
 
 //    val scale = animateFloatAsState(
 //        targetValue = if (isPressed) 0.75f else 1f,
@@ -155,17 +158,16 @@ fun AnimatedIcon(
 
     val animationSpec = tween<Color>(durationMillis = 300, easing = FastOutSlowInEasing)
 
-    val iconColor = animateColorAsState(
+    val iconColor by animateColorAsState(
         targetValue = if (isSelected) Color(0xFF80BAF2) else Color.White,
         animationSpec = animationSpec,
         label = ""
     )
-
     //icon color - 0xFFF4C9FF
     Icon(
         painter = iconPainter,
         contentDescription = null,
-        tint = iconColor.value,
+        tint = iconColor,
         modifier = Modifier
             .padding(16.dp)
             .size(40.dp)
