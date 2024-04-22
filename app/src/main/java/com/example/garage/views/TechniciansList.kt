@@ -61,6 +61,7 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.repository.TechData
+import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -70,7 +71,7 @@ import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
-    navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel,
+    navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)

@@ -56,7 +56,7 @@ fun TechnicianCompleteJob(
     navStatus: String,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context,
+    context: Context
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()

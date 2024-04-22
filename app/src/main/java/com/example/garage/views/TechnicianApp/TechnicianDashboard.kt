@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
@@ -59,7 +60,7 @@ import java.net.SocketTimeoutException
 @Composable
 fun TechnicianDashboard(
     navController: NavController,
-    navStatus: String,
+    navStatus: String
 ){
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)

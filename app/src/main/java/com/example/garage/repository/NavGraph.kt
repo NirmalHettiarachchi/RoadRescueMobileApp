@@ -39,15 +39,25 @@ import java.util.Date
 fun SetupNavGraph(
     navController: NavHostController
 ){
+
+//    var screen:String=""
+//    if (session.isLoggedIn.value){
+//        screen=Screen.TechnicianDashboard.route
+//    }else{
+//        screen=Screen.GarageDashboard.route
+//    }
+
     val context= LocalContext.current
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
     val locationViewModel:LocationViewModel= viewModel()
     val locationUtils=LocationUtils(context)
 
+
+
     NavHost(
         navController = navController,
-        startDestination = Screen.GarageDashboard.route,
+        startDestination = Screen.TechnicianDashboard.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -132,6 +142,18 @@ fun SetupNavGraph(
             TechnicianProfile(navController = navController, navyStatus = "technicianProfile",sharedViewModel = sharedViewModel)
         }
 
+        composable(route=Screen.SettingsScreen.route) {
+            SettingsScreen(navController)
+        }
+
+        composable(route=Screen.ChangePhoneNumberScreen.route){
+            ChangePhoneNumWindow(navController = navController, onDismiss = {})
+        }
+
+        composable(route=Screen.HelpScreen.route){
+            HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel)
+        }
+
         composable(
             route=Screen.TechnicianDashboard.route
         ){
@@ -141,19 +163,9 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianCompleteJob.route
         ){
-            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel,context=context)
+            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel, context = context)
         }
 
-        composable(route=Screen.SettingsScreen.route) {
-            SettingsScreen(navController) }
-
-        composable(route=Screen.ChangePhoneNumberScreen.route){
-              ChangePhoneNumWindow(navController = navController, onDismiss = {})
-        }
-
-        composable(route=Screen.HelpScreen.route){
-            HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel)
-        }
     }
 }
 

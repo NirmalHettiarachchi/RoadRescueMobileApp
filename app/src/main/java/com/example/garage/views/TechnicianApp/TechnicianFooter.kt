@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.garage.R
+import com.example.garage.repository.Screen
 
 @Composable
 fun TechnicianFooter(
@@ -54,7 +55,7 @@ fun TechnicianFooter(
                 .padding(16.dp)
                 .size(45.dp)
                 .clickable {
-//                    navController.navigate(route = Screen.GarageDashboard.route)
+                    navController.navigate(Screen.TechnicianDashboard.route)
                 }
             ,
             tint = Color.Unspecified,

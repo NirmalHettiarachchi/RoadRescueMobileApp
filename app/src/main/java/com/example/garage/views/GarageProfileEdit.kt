@@ -66,6 +66,7 @@ import androidx.navigation.NavHostController
 import com.example.garage.R
 import com.example.garage.models.Garage
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garage.R
+import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException

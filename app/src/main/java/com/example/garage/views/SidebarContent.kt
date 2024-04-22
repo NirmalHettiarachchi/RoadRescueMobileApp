@@ -37,7 +37,6 @@ fun SidebarContent(
     menuClicked:()->Unit
 ){
 
-
     Column(
 
 
@@ -95,6 +94,9 @@ fun SidebarContent(
         }
 
         SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {
+
+            // session closed
+//            session.logIn()
 
             // Handle logout logic here
             // For example, clear session data and navigate to login screen

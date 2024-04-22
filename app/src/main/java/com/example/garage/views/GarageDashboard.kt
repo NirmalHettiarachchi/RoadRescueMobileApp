@@ -71,7 +71,7 @@ import java.net.SocketTimeoutException
 fun GarageDashboard(
     navController: NavController,
     navStatus: String,
-    garageSharedViewModel: GarageSharedViewModel,
+    garageSharedViewModel: GarageSharedViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -838,6 +838,3 @@ suspend fun loadTechniciansGroupByIssue(viewModel: MainViewModel,issueCategory:S
     return response
 
 }
-
-
-
