@@ -94,5 +94,4 @@ class CustomerSupportTicketViewModel : ViewModel() {
             loading.value = false
         }
     }
-
 }

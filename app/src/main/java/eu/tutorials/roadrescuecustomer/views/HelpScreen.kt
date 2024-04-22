@@ -113,9 +113,36 @@ fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewM
         customerSupportTicketViewModel.fetchCustomerSupportTickets(customerId)
     }
 
-    customerSupportTicketViewModel.tickets.forEach { ticket ->
-        HelpRequested(ticket)
+    Card(
+        modifier = cardModifier,
+        border = BorderStroke(width = 2.dp, Color.White),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))
+    ) {
+        if(customerSupportTicketViewModel.tickets.isEmpty()) {
+            Spacer(modifier = Modifier.height(128.dp))
+            Text(
+                text = "There are no support tickets to show!",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(128.dp))
+        } else {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Support tickets",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                style = textStyle2
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            customerSupportTicketViewModel.tickets.forEach { ticket ->
+                HelpRequested(ticket)
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
+
     Spacer(modifier = Modifier.height(8.dp))
 }
 
@@ -265,7 +292,7 @@ fun HelpRequested(customerSupportTicket: CustomerSupportTicket) {
         border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = { showMoreDetailsWindow = true }
     ) {
 
