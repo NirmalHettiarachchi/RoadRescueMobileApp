@@ -178,6 +178,8 @@ fun TechnicianCompleteJob(
                                     }
                             }
 
+                            // load google map
+
                             GoogleMap(
                                 modifier = Modifier.fillMaxSize(),
                                 cameraPositionState = cameraPositionState,

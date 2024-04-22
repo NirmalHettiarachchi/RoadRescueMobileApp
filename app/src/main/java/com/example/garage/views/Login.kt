@@ -1,20 +1,33 @@
 package com.example.garage.views
 
+import android.content.Context
+import android.content.Intent
+import android.location.LocationManager
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,14 +40,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garage.R
+import com.example.garage.models.LocationUtils
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
@@ -42,10 +59,13 @@ import java.net.SocketTimeoutException
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    loginShearedViewModel: LoginShearedViewModel
+    loginShearedViewModel: LoginShearedViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel
 ) {
 
     val viewModel = viewModel<MainViewModel>()
+    val context = LocalContext.current
 
     Column(
         defaultBackground
@@ -54,6 +74,11 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+        TrackLocation(
+            locationUtils = locationUtils,
+            locationViewModel = locationViewModel,
+            context = context
+        )
 
         Column(
             cardModifier,
@@ -73,7 +98,9 @@ fun LoginScreen(
                 LoginBox(
                     navController = navController,
                     viewModel = viewModel,
-                    loginShearedViewModel
+                    loginShearedViewModel,
+                    locationUtils,
+                    locationViewModel
                 )
             }
         }
@@ -85,9 +112,12 @@ fun LoginScreen(
 fun LoginBox(
     navController: NavHostController,
     viewModel: MainViewModel,
-    loginShearedViewModel: LoginShearedViewModel
+    loginShearedViewModel: LoginShearedViewModel,
+    locationUtils: LocationUtils,
+    locationViewModel: LocationViewModel
 ) {
     val showDialog = remember { mutableStateOf(false) }
+    var showLocationDialog = remember { mutableStateOf(false) }
 
     var status by remember { mutableStateOf(0) }
     var title by remember { mutableStateOf("") }
@@ -187,40 +217,62 @@ fun LoginBox(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp)
             ) {
-                if (txtOtp == otp){
+                if (txtOtp.isEmpty() || phoneNumber.isEmpty()){
+                    Toast.makeText(
+                        context,
+                        "Empty fields",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    if (txtOtp == otp){
 
-                    val part= id.split("-")
-                    Log.d("TAG log", "LoginBox: ${part[0]}")
-                    Log.d("TAG log", "LoginBox: ${part[1]}")
+                        val currentLocation =
+                            locationViewModel.location.value?.latitude?.let { it1 ->
+                                locationViewModel.location.value?.longitude?.let { it2 ->
+                                    LatLng(
+                                        it1, it2
+                                    )
+                                }
+                            }
 
-                    if (part[0]=="sp"){
-                        loginShearedViewModel.specificLoginId(part[1])
-                        navController.navigate(Screen.GarageDashboard.route)
-                    }else if (part[0]=="mp"){
-                        loginShearedViewModel.specificLoginId(part[1])
+
+                        val part= id.split("-")
+                        Log.d("TAG log", "LoginBox: ${part[0]}")
+                        Log.d("TAG log", "LoginBox: ${part[1]}")
+
+
+                        if (currentLocation!=null){
+                            if (part[0]=="sp"){
+                                loginShearedViewModel.specificLoginId(part[1])
+                                navController.navigate(Screen.GarageDashboard.route)
+                            }else if (part[0]=="mp"){
+                                loginShearedViewModel.specificLoginId(part[1])
 //                        navController.navigate(Screen.)
-                    }else if (part[0]=="t"){
-                        loginShearedViewModel.specificLoginId(part[1])
-                        navController.navigate(Screen.TechnicianDashboard.route)
+                            }else if (part[0]=="t"){
+                                loginShearedViewModel.specificLoginId(part[1])
+                                navController.navigate(Screen.TechnicianDashboard.route)
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    "Error matching",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }else{
+                            message = "Please turn on device location,with uses RoadRescue service"
+                            buttonOneName = "OK"
+                            showLocationDialog.value= true
+                        }
                     }else{
                         Toast.makeText(
                             context,
-                            "Error matching",
+                            "OTP is incorrect.",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-
-
-
-
-                }else{
-                    Toast.makeText(
-                        context,
-                        "OTP is incorrect.",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
+
             Spacer(modifier = Modifier.height(40.dp))
             Spacer(
                 modifier = Modifier
@@ -259,4 +311,92 @@ fun LoginBox(
         )
     }
 
+    if (showLocationDialog.value){
+        locationAlert(
+            message = message,
+            buttonOneName = buttonOneName,
+            onConfirm = {
+                enableLocation(context)
+                showLocationDialog.value=false
+            }
+        )
+    }
+
+
+}
+
+
+@Composable
+fun locationAlert(
+    message: String?,
+    buttonOneName: String?,
+    onConfirm: () -> Unit,
+) {
+
+    AlertDialog(
+        onDismissRequest = { /* Nothing to do here */ },
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = "location icon",
+                    modifier = deleteIconStyles.size(64.dp),
+                    tint = Color(0xB5D32222)
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                if (message != null) {
+                    Text(
+                        text = message,
+                        style = textStyle2,
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+
+                Button(
+                    modifier = Modifier.width(80.dp),
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.buttonColors(Color(0xFF253555)),
+                    border = BorderStroke(width = 2.dp,color= Color.White)
+                ) {
+
+                    if (buttonOneName != null) {
+                        Text(text = buttonOneName, color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        },
+        containerColor = Color(0xC1CCC0C0)
+    )
+}
+
+private fun enableLocation(context: Context) {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+    if (locationManager != null && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        // If location is not enabled, show location settings
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
 }

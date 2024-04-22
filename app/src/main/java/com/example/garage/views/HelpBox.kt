@@ -55,7 +55,6 @@ import com.example.garage.R
 import com.example.garage.models.CustomerSupportTicket
 import com.example.garage.models.IssueSupportTicket
 import com.example.garage.models.ResponseObject
-import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
