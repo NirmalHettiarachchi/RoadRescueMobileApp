@@ -130,7 +130,7 @@ fun AnimatedIcon(
     )
 
     val iconColor = animateColorAsState(
-        targetValue = if (isSelected) Color(0xFFF4C9FF) else Color.White, label = ""
+        targetValue = if (isSelected) Color(0xFF77ACE0) else Color.White, label = ""  //0xFFF4C9FF
     )
 
     Icon(

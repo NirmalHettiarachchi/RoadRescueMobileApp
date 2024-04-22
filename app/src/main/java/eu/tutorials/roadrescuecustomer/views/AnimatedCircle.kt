@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import eu.tutorials.roadrescuecustomer.R
 import kotlinx.coroutines.delay
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 
 @Composable
 fun AnimatedCircle(isDisplayed: Boolean) {
@@ -41,7 +43,8 @@ fun AnimatedCircle(isDisplayed: Boolean) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
-                    .rotate(rotationState)
+                    .rotate(rotationState),
+                colorFilter = ColorFilter.tint(Color(0xFF253555))
             )
         }
     }

@@ -1,9 +1,11 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +22,8 @@ import eu.tutorials.roadrescuecustomer.R
 import kotlinx.coroutines.delay
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +50,8 @@ fun CircularProgressBar(isDisplayed: Boolean) {
                     contentDescription = null,
                     modifier = Modifier
                         .size(50.dp)
-                        .rotate(rotationState)
+                        .rotate(rotationState),
+                    colorFilter = ColorFilter.tint(Color(0xFF171E2C))
                 )
             }
         }
