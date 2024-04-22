@@ -70,7 +70,6 @@ import androidx.navigation.NavController
 import com.example.garage.R
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageProfileViewModel
-import com.example.garage.viewModels.GarageSessionViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
@@ -274,22 +273,6 @@ fun GarageProfile(
                                     .align(Alignment.Bottom)
                                     .background(Color(0xFF253555), shape = RoundedCornerShape(4.dp))
                                     .clickable {
-                                        /*val garageData = GarageCommonDetails(
-                                            processGarage.getGarageId(),
-                                            processGarage.getGarageName(),
-                                            processGarage.getGarageContactNumber(),
-                                            processGarage.getGarageStatus(),
-                                            processGarage.getGarageEmail(),
-                                            processGarage
-                                                .getGarageRating()
-                                                .toString(),
-                                            processGarage.getGarageType(),
-                                            processGarage.getOwnerName(),
-                                            processGarage.getGarageProfilePicRef()
-                                        )*/
-                                        /*if (garageData != null) {
-                                            tempViewModel.garageCommonDetails(garageData)
-                                        }*/
                                         navController.navigate(route = Screen.GarageProfileEdit.route)
                                     }
                             )

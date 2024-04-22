@@ -1,5 +1,6 @@
 package com.example.garage.repository
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -15,7 +16,9 @@ import androidx.navigation.compose.composable
 import com.example.garage.models.LocationUtils
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.LocationViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
 import com.example.garage.views.ChangePhoneNumWindow
@@ -37,6 +40,7 @@ import java.util.Date
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SetupNavGraph(
+    mainActivity: Context,
     navController: NavHostController
 ){
 
@@ -50,6 +54,8 @@ fun SetupNavGraph(
     val context= LocalContext.current
     val sharedViewModel: SharedViewModel = viewModel()
     val garageSharedViewModel:GarageSharedViewModel= viewModel()
+    val loginShearedViewModel: LoginShearedViewModel = viewModel()
+    val technicianDashboardServiceCommonDetails:TechnicianShearedViewModel  = viewModel()
     val locationViewModel:LocationViewModel= viewModel()
     val locationUtils=LocationUtils(context)
 
@@ -57,7 +63,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.TechnicianDashboard.route,
+        startDestination = Screen.Login.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -79,7 +85,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.Login.route
         ){
-            LoginScreen(navController=navController)
+            LoginScreen(navController=navController,loginShearedViewModel)
         }
 
         composable(
@@ -93,7 +99,7 @@ fun SetupNavGraph(
             route=Screen.GarageDashboard.route
         ){
 
-            GarageDashboard(navController=navController,navStatus="tempData",garageSharedViewModel= garageSharedViewModel)
+            GarageDashboard(navController=navController,navStatus="tempData",garageSharedViewModel= garageSharedViewModel,loginShearedViewModel)
         }
         
         composable(
@@ -157,13 +163,15 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianDashboard.route
         ){
-            TechnicianDashboard(navController = navController, navStatus = "technicianDashboard")
+            TechnicianDashboard(navController = navController, navStatus = "technicianDashboard",loginShearedViewModel,technicianDashboardServiceCommonDetails)
         }
 
         composable(
             route=Screen.TechnicianCompleteJob.route
         ){
-            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel, context = context)
+            TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel, context = context,
+                technicianShearedViewModel = technicianDashboardServiceCommonDetails
+            )
         }
 
     }

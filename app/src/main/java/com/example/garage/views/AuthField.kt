@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,14 +52,21 @@ fun AuthField(labelName: String, value: String?): String {
             OutlinedTextField(
                 value = fieldValue ?: "",
                 onValueChange = { fieldValue = it },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
                     .padding(horizontal = 36.dp)
                     .height(50.dp)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(50))
                     .shadow(6.dp, shape = RoundedCornerShape(50))
                     .background(Color.White),
-                textStyle = textStyle2,
+                textStyle = TextStyle(
+                    Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize =16.sp,
+                    letterSpacing = 0.15.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily
+                ),
                 placeholder = {
                     Text(
                         text = labelName,

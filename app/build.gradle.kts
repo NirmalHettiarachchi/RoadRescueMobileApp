@@ -106,7 +106,7 @@ dependencies {
     // otp authentication
 
 //    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
-//    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
 //    implementation("com.google.firebase:firebase-analytics-impl:16.3.0")
 
     // add gif lib

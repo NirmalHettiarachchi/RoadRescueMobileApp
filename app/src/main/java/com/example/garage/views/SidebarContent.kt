@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.garage.repository.Screen
-import kotlin.system.exitProcess
 
 
 @Composable
@@ -95,16 +94,7 @@ fun SidebarContent(
 
         SidebarButton(buttonName="Log Out",verticalPadding=16, onClick = {
 
-            // session closed
-//            session.logIn()
-
-            // Handle logout logic here
-            // For example, clear session data and navigate to login screen
-//            clearSessionData()
-//            navigateToLoginScreen()
-
-            // Stop the application execution
-            exitProcess(0)
+            navController.navigate(Screen.Login.route)
         })
     }
 

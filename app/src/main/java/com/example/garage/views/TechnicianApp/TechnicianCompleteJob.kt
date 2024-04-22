@@ -32,7 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.garage.models.LocationUtils
+import com.example.garage.models.TechnicianDashboard
 import com.example.garage.viewModels.LocationViewModel
+import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
@@ -56,11 +58,14 @@ fun TechnicianCompleteJob(
     navStatus: String,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
-    context: Context
+    context: Context,
+    technicianShearedViewModel: TechnicianShearedViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
+    var service = technicianShearedViewModel.technician
+    val technicianService= service?.serviceId?.let {
+        TechnicianDashboard(it,service.time,service.description,service.issueCategory,service.customerName,service.customerContact,service.vehicleModel) }
 
 
     ModalNavigationDrawer(
@@ -116,7 +121,7 @@ fun TechnicianCompleteJob(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth(0.84f)
-                        .fillMaxHeight(1f)
+                        .fillMaxHeight(0.97f)
                         .verticalScroll(state = rememberScrollState()),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3)),
@@ -125,17 +130,26 @@ fun TechnicianCompleteJob(
                     ) {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ServiceRequest(
-                        navController = navController,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
+                    service?.techId?.let { it1 ->
+                        if (technicianService != null) {
+                            ServiceRequest(
+                                it1,
+                                technicianService,
+                                navController = navController,
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                context = context,
+                                technicianShearedViewModel,
+                                false
+                            )
+                        }
+                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.95f)
-                            .height(300.dp)
+                            .height(340.dp)
                             .align(Alignment.CenterHorizontally),
                         shape = RoundedCornerShape(20.dp)
                     ) {

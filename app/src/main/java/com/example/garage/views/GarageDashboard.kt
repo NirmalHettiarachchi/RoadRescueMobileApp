@@ -58,6 +58,7 @@ import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -71,8 +72,11 @@ import java.net.SocketTimeoutException
 fun GarageDashboard(
     navController: NavController,
     navStatus: String,
-    garageSharedViewModel: GarageSharedViewModel
+    garageSharedViewModel: GarageSharedViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
+
+    var garageId=loginShearedViewModel.loginId
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val viewModel = viewModel<MainViewModel>()
@@ -91,7 +95,7 @@ fun GarageDashboard(
 
 
     LaunchedEffect(Unit) {
-        val response = loadGarageDetails(viewModel)
+        val response = garageId?.let { loadGarageDetails(viewModel, searchId = it) }
         if (response != null) {
             if (response.status == 200) {
 
@@ -218,18 +222,22 @@ fun GarageDashboard(
 
 
             // Sheared garage common details using Parcelize
-            val garageCommonDetails = GarageCommonDetails(
-                "1",
-                garageDetailsBackend.getGarageName(),
-                garageDetailsBackend.getGarageContactNumber(),
-                garageDetailsBackend.getGarageStatus(),
-                garageDetailsBackend.getGarageEmail(),
-                garageDetailsBackend.getGarageRating().toString(),
-                garageDetailsBackend.getGarageType(),
-                garageDetailsBackend.getOwnerName(),
-                garageDetailsBackend.getGarageProfilePicRef()
-            )
-            garageSharedViewModel.garageCommonDetails(garageCommonDetails)
+            val garageCommonDetails = garageId?.let {
+                GarageCommonDetails(
+                    it,
+                    garageDetailsBackend.getGarageName(),
+                    garageDetailsBackend.getGarageContactNumber(),
+                    garageDetailsBackend.getGarageStatus(),
+                    garageDetailsBackend.getGarageEmail(),
+                    garageDetailsBackend.getGarageRating().toString(),
+                    garageDetailsBackend.getGarageType(),
+                    garageDetailsBackend.getOwnerName(),
+                    garageDetailsBackend.getGarageProfilePicRef()
+                )
+            }
+            if (garageCommonDetails != null) {
+                garageSharedViewModel.garageCommonDetails(garageCommonDetails)
+            }
 
 
         } catch (e: JSONException) {
@@ -274,7 +282,7 @@ fun GarageDashboard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Welcome, ${garageDetailsBackend.getGarageName()}",
+                    text = "Welcome ${garageDetailsBackend.getGarageName()}",
                     color = Color(0xFF253555),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
@@ -365,11 +373,11 @@ suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
     return response
 }
 
-suspend fun loadGarageDetails(viewModel: MainViewModel): ResponseObject? {
+suspend fun loadGarageDetails(viewModel: MainViewModel,searchId:String): ResponseObject? {
     var response: ResponseObject? = null
 
     try {
-        viewModel.getGarageDetails("1", "search") { responseObject ->
+        viewModel.getGarageDetails(searchId, "search") { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {

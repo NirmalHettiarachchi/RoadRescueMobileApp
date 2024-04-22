@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity()  {
 
             GarageTheme {
                 navController= rememberNavController()
-                SetupNavGraph(navController = navController as NavHostController)
+                SetupNavGraph(mainActivity = this, navController = navController as NavHostController)
 
             }
         }

@@ -19,7 +19,7 @@ import retrofit2.http.Query
 
 
 
-private val ipV4Address="10.22.162.54"
+private val ipV4Address="192.168.28.117"
 private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
@@ -27,6 +27,10 @@ private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/ro
 val garageService = retrofit.create(ApiService::class.java)
 
 interface ApiService {
+
+    @Headers("Content-Type: application/json")
+    @GET("login")
+    fun login(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
     @Headers("Content-Type: application/json")
     @GET("garage")
     fun getGarageData(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>

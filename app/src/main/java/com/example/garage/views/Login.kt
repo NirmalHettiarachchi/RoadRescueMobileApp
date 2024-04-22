@@ -1,6 +1,7 @@
 package com.example.garage.views
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,61 +28,65 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garage.R
-import com.example.garage.viewModels.GarageSessionViewModel
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
 
-
-
-
 @Composable
 fun LoginScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
-    val viewModel= viewModel<MainViewModel>()
+    val viewModel = viewModel<MainViewModel>()
 
     Column(
-        backgroundModifier
+        defaultBackground
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
-        Header(menuClicked = {})
 
         Column(
-            backgroundModifier,
-            verticalArrangement = Arrangement.SpaceBetween,
+            cardModifier,
+            verticalArrangement = Arrangement.Center,
         ) {
             Column {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.log_in_to_road_rescue),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    style = textStyle1
+                    style = textStyle1,
+                    fontSize = 32.sp
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                LoginBox(navController = navController, viewModel =viewModel )//LoginBox(navController, context, loginViewModel)
+                LoginBox(
+                    navController = navController,
+                    viewModel = viewModel,
+                    loginShearedViewModel
+                )
             }
         }
-        Footer(navController, "")
     }
 }
-
 
 
 @Composable
 fun LoginBox(
     navController: NavHostController,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
-
     val showDialog = remember { mutableStateOf(false) }
 
     var status by remember { mutableStateOf(0) }
@@ -93,17 +98,17 @@ fun LoginBox(
     val coroutineScope = rememberCoroutineScope()
     var phoneNumber by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
+    var txtOtp by remember { mutableStateOf("") }
     val context = LocalContext.current
-//    var loginResponse: LoginResponse? = null
-//    var mAuth: FirebaseAuth? = null
-//    mAuth = FirebaseAuth.getInstance()
-//    var otpid: String? = null
+    var id by remember { mutableStateOf("") }
+
+
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))
     ) {
         Column(
             modifier = Modifier
@@ -117,132 +122,64 @@ fun LoginBox(
                 onClickButton = {
                     coroutineScope.launch {
                         try {
-                            if (phoneNumber.isNotEmpty() && phoneNumber.length==10) {
-                                viewModel.checkPhoneNumberIsExists(phoneNumber,"loginSearch"){responseObject->
-                                    if (responseObject != null) {
-                                        if(responseObject.status==200){
-                                            title="Success"
-                                            message= responseObject.message.toString()
-                                            buttonOneName="null"
-                                            buttonTwoName="null"
-                                            showDialog.value=true
-                                        }else if (responseObject.status==500){
+                            if (phoneNumber.isNotEmpty() && phoneNumber.length == 10) {
+                                viewModel.checkPhoneNumberIsExists(phoneNumber, "loginSearch") { responseObject ->
 
-                                            title="Failed"
-                                            message= responseObject.message.toString()
-                                            buttonOneName="null"
-                                            buttonTwoName="null"
-                                            showDialog.value=true
-                                        }else{
-                                            Log.d("check request","methana handle karanna ")
-                                            title="Phone Number is not exists."
-                                            message= responseObject.toString()
-                                            buttonOneName= "null"
-                                            buttonTwoName="null"
-                                            showDialog.value=true
+                                    if (responseObject != null) {
+                                        if (responseObject.status == 200) {
+                                            otp= responseObject.message.toString().split(" ").lastOrNull().toString()
+                                            id=responseObject.data.toString()
+                                            title = "OTP"
+                                            message = responseObject.message.toString()
+                                            buttonOneName = "null"
+                                            buttonTwoName = "null"
+                                            showDialog.value = true
+                                        } else if(responseObject.status == 204){
+                                            title = "Does not exits."
+                                            message = responseObject.message.toString()
+                                            buttonOneName = "null"
+                                            buttonTwoName = "null"
+                                            showDialog.value = true
+                                        } else if (responseObject.status == 500) {
+
+                                            title = "Failed"
+                                            message = responseObject.message.toString()
+                                            buttonOneName = "null"
+                                            buttonTwoName = "null"
+                                            showDialog.value = true
+                                        } else {
+                                            title = "Phone Number is not exists."
+                                            message = responseObject.toString()
+                                            buttonOneName = "null"
+                                            buttonTwoName = "null"
+                                            showDialog.value = true
                                         }
                                     }
                                 }
-                            }else{
-                                title="Error..!"
-                                message= "Phone number length does not match the required length. Please enter a valid phone number."
-                                buttonOneName= "null"
-                                buttonTwoName="null"
-                                showDialog.value=true
+                            } else {
+                                title = "Error..!"
+                                message =
+                                    "Phone number length does not match the required length. Please enter a valid phone number."
+                                buttonOneName = "null"
+                                buttonTwoName = "null"
+                                showDialog.value = true
                             }
                         } catch (e: Exception) {
-                            message= e.message.toString()
-                            buttonOneName= "null"
-                            buttonTwoName="null"
-                            showDialog.value=true
-                        }catch (e:SocketTimeoutException){
-                            message= e.message.toString()
-                            buttonOneName= "null"
-                            buttonTwoName="null"
-                            showDialog.value=true
+                            message = e.message.toString()
+                            buttonOneName = "null"
+                            buttonTwoName = "null"
+                            showDialog.value = true
+                        } catch (e: SocketTimeoutException) {
+                            message = e.message.toString()
+                            buttonOneName = "null"
+                            buttonTwoName = "null"
+                            showDialog.value = true
                         }
 
                     }
-
-
-
-
-//                    if (phoneNumber.isNotEmpty()) {
-//                        loginViewModel.checkPhoneNumberExists(
-//                            Customer(
-//                                null,
-//                                null, null,
-//                                phoneNumber = phoneNumber
-//                            ), object :
-//                                LoginViewModel.PhoneNumberCheckCallback {
-//                                override fun onResult(exists: Boolean) {
-//                                    if (exists) {
-//                                        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-//                                            phoneNumber.replace(" ", ""),  // Phone number to verify
-//                                            60,  // Timeout duration
-//                                            TimeUnit.SECONDS,  // Unit of timeout
-////                                            mainActivity,  // Activity (for callback binding)
-//                                            object :
-//                                                PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-//                                                override fun onCodeSent(
-//                                                    s: String,
-//                                                    forceResendingToken: PhoneAuthProvider.ForceResendingToken
-//                                                ) {
-//                                                    otpid = s
-//                                                    Toast.makeText(
-//                                                        context,
-//                                                        "OTP SENT",
-//                                                        Toast.LENGTH_SHORT
-//                                                    )
-//                                                        .show()
-//                                                }
-//
-//                                                override fun onVerificationCompleted(
-//                                                    phoneAuthCredential: PhoneAuthCredential
-//                                                ) {
-//                                                    mAuth?.signInWithCredential(phoneAuthCredential)
-//                                                        ?.addOnCompleteListener(
-//                                                            mainActivity
-//                                                        ) { task ->
-//                                                            if (task.isSuccessful) {
-//                                                                navController.navigate("dashboardscreen")
-//                                                            } else {
-//                                                                Toast.makeText(
-//                                                                    context,
-//                                                                    "Error",
-//                                                                    Toast.LENGTH_SHORT
-//                                                                ).show()
-//                                                            }
-//                                                        }
-//                                                }
-//
-//                                                override fun onVerificationFailed(e: FirebaseException) {
-//                                                    Toast.makeText(
-//                                                        context,
-//                                                        e.message,
-//                                                        Toast.LENGTH_LONG
-//                                                    ).show()
-//
-//
-//                                                }
-//                                            })
-//                                    } else {
-//                                        MainScope().launch {
-//                                            Toast.makeText(
-//                                                context,
-//                                                "User is not Registered",
-//                                                Toast.LENGTH_SHORT
-//                                            ).show()
-//                                        }
-//                                    }
-//                                }
-//                            })
-//                    } else {
-//                        Toast.makeText(context, "Enter the Phone Number", Toast.LENGTH_SHORT).show()
-//                    }
                 }
             )
-            otp = AuthField("Enter the OTP", "")
+            txtOtp = AuthField("Enter the OTP", "")
             //Edit button
             AuthCommonButton(
                 btnName = "Log in",
@@ -250,7 +187,39 @@ fun LoginBox(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp)
             ) {
-                // handle otp
+                if (txtOtp == otp){
+
+                    val part= id.split("-")
+                    Log.d("TAG log", "LoginBox: ${part[0]}")
+                    Log.d("TAG log", "LoginBox: ${part[1]}")
+
+                    if (part[0]=="sp"){
+                        loginShearedViewModel.specificLoginId(part[1])
+                        navController.navigate(Screen.GarageDashboard.route)
+                    }else if (part[0]=="mp"){
+                        loginShearedViewModel.specificLoginId(part[1])
+//                        navController.navigate(Screen.)
+                    }else if (part[0]=="t"){
+                        loginShearedViewModel.specificLoginId(part[1])
+                        navController.navigate(Screen.TechnicianDashboard.route)
+                    }else{
+                        Toast.makeText(
+                            context,
+                            "Error matching",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+
+
+
+                }else{
+                    Toast.makeText(
+                        context,
+                        "OTP is incorrect.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             Spacer(modifier = Modifier.height(40.dp))
             Spacer(
@@ -278,14 +247,14 @@ fun LoginBox(
         }
     }
 
-    if (showDialog.value){
+    if (showDialog.value) {
         sweetAlertDialog(
             title = title,
             message = message,
             buttonOneName = buttonOneName,
             buttonTwoName = buttonTwoName,
             onConfirm = {
-                showDialog.value=false
+                showDialog.value = false
             }
         )
     }

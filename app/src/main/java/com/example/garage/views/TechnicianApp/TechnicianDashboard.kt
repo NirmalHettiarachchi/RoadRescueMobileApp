@@ -1,7 +1,11 @@
 package com.example.garage.views.TechnicianApp
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -21,8 +25,8 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -31,7 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -44,32 +52,88 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.models.ResponseObject
-import com.example.garage.models.ServicesRequestModel
+import com.example.garage.models.TechnicianDashboard
 import com.example.garage.repository.Screen
-import com.example.garage.viewModels.GarageSessionViewModel
+import com.example.garage.repository.TechnicianDashboardServiceCommonDetails
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
 import com.example.garage.views.SidebarContent
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import java.net.SocketTimeoutException
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TechnicianDashboard(
     navController: NavController,
-    navStatus: String
+    navStatus: String,
+    loginShearedViewModel: LoginShearedViewModel,
+    technicianShearedViewModel: TechnicianShearedViewModel
 ){
-
+    val techId=loginShearedViewModel.loginId
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
+    var showLoadGarageDetails by remember { mutableStateOf(false) }
     val viewModel:MainViewModel= viewModel()
+    var responseString by remember { mutableStateOf("") }
+    val context= LocalContext.current
 
     LaunchedEffect(Unit){
-        loadServices(viewModel)
+        if (techId != null) {
+            var response =loadServices(viewModel,techId)
+            if (response != null) {
+                if (response.status == 200) {
+                    Log.d("responce", response.data.toString())
+                    responseString = response.data!!.toString()
+//                showProgressBar=false
+                    showLoadGarageDetails = true
+
+                } else if (response.status == 400) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else if (response.status == 404) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else if (response.status == 500) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (response.status == 508) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else {
+                Toast.makeText(
+                    context,
+                    "Cannot call the sever",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
 
@@ -126,65 +190,63 @@ fun TechnicianDashboard(
 
                     ) {
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (showLoadGarageDetails) {
+                        Log.d("1", "TechnicianDashboard: 1")
+                        if (responseString.isNotEmpty()) {
+                            Log.d("2", "TechnicianDashboard: 2")
+                            val jsonArray = JSONArray(responseString)
+                            for (i in 0 until jsonArray.length()) {
+                                Log.d("3", "TechnicianDashboard: 3")
+                                val jsonObject = jsonArray.getJSONObject(i)
+                                val time = jsonObject.getString("time")
+                                val description = jsonObject.getString("description")
+                                val issueCategory = jsonObject.getString("issueCategory")
+                                val customerName = jsonObject.getString("customerName")
+                                val customerContact = jsonObject.getString("customerContact")
+                                val vehicleModel = jsonObject.getString("vehicleModel")
+                                val serviceId = jsonObject.getString("serviceId")
+                                val technicianService=TechnicianDashboard(serviceId,time,description,issueCategory,customerName,customerContact,vehicleModel)
 
-                    ServiceRequest(
-                        navController,
-                        Modifier.align(Alignment.CenterHorizontally)
-                    )
+                                Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ServiceRequest(
-                        navController,
-                        Modifier.align(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    ServiceRequest(
-                        navController,
-                        Modifier.align(Alignment.CenterHorizontally)
-                    )
-
+                                if (techId != null) {
+                                    ServiceRequest(
+                                        techId,
+                                        technicianService,
+                                        navController,
+                                        Modifier.align(Alignment.CenterHorizontally),
+                                        context,
+                                        technicianShearedViewModel,
+                                        true
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
-        }}
-}
-
-fun loadServices(viewModel: MainViewModel):ResponseObject? {
-    var response: ResponseObject? = null
-
-    try {
-        /*viewModel.getGarageServiceRequest("1", "getServices") { responseObject ->
-            if (responseObject != null) {
-                response = responseObject
-            } else {
-                response = ResponseObject(400, "response is null", null)
-            }
-        }*/
-    }catch (e: SocketTimeoutException) {
-        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
-    } catch (e: Exception) {
-        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+        }
     }
-    return response
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
+
+
 @Composable
-fun ServiceRequest(navController: NavController,modifier: Modifier) {
+fun ServiceRequest(
+    techId:String,
+    technicianService:TechnicianDashboard,
+    navController: NavController,
+    modifier: Modifier,
+    context: Context,
+    technicianShearedViewModel: TechnicianShearedViewModel,
+    button:Boolean
+) {
 
-    val garageDetails = ServicesRequestModel(
-        15,"Nirmal Dakshina", "date",
-        "Tire Punch", "Need help as soon as possible", 25000.00,"paka"
-    )
-    val phoneNumber = "0716788537"
-    val context = LocalContext.current
+    Log.d("TAG 1", "ServiceRequest: ${technicianService.getIssueCategory()}")
+    val phoneNumber = technicianService.getCustomerContact()
+    Log.d("TAG 2", "ServiceRequest: ${technicianService.getTime()}")
 
-
-    
 
     Card(
         modifier = modifier
@@ -203,7 +265,7 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = " ${garageDetails.getIssue()}",
+                text = " ${technicianService.getIssueCategory()}",
                 color = Color(0xFF253555),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -222,14 +284,17 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                 imageVector = Icons.Default.Call,
                 contentDescription = "Contact icon",
                 tint = Color.Black,
-                modifier = Modifier.clickable {  }
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
+                    context.startActivity(intent)
+                }
             )
 
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Divider(color = Color(0xFF253555), thickness = 2.dp)
+        HorizontalDivider(thickness = 2.dp, color = Color(0xFF253555))
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -245,7 +310,7 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getIssue(), //time ek danna
+                text = technicianService.getTime(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f)
             )
@@ -265,7 +330,7 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = garageDetails.getDescription(),
+                text = technicianService.getCustomerName(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
                 maxLines = 2
@@ -286,10 +351,10 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = "LKR ${garageDetails.getServiceFee()}0",
+                text = technicianService.getVehicleModel(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
-                maxLines = 2
+                maxLines = 1
             )
         }
 
@@ -307,7 +372,7 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = "LKR ${garageDetails.getServiceFee()}0",
+                text = technicianService.getDescription().ifEmpty { "No Description" },
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
                 maxLines = 3
@@ -317,25 +382,56 @@ fun ServiceRequest(navController: NavController,modifier: Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        if (button) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            CommonButton(
-                btnName = "Accept",
-                modifier = Modifier.align(Alignment.CenterVertically),
-                onClickButton = {
-                    navController.navigate(route = Screen.TechnicianCompleteJob.route)
-                }
-            )
+                CommonButton(
+                    btnName = "Accept",
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    onClickButton = {
 
+                        val details= TechnicianDashboardServiceCommonDetails(
+                            techId,
+                            technicianService.getServiceId(),
+                            technicianService.getTime(),
+                            technicianService.getDescription(),
+                            technicianService.getIssueCategory(),
+                            technicianService.getCustomerName(),
+                            technicianService.getCustomerContact(),
+                            technicianService.getVehicleModel()
+                        )
+                        technicianShearedViewModel.techCommonDetails(details)
+                        navController.navigate(route = Screen.TechnicianCompleteJob.route)
+                    }
+                )
+
+            }
         }
+
+
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
-fun getData() {
-    Log.d("delay checked","delay is ok ")
+suspend fun loadServices(viewModel: MainViewModel,techId:String):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.getTechnicianServices(techId, "getTechServices") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    }catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
 }
