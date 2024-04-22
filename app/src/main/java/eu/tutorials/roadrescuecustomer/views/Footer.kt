@@ -1,9 +1,11 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,23 +58,42 @@ fun Footer(
             .clip(RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
             .background(color = Color(0xFF253555))
     ) {
-        AnimatedIcon(painterId = R.drawable.book_fill, isSelected = selectedIcon.value == R.drawable.book_fill, onClick = {
+        AnimatedIcon(
+            selectedPainterId = R.drawable.book_fill,
+            unselectedPainterId = R.drawable.book_un,
+            isSelected = selectedIcon.value == R.drawable.book_fill,
+            onClick = {
             navigationToActivitiesScreen()
             navigationViewModel.selectFooterIcon(R.drawable.book_fill)
         })
-        AnimatedIcon(painterId = R.drawable.compass_fill, isSelected = selectedIcon.value == R.drawable.compass_fill, onClick = {
+        AnimatedIcon(
+            selectedPainterId = R.drawable.compass_fill,
+            unselectedPainterId = R.drawable.compass_un,
+            isSelected = selectedIcon.value == R.drawable.compass_fill, onClick = {
             navigationToTrackLocationScreen()
             navigationViewModel.selectFooterIcon(R.drawable.compass_fill)
         })
-        AnimatedIcon(painterId = R.drawable.home, isSelected = selectedIcon.value == R.drawable.home, onClick = {
+        AnimatedIcon(
+            selectedPainterId = R.drawable.home,
+            unselectedPainterId = R.drawable.home_un,
+            isSelected = selectedIcon.value == R.drawable.home,
+            onClick = {
             navigationToDashboardScreen()
             navigationViewModel.selectFooterIcon(R.drawable.home)
         })
-        AnimatedIcon(painterId = R.drawable.chat_fill, isSelected = selectedIcon.value == R.drawable.chat_fill, onClick = {
+        AnimatedIcon(
+            selectedPainterId = R.drawable.chat_fill,
+            unselectedPainterId = R.drawable.chat_un,
+            isSelected = selectedIcon.value == R.drawable.chat_fill,
+            onClick = {
             navigationToInstructionsScreen()
             navigationViewModel.selectFooterIcon(R.drawable.chat_fill)
         })
-        AnimatedIcon(painterId = R.drawable.user_fill, isSelected = selectedIcon.value == R.drawable.user_fill, onClick = {
+        AnimatedIcon(
+            selectedPainterId = R.drawable.user_fill,
+            unselectedPainterId = R.drawable.user_un,
+            isSelected = selectedIcon.value == R.drawable.user_fill,
+            onClick = {
             navigationToProfileScreen()
             navigationViewModel.selectFooterIcon(R.drawable.user_fill)
         })
@@ -115,47 +136,55 @@ fun Footer(
 
 @Composable
 fun AnimatedIcon(
-    painterId: Int,
+    selectedPainterId: Int,
+    unselectedPainterId: Int,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    var isPressed by remember { mutableStateOf(false) }
+//    var isPressed by remember { mutableStateOf(false) }
 
-    val scale = animateFloatAsState(
-        targetValue = if (isPressed) 0.75f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
+    val iconPainter = painterResource(id = if (isSelected) selectedPainterId else unselectedPainterId)
+
+//    val scale = animateFloatAsState(
+//        targetValue = if (isPressed) 0.75f else 1f,
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioMediumBouncy,
+//            stiffness = Spring.StiffnessLow
+//        ), label = ""
+//    )
+
+    val animationSpec = tween<Color>(durationMillis = 300, easing = FastOutSlowInEasing)
 
     val iconColor = animateColorAsState(
-        targetValue = if (isSelected) Color(0xFF77ACE0) else Color.White, label = ""  //0xFFF4C9FF
+        targetValue = if (isSelected) Color(0xFF80BAF2) else Color.White,
+        animationSpec = animationSpec,
+        label = ""
     )
 
+    //icon color - 0xFFF4C9FF
     Icon(
-        painter = painterResource(id = painterId),
+        painter = iconPainter,
         contentDescription = null,
         tint = iconColor.value,
         modifier = Modifier
             .padding(16.dp)
             .size(40.dp)
-            .graphicsLayer {
-                scaleX = scale.value
-                scaleY = scale.value
-            }
+//            .graphicsLayer {
+//                scaleX = scale.value
+//                scaleY = scale.value
+//            }
             .clickable(
                 onClick = {
-                    isPressed = true
+//                    isPressed = true
                     onClick()
                 }
             )
     )
 
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            kotlinx.coroutines.delay(100)
-            isPressed = false
-        }
-    }
+//    LaunchedEffect(isPressed) {
+//        if (isPressed) {
+//            kotlinx.coroutines.delay(100)
+//            isPressed = false
+//        }
+//    }
 }
