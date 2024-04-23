@@ -246,13 +246,13 @@ class ServiceRequestViewModel : ViewModel() {
     }
 
 
-    fun paymentDone(context: Context, requestId: Int) {
+    fun paymentDone(context: Context, requestId: Int, paidByCard: Boolean = false) {
         viewModelScope.launch {
             Log.d(TAG, "paymentDone: Started")
             loading.value = true
             Log.d(TAG, "paymentDone: Delay")
             val deleteResult = withContext(Dispatchers.IO) {
-                paymentDoneDatabase(requestId)
+                paymentDoneDatabase(requestId, paidByCard = paidByCard)
             }
 
             when (deleteResult) {
@@ -552,7 +552,7 @@ class ServiceRequestViewModel : ViewModel() {
         }
     }
 
-    private fun paymentDoneDatabase(requestId: Int): DeleteResult {
+    private fun paymentDoneDatabase(requestId: Int, paidByCard: Boolean): DeleteResult {
         try {
             val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
@@ -564,8 +564,12 @@ class ServiceRequestViewModel : ViewModel() {
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
 
-                val statusQuery =
-                    "UPDATE service_request SET status = 4 WHERE service_request.id = ?"
+                var statusQuery = ""
+                if(paidByCard) {
+                    statusQuery = "UPDATE service_request SET status = 4, paid_amount = 1.00 WHERE id = ?;"
+                } else {
+                    statusQuery = "UPDATE service_request SET status = 4 WHERE id = ?;"
+                }
 
                 connection.prepareStatement(statusQuery).use { preparedStatement ->
                     preparedStatement.setInt(1, requestId)

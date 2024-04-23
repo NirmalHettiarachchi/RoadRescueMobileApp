@@ -666,7 +666,8 @@ fun ServiceProvidedDashboard(
                 Log.d("TAG", "PaymentMethodDialog: Payment Done.....")
                 serviceRequestViewModel.paymentDone(
                     context,
-                    request.id.toInt()
+                    request.id.toInt(),
+                    true
                 )
             }
         }
