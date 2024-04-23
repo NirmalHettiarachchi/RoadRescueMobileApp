@@ -71,7 +71,7 @@ fun InstructionsScreen(tipViewModel: TipViewModel) {
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = "Quick Guidelines",
+                        text = "Quick guidelines",
                         style = textStyle2,
                         textAlign = TextAlign.Center
                     )

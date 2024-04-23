@@ -96,6 +96,7 @@ fun TrackLocationScreen(
                     request.location,
                     request.serviceProviderName,
                     request.serviceProviderPhoneNum,
+                    request.serviceProviderLocation,
                     LocalContext.current
                 )
             } else {
@@ -140,6 +141,7 @@ fun PendingActivityTrackLocationScreen(
     latLong: String,
     serviceProviderName: String,
     serviceProviderPhoneNum: String?,
+    serviceProviderLocation: String?,
     context: Context
 ) {
     Card(
@@ -169,6 +171,7 @@ fun PendingActivityTrackLocationScreen(
             //displayLocation
             LocationDisplay(
                 latLong,
+                serviceProviderLocation,
                 modifier = Modifier
                     .border(width = 2.dp, color = Color.White)
                     .size(320.dp)
@@ -200,6 +203,7 @@ fun PendingActivityTrackLocationScreen(
 @Composable
 fun LocationDisplay(
     latLongStr: String,
+    latLongSpStr: String?,
     modifier: Modifier
 ) {
     val mapReady = remember { mutableStateOf(false) }
@@ -207,12 +211,28 @@ fun LocationDisplay(
     val latitude = extractLatitude(latLongStr)
     val longitude = extractLongitude(latLongStr)
 
-    val latitude2 = 6.994833270682517
-    val longitude2 = 79.87625012425737
+    var latitudeTech = 0.00
+    var longitudeTech = 0.00
+//    val latitudeTech = 6.994833270682517
+//    val longitudeTech = 79.87625012425737
+
+    var latitudeSp = 0.00
+    var longitudeSp = 0.00
+
+    if(latLongSpStr != null) {
+        latitudeSp = extractLatitudeSp(latLongSpStr)
+        longitudeSp = extractLongitudeSp(latLongSpStr)
+    }
+
+//    if(latLongTechStr != null) {
+//        latitudeTech = extractLatitudeSp(latLongTechStr)
+//        longitudeTech = extractLongitudeSp(latLongTechStr)
+//    }
 
     if (latitude != null && longitude != null) {
         val curLocation = LatLng(latitude, longitude)
-        val techLocation = LatLng(latitude2, longitude2)
+        val techLocation = LatLng(latitudeTech, longitudeTech)
+        val spLocation = LatLng(latitudeSp, longitudeSp)
 
         val cameraPosition = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(curLocation, 10f)
@@ -226,17 +246,26 @@ fun LocationDisplay(
                 onMapLoaded = { mapReady.value = true }
             ) {
                 if (mapReady.value) {
+                    val techIconBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.tech_icon)
+                    val resizedTechIcon = resizeBitmap(techIconBitmap, 90, 90)
+                    val techIcon = BitmapDescriptorFactory.fromBitmap(resizedTechIcon)
+
+                    val spIconBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.garage)
+                    val resizedSpIcon = resizeBitmap(spIconBitmap, 90, 90)
+                    val spIcon = BitmapDescriptorFactory.fromBitmap(resizedSpIcon)
                     Marker(
                         state = MarkerState(position = curLocation),
                         title = "Your location"
                     )
-                    val techIconBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.tech_icon)
-                    val resizedTechIcon = resizeBitmap(techIconBitmap, 90, 90)
-                    val techIcon = BitmapDescriptorFactory.fromBitmap(resizedTechIcon)
                     Marker(
                         state = MarkerState(position = techLocation),
                         title = "Technician's location",
                         icon = techIcon
+                    )
+                    Marker(
+                        state = MarkerState(position = spLocation),
+                        title = "Service provider's location",
+                        icon = spIcon
                     )
                 }
             }
@@ -257,6 +286,16 @@ fun extractLongitude(input: String): Double? {
     val pattern = "longitude=([\\d.+-]+)".toRegex()
     val matchResult = pattern.find(input)
     return matchResult?.groupValues?.get(1)?.toDouble()
+}
+
+fun extractLatitudeSp(coordString: String): Double {
+    val coords = coordString.split(",")
+    return coords[0].trim().toDouble()
+}
+
+fun extractLongitudeSp(coordString: String): Double {
+    val coords = coordString.split(",")
+    return coords[1].trim().toDouble()
 }
 
 fun resizeBitmap(source: Bitmap, width: Int, height: Int): Bitmap {

@@ -34,7 +34,8 @@ data class ServiceRequest(
     var issueCategoryName: String = "",
     var approxCost: String = "",
     var reqAmount: String? = null,
-    var serviceProviderPhoneNum: String? = null
+    var serviceProviderPhoneNum: String? = null,
+    var serviceProviderLocation: String? = null,
 )
 
 class ServiceRequestRepository {
