@@ -31,6 +31,9 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @GET("login")
     fun login(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
+    @POST("login")
+    fun locationUpdate(@Query("latitude")latitude:Double,@Query("longitude")longitude:Double,@Query("option")option:String,@Query("id")id:String): Call<ResponseBody>
+
     @Headers("Content-Type: application/json")
     @GET("garage")
     fun getGarageData(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
@@ -69,4 +72,11 @@ interface ApiService {
         @Query("serviceProviderId")serviceProviderId:String,
         @Query("technicianId")technicianId:String
         ): Call<ResponseBody>
+
+    @POST("service")
+    fun completeJob(
+        @Query("option") option:String,
+        @Query("serviceId")serviceId:String,
+        @Query("amount")amount:String
+    ): Call<ResponseBody>
 }

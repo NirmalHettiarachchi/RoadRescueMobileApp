@@ -121,7 +121,7 @@ fun sweetAlertDialog(
                     if (buttonOneName!="null" || buttonTwoName.equals("null")){
 
                         Button(
-                            modifier = Modifier.width(8.dp),
+                            modifier = Modifier.width(90.dp),
                             onClick = onConfirm,
                             colors = ButtonDefaults.buttonColors(Color.Gray)
                         ) {

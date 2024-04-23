@@ -354,27 +354,6 @@ fun AuthField(labelName: String, value: String?, isMobile: Boolean,keyboardType:
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AuthHeader() {
-    CenterAlignedTopAppBar(
-        title = {
-            Icon(
-                painter = painterResource(id = R.drawable.logo),
-                modifier = Modifier.size(100.dp),
-                tint = Color.Unspecified,
-                contentDescription = "Toolbar icon"
-            )
-        },
-        navigationIcon = {
-        },
-        modifier = Modifier.fillMaxWidth(),
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color(0xFF253555)
-        ),
-    )
-}
-
 @Composable
 fun dropDown(optionList:List<Any>,defaultSelection:Any):String{
     var expanded by remember { mutableStateOf(false) }

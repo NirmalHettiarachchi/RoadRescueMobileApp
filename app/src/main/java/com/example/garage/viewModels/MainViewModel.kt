@@ -20,6 +20,49 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainViewModel : ViewModel() {
+    suspend fun  updateLocation(
+        latitude: Double,
+        longitude: Double,
+        character: String,
+        id: String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ) {
+        val deferred = CompletableDeferred<ResponseObject>()
+        try {
+            val call = garageService.locationUpdate(latitude,longitude,character,id)
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        responseBody?.let {
+                            val jsonString = it.string() // Convert response body to JSON string
+                            val jsonObject = JSONObject(jsonString)
+                            val status = jsonObject.optString("status").toInt()
+                            val message = jsonObject.optString("message")
+                            val data = jsonObject.optString("data")
+
+                            val responseObject = ResponseObject(status, message, data)
+
+                            onResponseReceived(responseObject)
+                            deferred.complete(responseObject)
+                        }
+
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    deferred.completeExceptionally(t)
+                }
+
+            })
+
+        } catch (e: Exception) {
+            deferred.completeExceptionally(e)
+        }catch (e:JSONException){
+            deferred.completeExceptionally(e)
+        }
+        deferred.await()
+    }
 
 
 //    val backendState = MutableLiveData(ResponseState())
@@ -549,6 +592,56 @@ class MainViewModel : ViewModel() {
     }
 
 
+   suspend fun completeJob(
+       amount:String,
+       option:String,
+       serviceId:String,
+       onResponseReceived: (ResponseObject?) -> Unit
+   ){
+       val deferred = CompletableDeferred<ResponseObject>()
+
+       viewModelScope.launch {
+           try {
+               val call = garageService.completeJob(option,serviceId,amount)
+               call.enqueue(object : Callback<ResponseBody> {
+                   override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                       if (response.isSuccessful) {
+                           val responseBody = response.body()
+                           responseBody?.let {
+                               val jsonString = it.string() // Convert response body to JSON string
+                               val jsonObject = JSONObject(jsonString)
+                               val status = jsonObject.optString("status").toInt()
+                               val message = jsonObject.optString("message")
+                               val data = jsonObject.optString("data")
+
+                               val responseObject = ResponseObject(status, message, data)
+
+                               onResponseReceived(responseObject)
+                               deferred.complete(responseObject)
+                           }
+
+                       }
+                   }
+
+                   override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                       deferred.completeExceptionally(t)
+                   }
+
+               })
+
+           } catch (e: Exception) {
+               deferred.completeExceptionally(e)
+           }catch (e:JSONException){
+               deferred.completeExceptionally(e)
+           }
+       }
+       deferred.await()
+   }
+
+
+
+
+
     suspend fun getActivities(
         searchId:String,
         option: String,
@@ -656,6 +749,51 @@ class MainViewModel : ViewModel() {
                         supportTicket.getDescription(),option
                     )
                 )
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+    suspend fun checkPayment(
+        serviceId: String,
+        option: String,
+        onResponseReceived: (ResponseObject?) -> Unit,
+    ) {
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.getServiceRequests(serviceId,option)
                 call.enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                         if (response.isSuccessful) {

@@ -58,9 +58,9 @@ import com.example.garage.repository.TechnicianDashboardServiceCommonDetails
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.TechnicianShearedViewModel
+import com.example.garage.views.CircularProcessingBar
 import com.example.garage.views.CommonButton
 import com.example.garage.views.Header
-import com.example.garage.views.SidebarContent
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
@@ -79,6 +79,7 @@ fun TechnicianDashboard(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showLoadGarageDetails by remember { mutableStateOf(false) }
+    var processingBarStatus = remember { mutableStateOf(true) }
     val viewModel:MainViewModel= viewModel()
     var responseString by remember { mutableStateOf("") }
     val context= LocalContext.current
@@ -90,10 +91,11 @@ fun TechnicianDashboard(
                 if (response.status == 200) {
                     Log.d("responce", response.data.toString())
                     responseString = response.data!!.toString()
-//                showProgressBar=false
+                    processingBarStatus.value=false
                     showLoadGarageDetails = true
 
                 } else if (response.status == 400) {
+                    processingBarStatus.value=false
                     Toast.makeText(
                         context,
                         response.message,
@@ -101,6 +103,7 @@ fun TechnicianDashboard(
                     ).show()
 
                 } else if (response.status == 404) {
+                    processingBarStatus.value=false
                     Toast.makeText(
                         context,
                         response.message,
@@ -108,18 +111,21 @@ fun TechnicianDashboard(
                     ).show()
 
                 } else if (response.status == 500) {
+                    processingBarStatus.value=false
                     Toast.makeText(
                         context,
                         response.message,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else if (response.status == 508) {
+                    processingBarStatus.value=false
                     Toast.makeText(
                         context,
                         response.message,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
+                    processingBarStatus.value=false
                     Toast.makeText(
                         context,
                         response.message,
@@ -127,6 +133,7 @@ fun TechnicianDashboard(
                     ).show()
                 }
             } else {
+                processingBarStatus.value=false
                 Toast.makeText(
                     context,
                     "Cannot call the sever",
@@ -143,7 +150,7 @@ fun TechnicianDashboard(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    TechnicianSliderContent(navController) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -162,6 +169,8 @@ fun TechnicianDashboard(
                 TechnicianFooter(navController, navStatus)
             }
         ) {
+
+            CircularProcessingBar(isShow = processingBarStatus.value)
 
             Column(
                 modifier = defaultBackground.padding(it),
@@ -243,9 +252,7 @@ fun ServiceRequest(
     button:Boolean
 ) {
 
-    Log.d("TAG 1", "ServiceRequest: ${technicianService.getIssueCategory()}")
     val phoneNumber = technicianService.getCustomerContact()
-    Log.d("TAG 2", "ServiceRequest: ${technicianService.getTime()}")
 
 
     Card(
