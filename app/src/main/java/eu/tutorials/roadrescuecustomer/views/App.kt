@@ -29,6 +29,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.TipViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -43,6 +44,7 @@ fun App(
     loginViewModel: LoginViewModel,
     customerSupportTicketViewModel: CustomerSupportTicketViewModel,
     navigationViewModel: NavigationViewModel,
+    tipViewModel: TipViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()
@@ -163,7 +165,7 @@ fun App(
                     SettingsScreen(loginViewModel, context, profileViewModel, navController, currentStateViewModel, serviceRequestViewModel)
                 }
                 composable("instructionsscreen") {
-                    InstructionsScreen()
+                    InstructionsScreen(tipViewModel)
                 }
             }
         }

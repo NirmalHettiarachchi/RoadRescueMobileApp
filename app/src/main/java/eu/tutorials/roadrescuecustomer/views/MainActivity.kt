@@ -19,6 +19,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.TipViewModel
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
             val loginViewModel: LoginViewModel = viewModel()
             val customerSupportTicketViewModel: CustomerSupportTicketViewModel = viewModel()
             val navigationViewModel: NavigationViewModel = viewModel()
+            val tipViewModel: TipViewModel = viewModel()
             RoadRescueCustomerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -48,6 +50,7 @@ class MainActivity : ComponentActivity() {
                         loginViewModel,
                         customerSupportTicketViewModel,
                         navigationViewModel,
+                        tipViewModel,
                         this
                     )
                 }
