@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -54,9 +55,11 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import eu.tutorials.roadrescuecustomer.R
+import eu.tutorials.roadrescuecustomer.models.TechnicianLocation
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,6 +70,20 @@ fun TrackLocationScreen(
     val loading by currentStateViewModel.loading
     CircularProgressBar(isDisplayed = loading)
 
+//    LaunchedEffect(key1 = true) {
+//        while (true) {
+//            currentStateViewModel.fetchLatestRequest(
+//                AppPreferences(context).getStringPreference(
+//                    "CUSTOMER_ID",
+//                    ""
+//                ),
+//                showLoading = false
+//            )
+//            isChangeAutomatic = true
+//            delay(10000)
+//        }
+//    }
+
     LaunchedEffect(key1 = true) {
         currentStateViewModel.fetchLatestRequest(
             AppPreferences(context).getStringPreference(
@@ -75,9 +92,30 @@ fun TrackLocationScreen(
             ),
             showLoading = true
         )
+        currentStateViewModel.fetchLatestRequestTechLocation(
+            AppPreferences(context).getStringPreference(
+                "CUSTOMER_ID",
+                ""
+            ),
+            showLoading = true
+        )
+    }
+
+    LaunchedEffect(key1 = true) {
+        while(true) {
+            currentStateViewModel.fetchLatestRequestTechLocation(
+                AppPreferences(context).getStringPreference(
+                    "CUSTOMER_ID",
+                    ""
+                ),
+                showLoading = false
+            )
+            delay(5000)
+        }
     }
 
     val request = currentStateViewModel.latestRequests.collectAsState().value.firstOrNull()
+    val techLocation = currentStateViewModel.techLocationLatestRequests.collectAsState().value.firstOrNull()
 
     Column(
         backgroundModifier
@@ -97,6 +135,7 @@ fun TrackLocationScreen(
                     request.serviceProviderName,
                     request.serviceProviderPhoneNum,
                     request.serviceProviderLocation,
+                    techLocation?.location,
                     LocalContext.current
                 )
             } else {
@@ -142,6 +181,7 @@ fun PendingActivityTrackLocationScreen(
     serviceProviderName: String,
     serviceProviderPhoneNum: String?,
     serviceProviderLocation: String?,
+    technicianLocation: String?,
     context: Context
 ) {
     Card(
@@ -172,6 +212,7 @@ fun PendingActivityTrackLocationScreen(
             LocationDisplay(
                 latLong,
                 serviceProviderLocation,
+                technicianLocation,
                 modifier = Modifier
                     .border(width = 2.dp, color = Color.White)
                     .size(320.dp)
@@ -204,6 +245,7 @@ fun PendingActivityTrackLocationScreen(
 fun LocationDisplay(
     latLongStr: String,
     latLongSpStr: String?,
+    latLongTechStr: String?,
     modifier: Modifier
 ) {
     val mapReady = remember { mutableStateOf(false) }
@@ -224,10 +266,10 @@ fun LocationDisplay(
         longitudeSp = extractLongitudeSp(latLongSpStr)
     }
 
-//    if(latLongTechStr != null) {
-//        latitudeTech = extractLatitudeSp(latLongTechStr)
-//        longitudeTech = extractLongitudeSp(latLongTechStr)
-//    }
+    if(latLongTechStr != null) {
+        latitudeTech = extractLatitudeSp(latLongTechStr)
+        longitudeTech = extractLongitudeSp(latLongTechStr)
+    }
 
     if (latitude != null && longitude != null) {
         val curLocation = LatLng(latitude, longitude)

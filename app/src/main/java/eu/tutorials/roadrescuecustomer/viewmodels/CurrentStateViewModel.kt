@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import eu.tutorials.roadrescuecustomer.models.CurrentStateRepository
 import eu.tutorials.roadrescuecustomer.models.Issues
 import eu.tutorials.roadrescuecustomer.models.ServiceRequest
+import eu.tutorials.roadrescuecustomer.models.TechnicianLocation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,9 @@ class CurrentStateViewModel : ViewModel() {
 
     private val _latestRequests = MutableStateFlow(emptyList<ServiceRequest>())
     val latestRequests = _latestRequests.asStateFlow()
+
+    private val _techLocationLatestRequests = MutableStateFlow(emptyList<TechnicianLocation>())
+    val techLocationLatestRequests = _techLocationLatestRequests.asStateFlow()
 
     val loading = mutableStateOf(false)
 
@@ -148,5 +152,55 @@ class CurrentStateViewModel : ViewModel() {
         }
         Log.d("TAG", "fetchLatestRequestFromDatabase: Return Result ${latestRequests.size}")
         return latestRequests
+    }
+
+    fun fetchLatestRequestTechLocation(customerId: String, showLoading: Boolean = false) {
+        viewModelScope.launch {
+            if (showLoading) {
+                loading.value = true
+            }
+            val fetchedTechLocationLatestRequests = withContext(Dispatchers.IO) {
+                fetchLatestRequestTechLocation(customerId)
+            }
+            _techLocationLatestRequests.value = fetchedTechLocationLatestRequests
+            if(showLoading) {
+                loading.value = false
+            }
+        }
+    }
+
+
+    private fun fetchLatestRequestTechLocation(customerId: String): List<TechnicianLocation> {
+        val techLocationLatestRequests = mutableListOf<TechnicianLocation>()
+        try {
+            val DATABASE_NAME = "road_rescue"
+            val url =
+                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
+            val username = "admin"
+            val databasePassword = "admin123"
+
+            Class.forName("com.mysql.jdbc.Driver")
+            val connection: Connection =
+                DriverManager.getConnection(url, username, databasePassword)
+            val statement = connection.createStatement()
+            val resultSet: ResultSet = statement.executeQuery(
+                """
+                SELECT technician.location FROM service_request JOIN service_technician ON service_technician.service_request_id = service_request.id JOIN technician ON service_technician.technician_id = technician.id WHERE service_request.customer_id = $customerId AND service_request.status BETWEEN 2 and 5 ORDER BY request_timestamp DESC LIMIT 1;
+            """.trimIndent()
+            )
+
+            while (resultSet.next()) {
+                val location = resultSet.getString("technician.location")
+
+                val technicianLocation = TechnicianLocation(
+                    location = location
+                )
+                techLocationLatestRequests.add(technicianLocation)
+            }
+            connection.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return techLocationLatestRequests
     }
 }
