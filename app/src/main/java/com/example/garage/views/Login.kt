@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -179,12 +180,15 @@ fun LoginBox(
                                         if (responseObject.status == 200) {
                                             otp= responseObject.message.toString().split(" ").lastOrNull().toString()
                                             id=responseObject.data.toString()
-                                            title = "OTP"
+                                            processingBarStatus.value=false
+                                            Log.d("otp", "LoginBox: $otp")
+                                            Log.d("id", "LoginBox: $id")
+                                            /*title = "OTP"
                                             message = responseObject.message.toString()
                                             buttonOneName = "null"
                                             buttonTwoName = "null"
-                                            processingBarStatus.value=false
-                                            showDialog.value = true
+
+                                            showDialog.value = true*/
                                         } else if(responseObject.status == 204){
                                             title = "Does not exits."
                                             message = responseObject.message.toString()
@@ -461,7 +465,7 @@ fun LoginBox(
                     .align(Alignment.CenterHorizontally)
                     .padding(10.dp)
             ) {
-                navController.navigate("signupscreen")
+                navController.navigate(Screen.Register.route)
             }
             Spacer(modifier = Modifier.height(8.dp))
 

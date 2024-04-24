@@ -2,6 +2,7 @@ package com.example.garage.repository
 
 import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
+import com.example.garage.models.NewUser
 import com.example.garage.models.UpdateGarage
 import com.example.garage.models.UpdateTechnician
 import okhttp3.ResponseBody
@@ -33,6 +34,10 @@ interface ApiService {
     fun login(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
     @POST("login")
     fun locationUpdate(@Query("latitude")latitude:Double,@Query("longitude")longitude:Double,@Query("option")option:String,@Query("id")id:String): Call<ResponseBody>
+
+    @Headers("Content-Type: application/json")
+    @POST("register")
+    fun regUSer(@Body user: NewUser): Call<ResponseBody>
 
     @Headers("Content-Type: application/json")
     @GET("garage")

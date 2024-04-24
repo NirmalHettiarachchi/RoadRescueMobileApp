@@ -2,11 +2,11 @@ package com.example.garage.views.TechnicianApp
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -64,6 +64,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
@@ -277,7 +278,7 @@ fun TechnicianCompleteJob(
                                 btnName = "Ask for the payment",
                                 modifier = Modifier.width(200.dp)
                             ) {
-                                processingBarStatus.value=true
+                                processingBarStatus.value = true
                                 coroutineScope.launch {
 
                                     if (amount.isNotEmpty()) {
@@ -295,19 +296,19 @@ fun TechnicianCompleteJob(
                                                         response.message,
                                                         Toast.LENGTH_SHORT
                                                     ).show()
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     showDialog = false
                                                     showPaidDialog = true
                                                     // load cash or card seen eka
                                                 } else if (response.status == 204) {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 } else if (response.status == 400) {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
@@ -315,7 +316,7 @@ fun TechnicianCompleteJob(
                                                     ).show()
 
                                                 } else if (response.status == 404) {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
@@ -323,21 +324,21 @@ fun TechnicianCompleteJob(
                                                     ).show()
 
                                                 } else if (response.status == 500) {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 } else if (response.status == 508) {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 } else {
-                                                    processingBarStatus.value=false
+                                                    processingBarStatus.value = false
                                                     Toast.makeText(
                                                         context,
                                                         response.message,
@@ -345,7 +346,7 @@ fun TechnicianCompleteJob(
                                                     ).show()
                                                 }
                                             } else {
-                                                processingBarStatus.value=false
+                                                processingBarStatus.value = false
                                                 Toast.makeText(
                                                     context,
                                                     "Cannot call the sever",
@@ -354,7 +355,7 @@ fun TechnicianCompleteJob(
                                             }
                                         }
                                     } else {
-                                        processingBarStatus.value=false
+                                        processingBarStatus.value = false
                                         Toast.makeText(
                                             context,
                                             "Please enter valid amount.",
@@ -397,6 +398,7 @@ fun TechnicianCompleteJob(
                             Spacer(modifier = Modifier.height(32.dp))
 
                             CommonButton(btnName = "Yes", modifier = Modifier.width(150.dp)) {
+
                                 navController.navigate(Screen.TechnicianDashboard.route)
                             }
 
@@ -406,87 +408,96 @@ fun TechnicianCompleteJob(
                                 btnName = "Check if paid by card.",
                                 modifier = Modifier.width(230.dp)
                             ) {
-                                processingBarStatus.value=true
+                                processingBarStatus.value = true
                                 coroutineScope.launch {
-                                    val response = service?.serviceId?.let { it1 ->
-                                        checkForCustomerPaid(
-                                            viewModel,
-                                            it1, "checkPayment"
-                                        )
-                                    }
-
-                                    if (response != null) {
-                                        if (response.status == 200) {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.navigate(Screen.TechnicianDashboard.route)
-                                        } else if (response.status == 204) {
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                        } else if (response.status == 400) {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                        } else if (response.status == 404) {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-
-                                        } else if (response.status == 500) {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        } else if (response.status == 508) {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        } else {
-                                            processingBarStatus.value=false
-                                            Toast.makeText(
-                                                context,
-                                                response.message,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                    while (true){
+                                        val response = service?.serviceId?.let { it1 ->
+                                            checkForCustomerPaid(
+                                                viewModel,
+                                                it1, "checkPayment"
+                                            )
                                         }
-                                    } else {
-                                        processingBarStatus.value=false
-                                        Toast.makeText(
-                                            context,
-                                            "Cannot call the sever",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+
+                                        if (response != null) {
+                                            if (response.status == 200) {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                navController.navigate(Screen.TechnicianDashboard.route)
+                                            } else if (response.status == 204) {
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+
+                                            } else if (response.status == 400) {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                Log.d("TAG-paka ai wada natte ", "TechnicianCompleteJob: ")
+                                            } else if (response.status == 404) {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            } else if (response.status == 500) {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            } else if (response.status == 508) {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            } else {
+                                                processingBarStatus.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    response.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
+                                        } else {
+                                            processingBarStatus.value = false
+                                            Toast.makeText(
+                                                context,
+                                                "Cannot call the sever",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
+                                        delay(1000 * 60)
+
                                     }
+                                    
                                 }
                             }
-
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 )
             }
 
-            if (showPaidDialog){
+            /*if (showPendingDialog){
                 Dialog(
                     onDismissRequest = { },
                     content = {
@@ -505,7 +516,7 @@ fun TechnicianCompleteJob(
                         }
                     }
                 )
-            }
+            }*/
         }
     }
 }

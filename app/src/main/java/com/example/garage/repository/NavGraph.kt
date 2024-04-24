@@ -91,7 +91,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.Register.route
         ){
-            RegisterScreen(navHostController = navController)
+            RegisterScreen(navHostController = navController,locationUtils,locationViewModel,loginShearedViewModel)
         }
 
 

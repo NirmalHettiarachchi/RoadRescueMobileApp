@@ -54,3 +54,16 @@ data class NewSupportTicket(
     val option: String
 )
 
+data class NewUser(
+    @SerializedName("ownerName")
+    val ownerName: String,
+    @SerializedName("garageName")
+    val garageName: String,
+    @SerializedName("phoneNumber")
+    val phoneNumber: String,
+    @SerializedName("latitude")
+    val latitude: String,
+    @SerializedName("longitude")
+    val longitude: String
+)
+

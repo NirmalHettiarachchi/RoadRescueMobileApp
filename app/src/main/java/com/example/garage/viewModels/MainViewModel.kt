@@ -1,5 +1,7 @@
 package com.example.garage.viewModels
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garage.models.Garage
@@ -7,6 +9,8 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.IssueSupportTicket
 import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
+import com.example.garage.models.NewUser
+import com.example.garage.models.RegisterModel
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.UpdateGarage
 import com.example.garage.repository.garageService
@@ -20,6 +24,60 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainViewModel : ViewModel() {
+    suspend fun  registerUser(
+        registerModel: RegisterModel,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit,
+    ) {
+        Log.d(ContentValues.TAG, "SignUpBox: 4")
+        val deferred = CompletableDeferred<ResponseObject>()
+        try {
+            Log.d(ContentValues.TAG, "SignUpBox: 5")
+            val new= NewUser(
+                registerModel.getOwnerName(),
+                registerModel.getGarageName(),
+                registerModel.gePhoneNumber(),
+                registerModel.getLatitude().toString(),
+                registerModel.getLongitude().toString()
+            )
+            Log.d(ContentValues.TAG, "SignUpBox: 7")
+            val call = garageService.regUSer(new)
+            Log.d(ContentValues.TAG, "SignUpBox:8")
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        responseBody?.let {
+                            val jsonString = it.string() // Convert response body to JSON string
+                            val jsonObject = JSONObject(jsonString)
+                            val status = jsonObject.optString("status").toInt()
+                            val message = jsonObject.optString("message")
+                            val data = jsonObject.optString("data")
+
+                            val responseObject = ResponseObject(status, message, data)
+
+                            onResponseReceived(responseObject)
+                            deferred.complete(responseObject)
+                        }
+
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    deferred.completeExceptionally(t)
+                }
+
+            })
+
+        } catch (e: Exception) {
+            deferred.completeExceptionally(e)
+        }catch (e:JSONException){
+            deferred.completeExceptionally(e)
+        }
+        deferred.await()
+
+    }
+
     suspend fun  updateLocation(
         latitude: Double,
         longitude: Double,
@@ -152,7 +210,9 @@ class MainViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 deferred.completeExceptionally(e)
-            }
+            }catch (e:JSONException){
+            deferred.completeExceptionally(e)
+        }
         }
         deferred.await()
     }
@@ -198,7 +258,9 @@ class MainViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 deferred.completeExceptionally(e)
-            }
+            }catch (e:JSONException){
+            deferred.completeExceptionally(e)
+        }
         }
         deferred.await()
     }
@@ -244,6 +306,8 @@ class MainViewModel : ViewModel() {
                 })
 
             } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
                 deferred.completeExceptionally(e)
             }
         }
@@ -296,6 +360,8 @@ class MainViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Handle exception
                 deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
             }
         }
         deferred.await()
@@ -338,6 +404,8 @@ class MainViewModel : ViewModel() {
 
                 })
             }catch (e:Exception){
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
                 deferred.completeExceptionally(e)
             }
         }
@@ -388,6 +456,8 @@ class MainViewModel : ViewModel() {
                     }
                 })
             }catch (e:Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
                 deferred.completeExceptionally(e)
             }
         }
@@ -492,6 +562,8 @@ class MainViewModel : ViewModel() {
                     }
                 })
             }catch (e:Exception){
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
                 deferred.completeExceptionally(e)
             }
         }
@@ -797,6 +869,7 @@ class MainViewModel : ViewModel() {
                 call.enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                         if (response.isSuccessful) {
+                            Log.d("TAG response", "onResponse: ${response}")
                             val responseBody = response.body()
                             responseBody?.let {
                                 val jsonString = it.string() // Convert response body to JSON string
@@ -804,6 +877,10 @@ class MainViewModel : ViewModel() {
                                 val status = jsonObject.optString("status").toInt()
                                 val message = jsonObject.optString("message")
                                 val data = jsonObject.optString("data")
+
+                                Log.d("status", "onResponse: $status")
+                                Log.d("message", "onResponse: $message")
+                                Log.d("data", "onResponse: $data")
 
                                 val responseObject = ResponseObject(status, message, data)
 
