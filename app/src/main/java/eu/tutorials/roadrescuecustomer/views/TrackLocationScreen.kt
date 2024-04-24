@@ -92,11 +92,16 @@ fun TrackLocationScreen(
             ),
             showLoading = true
         )
+    }
+
+    val request = currentStateViewModel.latestRequests.collectAsState().value.firstOrNull()
+    val techLocation = currentStateViewModel.techLocationLatestRequests.collectAsState().value.firstOrNull()
+    val requestId = request?.id
+
+
+    LaunchedEffect(key1 = true) {
         currentStateViewModel.fetchLatestRequestTechLocation(
-            AppPreferences(context).getStringPreference(
-                "CUSTOMER_ID",
-                ""
-            ),
+            requestId.toString(),
             showLoading = true
         )
     }
@@ -104,18 +109,12 @@ fun TrackLocationScreen(
     LaunchedEffect(key1 = true) {
         while(true) {
             currentStateViewModel.fetchLatestRequestTechLocation(
-                AppPreferences(context).getStringPreference(
-                    "CUSTOMER_ID",
-                    ""
-                ),
+                requestId.toString(),
                 showLoading = false
             )
             delay(5000)
         }
     }
-
-    val request = currentStateViewModel.latestRequests.collectAsState().value.firstOrNull()
-    val techLocation = currentStateViewModel.techLocationLatestRequests.collectAsState().value.firstOrNull()
 
     Column(
         backgroundModifier
@@ -136,6 +135,7 @@ fun TrackLocationScreen(
                     request.serviceProviderPhoneNum,
                     request.serviceProviderLocation,
                     techLocation?.location,
+                    techLocation?.phoneNumber,
                     LocalContext.current
                 )
             } else {
@@ -182,6 +182,7 @@ fun PendingActivityTrackLocationScreen(
     serviceProviderPhoneNum: String?,
     serviceProviderLocation: String?,
     technicianLocation: String?,
+    techPhoneNumber: String?,
     context: Context
 ) {
     Card(
@@ -220,21 +221,21 @@ fun PendingActivityTrackLocationScreen(
                     .shadow(elevation = 8.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_DIAL)
-                    intent.data = Uri.parse("tel:$serviceProviderPhoneNum")
-                    context.startActivity(intent)
-                          },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                border = BorderStroke(width = 2.dp, color = Color.White),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF253555))
+            CommonButton(
+                btnName = "Contact Technician",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(
-                    text = "Contact Service Provider",
-                    style = textStyle3
-                )
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.data = Uri.parse("tel:$techPhoneNumber")
+                context.startActivity(intent)
+            }
+            CommonButton(
+                btnName = "Contact Garage",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.data = Uri.parse("tel:$serviceProviderPhoneNum")
+                context.startActivity(intent)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

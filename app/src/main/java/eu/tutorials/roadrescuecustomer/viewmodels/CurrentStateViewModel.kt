@@ -170,7 +170,7 @@ class CurrentStateViewModel : ViewModel() {
     }
 
 
-    private fun fetchLatestRequestTechLocation(customerId: String): List<TechnicianLocation> {
+    private fun fetchLatestRequestTechLocation(serviceRequestId: String): List<TechnicianLocation> {
         val techLocationLatestRequests = mutableListOf<TechnicianLocation>()
         try {
             val DATABASE_NAME = "road_rescue"
@@ -185,15 +185,17 @@ class CurrentStateViewModel : ViewModel() {
             val statement = connection.createStatement()
             val resultSet: ResultSet = statement.executeQuery(
                 """
-                SELECT technician.location FROM service_request JOIN service_technician ON service_technician.service_request_id = service_request.id JOIN technician ON service_technician.technician_id = technician.id WHERE service_request.customer_id = $customerId AND service_request.status BETWEEN 2 and 5 ORDER BY request_timestamp DESC LIMIT 1;
+                SELECT technician.location, technician.phone_number FROM service_technician JOIN technician ON service_technician.technician_id = technician.id WHERE service_technician.service_request_id = $serviceRequestId LIMIT 1;
             """.trimIndent()
             )
 
             while (resultSet.next()) {
                 val location = resultSet.getString("technician.location")
+                val techPhone = resultSet.getString("technician.phone_number")
 
                 val technicianLocation = TechnicianLocation(
-                    location = location
+                    location = location,
+                    phoneNumber = techPhone
                 )
                 techLocationLatestRequests.add(technicianLocation)
             }
