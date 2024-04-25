@@ -1,6 +1,8 @@
 package com.example.garage.views.TechnicianApp
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.R
 import com.example.garage.models.LocationUtils
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.TechnicianDashboard
@@ -56,6 +60,7 @@ import com.example.garage.views.Header
 import com.example.garage.views.TrackLocation
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -91,6 +96,9 @@ fun TechnicianCompleteJob(
     var amount by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
+    val mapReady = remember { mutableStateOf(false) }
+
+
     val technicianService = service?.serviceId?.let {
         TechnicianDashboard(
             it,
@@ -99,7 +107,8 @@ fun TechnicianCompleteJob(
             service.issueCategory,
             service.customerName,
             service.customerContact,
-            service.vehicleModel
+            service.vehicleModel,
+            service.customerLocation
         )
     }
 
@@ -174,7 +183,8 @@ fun TechnicianCompleteJob(
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 context = context,
                                 technicianShearedViewModel,
-                                false
+                                false,
+                                customerLocation = service.customerLocation
                             )
                         }
                     }
@@ -198,6 +208,20 @@ fun TechnicianCompleteJob(
                                 }
                             }
 
+                        val customerLocation = service?.customerLocation
+
+
+                        val customerLat = extractCustomerLatitude(customerLocation.toString())
+                        val customerLong = extractCustomerLongitude(customerLocation.toString())
+
+                        var customerLatLong = LatLng(0.00, 0.00)
+
+                        if(customerLat != null && customerLong != null) {
+                            customerLatLong = LatLng(customerLat.toDouble(), customerLong)
+                            Log.d("Custommer location", "TechnicianCompleteJob: $currentLocation")
+                        }
+                        Log.d("Custommer location 2", "TechnicianCompleteJob: $customerLocation")
+
                         val uiSettings = remember {
                             MapUiSettings(myLocationButtonEnabled = true)
                         }
@@ -208,7 +232,7 @@ fun TechnicianCompleteJob(
                                     currentLocation.let { it1 ->
                                         CameraPosition.fromLatLngZoom(
                                             it1,
-                                            10f
+                                            15f
                                         )
                                     }
                             }
@@ -218,16 +242,27 @@ fun TechnicianCompleteJob(
                             GoogleMap(
                                 modifier = Modifier.fillMaxSize(),
                                 cameraPositionState = cameraPositionState,
-                                uiSettings = uiSettings
+                                uiSettings = uiSettings,
+                                onMapLoaded = { mapReady.value = true }
                             ) {
-                                currentLocation?.let { it1 -> MarkerState(position = it1) }
-                                    ?.let { it2 ->
-                                        Marker(
-                                            state = it2,
-                                            title = "Singapore",
-                                            snippet = "Marker in Singapore"
-                                        )
-                                    }
+                                if(mapReady.value) {
+                                    val customerIconBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.customer)
+                                    val resizedCustomerIcon = resizeBitmap(customerIconBitmap, 90, 90)
+                                    val customerIcon = BitmapDescriptorFactory.fromBitmap(resizedCustomerIcon)
+
+                                    currentLocation?.let { it1 -> MarkerState(position = it1) }
+                                        ?.let { it2 ->
+                                            Marker(
+                                                state = it2,
+                                                title = "Technician Location",
+                                            )
+                                            Marker(
+                                                state = MarkerState(position = customerLatLong),
+                                                title = "Customer location",
+                                                icon = customerIcon
+                                            )
+                                        }
+                                }
                             }
                         }
                     }
@@ -485,7 +520,7 @@ fun TechnicianCompleteJob(
                                             ).show()
 
                                         }
-                                        delay(1000 * 60)
+                                        delay(1000 * 10)
 
                                     }
                                     
@@ -519,6 +554,18 @@ fun TechnicianCompleteJob(
             }*/
         }
     }
+}
+
+fun extractCustomerLatitude(input: String): Double? {
+    val pattern = "latitude=([\\d.+-]+)".toRegex()
+    val matchResult = pattern.find(input)
+    return matchResult?.groupValues?.get(1)?.toDouble()
+}
+
+fun extractCustomerLongitude(input: String): Double? {
+    val pattern = "longitude=([\\d.+-]+)".toRegex()
+    val matchResult = pattern.find(input)
+    return matchResult?.groupValues?.get(1)?.toDouble()
 }
 
 suspend fun checkForCustomerPaid(
@@ -567,4 +614,6 @@ suspend fun completeJob(
     return response
 }
 
-
+fun resizeBitmap(source: Bitmap, width: Int, height: Int): Bitmap {
+    return Bitmap.createScaledBitmap(source, width, height, false)
+}

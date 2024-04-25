@@ -17,12 +17,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -54,9 +54,11 @@ import androidx.navigation.NavController
 import com.example.garage.models.ResponseObject
 import com.example.garage.models.TechnicianDashboard
 import com.example.garage.repository.Screen
+import com.example.garage.repository.TechnicianCommonDetails
 import com.example.garage.repository.TechnicianDashboardServiceCommonDetails
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.TechShearedViewModel
 import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.CircularProcessingBar
 import com.example.garage.views.CommonButton
@@ -65,6 +67,8 @@ import com.example.garage.views.defaultBackground
 import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
 import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.net.SocketTimeoutException
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -73,26 +77,84 @@ fun TechnicianDashboard(
     navController: NavController,
     navStatus: String,
     loginShearedViewModel: LoginShearedViewModel,
-    technicianShearedViewModel: TechnicianShearedViewModel
+    technicianShearedViewModel: TechnicianShearedViewModel,
+    techShearedViewModel:TechShearedViewModel
 ){
     val techId=loginShearedViewModel.loginId
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var showLoadGarageDetails by remember { mutableStateOf(false) }
+    var showTechnicianJobs by remember { mutableStateOf(false) }
     var processingBarStatus = remember { mutableStateOf(true) }
+    val showTechProfileData = remember { mutableStateOf(false) }
     val viewModel:MainViewModel= viewModel()
     var responseString by remember { mutableStateOf("") }
+    var technicianData by remember { mutableStateOf("") }
     val context= LocalContext.current
 
     LaunchedEffect(Unit){
+
+        val response =loginShearedViewModel.loginId?.let { loadTechnicianData(viewModel, it) }
+
+        if (response != null) {
+            if (response.status == 200) {
+
+                technicianData = response.data!!.toString()
+                showTechProfileData.value=true
+
+                Log.d("TAG", "TechnicianProfile: $technicianData")
+
+
+            } else if (response.status == 400) {
+                Toast.makeText(
+                    context,
+                    response.message.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 404) {
+                Toast.makeText(
+                    context,
+                    response.message.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 500) {
+                Toast.makeText(
+                    context,
+                    response.message.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (response.status == 508) {
+                Toast.makeText(
+                    context,
+                    response.message.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    response.message.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            Toast.makeText(
+                context,
+                "Can not call the server.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
+
+
         if (techId != null) {
-            var response =loadServices(viewModel,techId)
+            val response =loadServices(viewModel,techId)
             if (response != null) {
                 if (response.status == 200) {
-                    Log.d("responce", response.data.toString())
                     responseString = response.data!!.toString()
                     processingBarStatus.value=false
-                    showLoadGarageDetails = true
+                    showTechnicianJobs = true
 
                 } else if (response.status == 400) {
                     processingBarStatus.value=false
@@ -143,6 +205,40 @@ fun TechnicianDashboard(
         }
     }
 
+    if (showTechProfileData.value) {
+        try {
+            val jsonObject = JSONObject(technicianData)
+
+            val techFName = jsonObject.getString("techFName")
+            val techLName = jsonObject.getString("techLName")
+            val tecEmail = jsonObject.getString("tecEmail")
+            val phoneNumber = jsonObject.getString("phoneNumber")
+            val imgRef = jsonObject.getString("imgRef")
+            val techExpertiseList = jsonObject.getString("expertiseList")
+
+            val contentString =
+                techExpertiseList.substring(1, techExpertiseList.length - 1)
+            val resultList = contentString.split(", ")
+
+
+           val temp= TechnicianCommonDetails(
+                techFName,
+                techLName,
+                phoneNumber,
+                imgRef,
+                tecEmail,
+                resultList
+            )
+
+            techShearedViewModel.techCommonDetails(temp)
+
+
+        } catch (e: JSONException) {
+            e.localizedMessage?.let { it1 -> Log.d("json error", it1) }
+        }
+
+    }
+
 
 
     ModalNavigationDrawer(
@@ -179,7 +275,7 @@ fun TechnicianDashboard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Welcome Sanath Nishnatha",
+                    text = techShearedViewModel.techDetails?.techFName +" "+techShearedViewModel.techDetails?.techLName,
                     color = Color(0xFF253555),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
@@ -199,13 +295,10 @@ fun TechnicianDashboard(
 
                     ) {
 
-                    if (showLoadGarageDetails) {
-                        Log.d("1", "TechnicianDashboard: 1")
+                    if (showTechnicianJobs) {
                         if (responseString.isNotEmpty()) {
-                            Log.d("2", "TechnicianDashboard: 2")
                             val jsonArray = JSONArray(responseString)
                             for (i in 0 until jsonArray.length()) {
-                                Log.d("3", "TechnicianDashboard: 3")
                                 val jsonObject = jsonArray.getJSONObject(i)
                                 val time = jsonObject.getString("time")
                                 val description = jsonObject.getString("description")
@@ -214,7 +307,8 @@ fun TechnicianDashboard(
                                 val customerContact = jsonObject.getString("customerContact")
                                 val vehicleModel = jsonObject.getString("vehicleModel")
                                 val serviceId = jsonObject.getString("serviceId")
-                                val technicianService=TechnicianDashboard(serviceId,time,description,issueCategory,customerName,customerContact,vehicleModel)
+                                val customerLocation = jsonObject.getString("customerLocation")
+                                val technicianService=TechnicianDashboard(serviceId,time,description,issueCategory,customerName,customerContact,vehicleModel,customerLocation)
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -226,7 +320,8 @@ fun TechnicianDashboard(
                                         Modifier.align(Alignment.CenterHorizontally),
                                         context,
                                         technicianShearedViewModel,
-                                        true
+                                        true,
+                                        customerLocation
                                     )
                                 }
                             }
@@ -249,7 +344,8 @@ fun ServiceRequest(
     modifier: Modifier,
     context: Context,
     technicianShearedViewModel: TechnicianShearedViewModel,
-    button:Boolean
+    button:Boolean,
+    customerLocation:String
 ) {
 
     val phoneNumber = technicianService.getCustomerContact()
@@ -276,15 +372,6 @@ fun ServiceRequest(
                 color = Color(0xFF253555),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-            )
-
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "location",
-                tint = Color.Black,
-                modifier = Modifier
-                    .padding(100.dp, 0.dp, 0.dp, 0.dp)
-                    .clickable { }
             )
 
             Icon(
@@ -397,8 +484,8 @@ fun ServiceRequest(
             ) {
 
                 CommonButton(
-                    btnName = "Accept",
-                    modifier = Modifier.align(Alignment.CenterVertically),
+                    btnName = "Show Details",
+                    modifier = Modifier.align(Alignment.CenterVertically).width(90.dp),
                     onClickButton = {
 
                         val details= TechnicianDashboardServiceCommonDetails(
@@ -409,7 +496,8 @@ fun ServiceRequest(
                             technicianService.getIssueCategory(),
                             technicianService.getCustomerName(),
                             technicianService.getCustomerContact(),
-                            technicianService.getVehicleModel()
+                            technicianService.getVehicleModel(),
+                            customerLocation
                         )
                         technicianShearedViewModel.techCommonDetails(details)
                         navController.navigate(route = Screen.TechnicianCompleteJob.route)

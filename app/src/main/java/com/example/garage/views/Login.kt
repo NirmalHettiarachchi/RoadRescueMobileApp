@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -165,7 +164,7 @@ fun LoginBox(
 
 
             Spacer(modifier = Modifier.height(60.dp))
-            phoneNumber = AuthField("Registered Phone Number", "")
+            phoneNumber = AuthField("Registered Phone Number", "",isMobile = true)
 
             AuthFieldBtn(
                 onClickButton = {
@@ -173,7 +172,7 @@ fun LoginBox(
 
                     coroutineScope.launch {
                         try {
-                            if (phoneNumber.isNotEmpty() && phoneNumber.length == 10) {
+                            if (phoneNumber.isNotEmpty() && phoneNumber.length == 12) {
                                 viewModel.checkPhoneNumberIsExists(phoneNumber, "loginSearch") { responseObject ->
 
                                     if (responseObject != null) {
@@ -181,14 +180,12 @@ fun LoginBox(
                                             otp= responseObject.message.toString().split(" ").lastOrNull().toString()
                                             id=responseObject.data.toString()
                                             processingBarStatus.value=false
-                                            Log.d("otp", "LoginBox: $otp")
-                                            Log.d("id", "LoginBox: $id")
-                                            /*title = "OTP"
+                                            title = "OTP"
                                             message = responseObject.message.toString()
                                             buttonOneName = "null"
                                             buttonTwoName = "null"
 
-                                            showDialog.value = true*/
+                                            showDialog.value = true
                                         } else if(responseObject.status == 204){
                                             title = "Does not exits."
                                             message = responseObject.message.toString()
@@ -240,7 +237,7 @@ fun LoginBox(
                     }
                 }
             )
-            txtOtp = AuthField("Enter the OTP", "")
+            txtOtp = AuthField("Enter the OTP", "",isMobile = false)
             //Edit button
             AuthCommonButton(
                 btnName = "Log in",
@@ -256,7 +253,7 @@ fun LoginBox(
                         processingBarStatus.value=false
                         Toast.makeText(
                             context,
-                            "Empty fields",
+                            "Enter OTP",
                             Toast.LENGTH_SHORT
                         ).show()
                     }else{

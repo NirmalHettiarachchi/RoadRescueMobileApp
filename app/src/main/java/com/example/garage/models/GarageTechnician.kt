@@ -8,6 +8,7 @@ class GarageTechnician {
     private var _techExpertiseAreas: List<String> = emptyList()
     private var _techStatus: Int = 0
     private var _techImageRef: String = ""
+    private var _techEmail: String = ""
 
 
 
@@ -17,14 +18,14 @@ class GarageTechnician {
         _techLastName: String,
         _techContactNumber: String,
         _techExpertiseAreas: List<String>,
-        _techStatus: Int,
+        _techEmail: String,
         _techImageRef:String
     ) {
         this._techFirstName = _techFirstName
         this._techLastName = _techLastName
         this._techContactNumber = _techContactNumber
         this._techExpertiseAreas = _techExpertiseAreas
-        this._techStatus = _techStatus
+        this._techEmail = _techEmail
         this._techImageRef=_techImageRef
     }
 
@@ -113,6 +114,14 @@ class GarageTechnician {
 
     fun setTechImageRef(imageRef: String) {
         this._techImageRef = imageRef
+    }
+
+    fun getTechEmail(): String {
+        return this._techEmail
+    }
+
+    fun setTechEmail(email: String) {
+        this._techEmail = email
     }
 }
 

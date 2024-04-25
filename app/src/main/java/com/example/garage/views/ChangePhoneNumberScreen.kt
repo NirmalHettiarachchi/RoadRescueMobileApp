@@ -73,7 +73,7 @@ fun ChangePhoneNumWindow(navController: NavController,onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                newPhoneNumber = AuthField("New Phone Number", "")
+                newPhoneNumber = AuthField("New Phone Number", "",isMobile = true)
 
                 Spacer(modifier = Modifier.height(16.dp))
 

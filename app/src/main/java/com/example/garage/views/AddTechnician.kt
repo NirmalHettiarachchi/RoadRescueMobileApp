@@ -2,6 +2,7 @@ package com.example.garage.views
 
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -173,6 +175,7 @@ fun AddTechnician(
                     var textLastName by remember { mutableStateOf("") }
                     var textContactNumber by remember { mutableStateOf("") }
                     var selectedServices by remember { mutableStateOf(emptyList<String>()) }
+                    val context= LocalContext.current
                     Column(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -192,7 +195,7 @@ fun AddTechnician(
                             textLastName=CommonTextField(textLastName, true, "Last Name",Modifier.weight(1f),false,KeyboardType.Text)
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),true,KeyboardType.Number)
+                            textContactNumber=CommonTextField(textContactNumber, true, "Contact Number",Modifier.weight(1f),true,KeyboardType.Phone)
                             Spacer(modifier = Modifier.height(16.dp))
 
                         }
@@ -279,43 +282,59 @@ fun AddTechnician(
 
                                 coroutineScope.launch {
                                     try {
-//                                showProgressBar.value=true
-                                        viewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
+                                        if(textFirstName.isNotEmpty() && textLastName.isNotEmpty()){
+
+                                            if (textContactNumber.length==12){
+                                                viewModel.addTechnician(GarageTechnician(textFirstName,textLastName,textContactNumber,selectedServices,1)) { responseObject ->
 
 
-                                            if (responseObject != null) {
+                                                    if (responseObject != null) {
 
 
-                                                if(responseObject.status==201){
-                                                    title="Success"
-                                                    message= responseObject.message.toString()
-                                                    buttonOneName="null"
-                                                    buttonTwoName="null"
+                                                        if(responseObject.status==201){
+                                                            title="Success"
+                                                            message= responseObject.message.toString()
+                                                            buttonOneName="null"
+                                                            buttonTwoName="null"
+                                                            showDialog.value=true
+
+                                                            textFirstName = textFirstName.trim()
+                                                            textLastName = textLastName.trim()
+                                                            textContactNumber = textContactNumber.trim()
+
+                                                        }else if (responseObject.status==500){
+
+                                                            title="Failed"
+                                                            message= responseObject.message.toString()
+                                                            buttonOneName="null"
+                                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
-                                                    showDialog.value=true
-
-                                                    textFirstName = textFirstName.trim()
-                                                    textLastName = textLastName.trim()
-                                                    textContactNumber = textContactNumber.trim()
-
-                                                }else if (responseObject.status==500){
-
-                                                    title="Failed"
-                                                    message= responseObject.message.toString()
-                                                    buttonOneName="null"
-                                                    buttonTwoName="null"
+                                                            showDialog.value=true
+                                                        }else{
+                                                            title="Failed"
+                                                            message= responseObject.toString()
+                                                            buttonOneName= "null"
+                                                            buttonTwoName="null"
 //                                            showProgressBar.value=false
-                                                    showDialog.value=true
-                                                }else{
-                                                    title="Failed"
-                                                    message= responseObject.toString()
-                                                    buttonOneName= "null"
-                                                    buttonTwoName="null"
-//                                            showProgressBar.value=false
-                                                    showDialog.value=true
+                                                            showDialog.value=true
+                                                        }
+                                                    }
                                                 }
+                                            }else{
+                                                Toast.makeText(
+                                                    context,
+                                                    "Invalid phone number",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
+                                        }else{
+                                            Toast.makeText(
+                                                context,
+                                                "Please enter technician name",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
+
                                     }catch (e:SocketTimeoutException){
                                         // Handle timeout exception
 //                                showProgressBar.value=false

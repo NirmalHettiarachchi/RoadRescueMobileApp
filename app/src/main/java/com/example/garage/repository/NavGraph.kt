@@ -17,7 +17,9 @@ import com.example.garage.models.LocationUtils
 import com.example.garage.viewModels.GarageSharedViewModel
 import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.LoginShearedViewModel
+import com.example.garage.viewModels.NotificationViewModel
 import com.example.garage.viewModels.SharedViewModel
+import com.example.garage.viewModels.TechShearedViewModel
 import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
@@ -34,8 +36,6 @@ import com.example.garage.views.TechnicianApp.TechnicianCompleteJob
 import com.example.garage.views.TechnicianApp.TechnicianDashboard
 import com.example.garage.views.TechnicianApp.TechnicianProfile
 import com.example.garage.views.TechniciansList
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -57,6 +57,8 @@ fun SetupNavGraph(
     val loginShearedViewModel: LoginShearedViewModel = viewModel()
     val technicianDashboardServiceCommonDetails:TechnicianShearedViewModel  = viewModel()
     val locationViewModel:LocationViewModel= viewModel()
+    val notificationViewModel: NotificationViewModel = viewModel()
+    val techShearedViewModel:TechShearedViewModel = viewModel()
     val locationUtils=LocationUtils(context)
 
 
@@ -75,12 +77,6 @@ fun SetupNavGraph(
             )
         }
     ){
-        val date = SimpleDateFormat("dd/M/yyyy")
-        val time = SimpleDateFormat("hh:mm")
-        val currentDate = date.format(Date())
-        val currentTime = time.format(Date())
-
-
 
         composable(
             route=Screen.Login.route
@@ -99,7 +95,7 @@ fun SetupNavGraph(
             route=Screen.GarageDashboard.route
         ){
 
-            GarageDashboard(navController=navController,navStatus="tempData",garageSharedViewModel= garageSharedViewModel,loginShearedViewModel)
+            GarageDashboard(navController=navController,navStatus="tempData",garageSharedViewModel= garageSharedViewModel,loginShearedViewModel, notificationViewModel,locationViewModel)
         }
         
         composable(
@@ -139,13 +135,13 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianList.route
         ){
-            TechniciansList(navController = navController, navyStatus = "technicianList",sharedViewModel = sharedViewModel)
+            TechniciansList(navController = navController, navyStatus = "technicianList",sharedViewModel = sharedViewModel,loginShearedViewModel)
         }
 
         composable(
             route=Screen.TechnicianProfile.route
         ){
-            TechnicianProfile(navController = navController, navyStatus = "technicianProfile",sharedViewModel = sharedViewModel)
+            TechnicianProfile(navController,"",loginShearedViewModel,techShearedViewModel)
         }
 
         composable(route=Screen.SettingsScreen.route) {
@@ -163,7 +159,7 @@ fun SetupNavGraph(
         composable(
             route=Screen.TechnicianDashboard.route
         ){
-            TechnicianDashboard(navController = navController, navStatus = "technicianDashboard",loginShearedViewModel,technicianDashboardServiceCommonDetails)
+            TechnicianDashboard(navController = navController, navStatus = "technicianDashboard",loginShearedViewModel,technicianDashboardServiceCommonDetails,techShearedViewModel)
         }
 
         composable(
@@ -173,6 +169,8 @@ fun SetupNavGraph(
                 technicianShearedViewModel = technicianDashboardServiceCommonDetails
             )
         }
+
+
 
     }
 }

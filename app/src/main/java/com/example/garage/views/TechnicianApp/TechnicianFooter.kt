@@ -82,7 +82,7 @@ fun TechnicianFooter(
                 .size(45.dp)
                 .clickable {
 
-//                    navController.navigate(route = Screen.GarageProfile.route)
+                    navController.navigate(route = Screen.TechnicianProfile.route)
                 }
             ,
             tint = Color.Unspecified,

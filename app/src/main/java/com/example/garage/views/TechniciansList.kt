@@ -61,6 +61,7 @@ import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
 import com.example.garage.repository.TechData
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -70,7 +71,7 @@ import java.net.SocketTimeoutException
 
 @Composable
 fun TechniciansList(
-    navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel
+    navController: NavController, navyStatus: String, sharedViewModel: SharedViewModel,loginShearedViewModel: LoginShearedViewModel
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -90,7 +91,7 @@ fun TechniciansList(
 
     LaunchedEffect(Unit) {
 
-        val response = loadAllTechnicians(viewModel)
+        val response = loginShearedViewModel.loginId?.let { loadAllTechnicians(viewModel, it,) }
         Log.d("res double checked", response.toString())
         if (response != null) {
             if (response.status == 200) {
@@ -252,13 +253,6 @@ fun TechniciansList(
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                     ) {
-
-                        val list: MutableList<GarageTechnician> =
-                            emptyList<GarageTechnician>().toMutableList()
-
-//                        val coroutineScope = CoroutineScope(Dispatchers.Main)
-
-
 
                         // load all technicians in the table
                         if (showLoadTechnicians) {
@@ -804,11 +798,11 @@ fun TechniciansLoadStretcher(
 }
 
 
-suspend fun loadAllTechnicians(viewModel: MainViewModel): ResponseObject? {
+suspend fun loadAllTechnicians(viewModel: MainViewModel,garageId:String): ResponseObject? {
     var response: ResponseObject? = null
 
     try {
-        viewModel.getTechnicians("", "getAll") { responseObject ->
+        viewModel.getTechnicians(garageId, "getAll") { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {

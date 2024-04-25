@@ -62,14 +62,14 @@ fun CommonTextField(
                 .fillMaxHeight()
                 .fillMaxWidth(0.9f),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             OutlinedTextField(
                 value = textFieldValue,
-                onValueChange = {textFieldValue = it },
+                onValueChange = { textFieldValue = it },
                 textStyle = TextStyle(
                     Color.Black,
                     fontWeight = FontWeight.Bold,
-                    fontSize =16.sp,
+                    fontSize = 16.sp,
                     letterSpacing = 0.15.sp,
                     textAlign = TextAlign.Center,
                     fontFamily = fontFamily
@@ -94,12 +94,12 @@ fun CommonTextField(
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF253555).copy(alpha = 0.5f),
-                        modifier = Modifier.padding(15.dp,0.dp,0.dp,0.dp),
-                        fontFamily= fontFamily
+                        modifier = Modifier.padding(15.dp, 0.dp, 0.dp, 0.dp),
+                        fontFamily = fontFamily
                     )
                 },
                 suffix = {
-                    if(prefixStatus){
+                    if (prefixStatus) {
                         IconButton(onClick = { /*TODO*/ }) {
                             Icon(
                                 imageVector = Icons.Rounded.Info,
@@ -115,7 +115,6 @@ fun CommonTextField(
             )
         }
     }
-
 
     return textFieldValue
 }

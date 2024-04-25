@@ -34,7 +34,7 @@ val fontFamily= FontFamily(
 val textStyle1 = TextStyle(
     fontFamily= fontFamily,
     fontWeight = FontWeight.ExtraBold,
-    fontSize = 20.sp,
+    fontSize = 18.sp,
     letterSpacing = 0.15.sp,
     color = Color(0xFF253555)
 )

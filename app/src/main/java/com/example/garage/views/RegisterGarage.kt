@@ -49,6 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -65,7 +67,6 @@ import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
@@ -135,16 +136,10 @@ fun SignUpBox(
     var otp by remember { mutableStateOf("") }
     var txtOtp by remember { mutableStateOf("") }
     val context = LocalContext.current
-    var mAuth: FirebaseAuth? = null
-    mAuth = FirebaseAuth.getInstance()
-    var otpid by remember {
-        mutableStateOf("")
-    }    // FirebaseApp.initializeApp(mainActivity)
 
-    var loading by remember { mutableStateOf(false) }
     var processingBarStatus = remember { mutableStateOf(false) }
     val coroutineScope= rememberCoroutineScope()
-    var id by remember { mutableStateOf("") }
+
 
 
     CircularProcessingBar(isShow = processingBarStatus.value)
@@ -476,7 +471,14 @@ fun AuthField(labelName: String, value: String?, isMobile: Boolean,keyboardType:
                             }
                         }
                     },
-                textStyle = textStyle2,
+                textStyle = TextStyle(
+                    Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize =16.sp,
+                    letterSpacing = 0.15.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily
+                ),
                 placeholder = {
                     Text(
                         text = labelName,

@@ -12,4 +12,5 @@ class TechnicianDashboardServiceCommonDetails (
     val customerName:String,
     val customerContact:String,
     val vehicleModel:String,
+    val customerLocation:String
 ): Parcelable

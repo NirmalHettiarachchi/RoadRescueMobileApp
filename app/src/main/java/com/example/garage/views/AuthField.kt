@@ -29,17 +29,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AuthField(labelName: String, value: String?): String {
-    var fieldValue by remember { mutableStateOf(value) }
+fun AuthField(labelName: String, value: String?,isMobile: Boolean): String {
+    var fieldValue by remember { mutableStateOf((TextFieldValue(value ?: "")))}
 
     Box(
         modifier = Modifier
@@ -50,7 +53,7 @@ fun AuthField(labelName: String, value: String?): String {
         Column {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = fieldValue ?: "",
+                value = fieldValue ,
                 onValueChange = { fieldValue = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
@@ -58,7 +61,18 @@ fun AuthField(labelName: String, value: String?): String {
                     .height(50.dp)
                     .border(2.dp, Color.White, shape = RoundedCornerShape(50))
                     .shadow(6.dp, shape = RoundedCornerShape(50))
-                    .background(Color.White),
+                    .background(Color.White)
+                    .onFocusChanged {
+                        if (isMobile) {
+                            if (it.isFocused) {
+                                if (fieldValue.text.isEmpty()) {
+                                    fieldValue = TextFieldValue("+94", selection = TextRange(3))
+                                }
+                            } else {
+                                // not focused
+                            }
+                        }
+                    },
                 textStyle = TextStyle(
                     Color.Black,
                     fontWeight = FontWeight.Bold,
@@ -80,7 +94,7 @@ fun AuthField(labelName: String, value: String?): String {
         }
     }
     Spacer(modifier = Modifier.height(8.dp))
-    return fieldValue ?: ""
+    return fieldValue.text
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

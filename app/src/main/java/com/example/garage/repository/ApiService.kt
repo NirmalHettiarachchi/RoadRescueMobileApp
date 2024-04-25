@@ -4,7 +4,7 @@ import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
 import com.example.garage.models.NewUser
 import com.example.garage.models.UpdateGarage
-import com.example.garage.models.UpdateTechnician
+import com.example.garage.models.UpdateTechnicianByGarage
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -64,7 +64,7 @@ interface ApiService {
     fun deleteTechnician(@Query("delId") delId: String):Call<ResponseBody>
     @Headers("Content-Type: application/json")
     @PUT("technician")
-    fun updateTechnician(@Body technician: UpdateTechnician):Call<ResponseBody>
+    fun updateTechnician(@Body technician: UpdateTechnicianByGarage):Call<ResponseBody>
 
 
     @Headers("Content-Type: application/json")

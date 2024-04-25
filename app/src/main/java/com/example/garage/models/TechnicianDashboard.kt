@@ -8,6 +8,7 @@ class TechnicianDashboard(
     private var _customerName:String,
     private var _customerContact:String,
     private var _vehicleModel:String,
+    private var _customerLocation:String
 ) {
 
     fun getServiceId(): String {
@@ -46,6 +47,9 @@ class TechnicianDashboard(
     fun getCustomerName(): String {
         return _customerName
     }
+    fun grtCustomerLocation():String{
+        return _customerLocation
+    }
 
     fun setCustomerName(customerName: String) {
         _customerName = customerName
@@ -54,6 +58,7 @@ class TechnicianDashboard(
     fun getCustomerContact(): String {
         return _customerContact
     }
+
 
     fun setCustomerContact(customerContact: String) {
         _customerContact = customerContact

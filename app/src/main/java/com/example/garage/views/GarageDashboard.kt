@@ -1,5 +1,6 @@
 package com.example.garage.views
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -58,14 +59,20 @@ import com.example.garage.models.ServicesRequestModel
 import com.example.garage.repository.GarageCommonDetails
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
+import com.example.garage.viewModels.NotificationViewModel
+import com.example.garage.views.TechnicianApp.extractCustomerLatitude
+import com.example.garage.views.TechnicianApp.extractCustomerLongitude
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.SocketTimeoutException
+import kotlin.math.cos
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -73,10 +80,12 @@ fun GarageDashboard(
     navController: NavController,
     navStatus: String,
     garageSharedViewModel: GarageSharedViewModel,
-    loginShearedViewModel: LoginShearedViewModel
+    loginShearedViewModel: LoginShearedViewModel,
+    notificationViewModel: NotificationViewModel,
+    locationViewModel: LocationViewModel,
 ) {
 
-    var garageId=loginShearedViewModel.loginId
+    var garageId = loginShearedViewModel.loginId
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val viewModel = viewModel<MainViewModel>()
@@ -92,11 +101,13 @@ fun GarageDashboard(
     var garage by remember { mutableStateOf("") }
     var requestServices by remember { mutableStateOf("") }
     var garageDetailsBackend = Garage()
-
+    val context: Context = LocalContext.current
+    var preServicesLength: Int = 0
 
     LaunchedEffect(Unit) {
         val response = garageId?.let { loadGarageDetails(viewModel, searchId = it) }
         if (response != null) {
+
             if (response.status == 200) {
 
                 garage = response.data!!.toString()
@@ -146,17 +157,28 @@ fun GarageDashboard(
         }
 
 
-
-            // fetch services requests every 1 minutes
+        notificationViewModel.initNotificationChannel(context = context)
+        // fetch services requests every 1 minutes
         while (true) {
-            requestServices=""
-            val serviceResponse=fetchServiceRequests(viewModel)
+
+            val serviceResponse = fetchServiceRequests(viewModel)
 
             if (serviceResponse != null) {
                 if (serviceResponse.status == 200) {
-                    requestServices=serviceResponse.data!!.toString()
-                    showServiceRequests=true
-                }else if (serviceResponse.status == 400) {
+                    requestServices = serviceResponse.data!!.toString()
+                    if (requestServices.length > preServicesLength) {
+                        preServicesLength = requestServices.length
+                        requestServices = ""
+                        requestServices = serviceResponse.data!!.toString()
+                        //send notification
+                        notificationViewModel.sendNotification(
+                            context,
+                            "New Service Request",
+                            "You have received a new service request"
+                        )
+                        showServiceRequests = true
+                    }
+                } else if (serviceResponse.status == 400) {
                     title = serviceResponse.status.toString()
                     message = serviceResponse.message.toString()
                     buttonOneName = "Ok"
@@ -183,16 +205,15 @@ fun GarageDashboard(
                     buttonTwoName = "null"
                     showMessageDialog = true
                 }
-            }else{
+            } else {
                 title = "401"
                 message = "Can not call the sever"
                 buttonOneName = "Ok"
                 buttonTwoName = "null"
                 showMessageDialog = true
             }
-            delay(1000 * 60)
+            delay(1000 * 5)
         }
-
 
 
     }
@@ -276,7 +297,7 @@ fun GarageDashboard(
             Column(
                 modifier = defaultBackground.padding(it),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+            ) {
 
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -306,31 +327,84 @@ fun GarageDashboard(
 
                     // Load are service requests
                     // customer request load karanna one
-                    if(showServiceRequests){
+                    if (showServiceRequests) {
                         if (requestServices.isNotEmpty()) {
-                            val jsonArray=JSONArray(requestServices)
-                            for (i in 0 until jsonArray.length()) {
-                                val jsonObject = jsonArray.getJSONObject(i)
-                                val issue = jsonObject.getString("issue")
-                                val customerContactNumber = jsonObject.getString("customerContactNumber")
-                                val approx_cost = jsonObject.getDouble("approx_cost")
-                                val requestTime = jsonObject.getString("requestTimeStamp")
-                                val description = jsonObject.getString("description")
-                                val indicatorLightStatus = jsonObject.getString("indicatorLightStatus")
-                                val serviceRequestId = jsonObject.getInt("serviceRequestId")
+                            val jsonArray = JSONArray(requestServices)
+                            if (jsonArray.length() > preServicesLength) {
 
+                                for (i in 0 until jsonArray.length()) {
+                                    val jsonObject = jsonArray.getJSONObject(i)
+                                    val issue = jsonObject.getString("issue")
+                                    val customerContactNumber =
+                                        jsonObject.getString("customerContactNumber")
+                                    val approx_cost = jsonObject.getDouble("approx_cost")
+                                    val requestTime = jsonObject.getString("requestTimeStamp")
+                                    val description = jsonObject.getString("description")
+                                    val indicatorLightStatus =
+                                        jsonObject.getString("indicatorLightStatus")
+                                    val serviceRequestId = jsonObject.getInt("serviceRequestId")
+                                    val garageVerification = jsonObject.getString("verification")
+                                    val serviceLocation = jsonObject.getString("serviceLocation")
 
-                                var serviceRequest=ServicesRequestModel(serviceRequestId,customerContactNumber,requestTime,issue,description,approx_cost,indicatorLightStatus)
+                                    // methananwens karanna wi balanna weyi
+                                    var serviceRequest = ServicesRequestModel(
+                                        serviceRequestId,
+                                        customerContactNumber,
+                                        requestTime,
+                                        issue,
+                                        description,
+                                        approx_cost,
+                                        indicatorLightStatus,
+                                        ""
+                                    )
 
-                                ServiceRequest(
-                                    navController,
-                                    serviceRequest,
-                                    Modifier.align(Alignment.CenterHorizontally),
-                                    viewModel
-                                )
+                                    if (garageVerification == "Yes") {
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                        val customerLat =
+                                            extractCustomerLatitude(serviceLocation.toString())
+                                        val customerLong =
+                                            extractCustomerLongitude(serviceLocation.toString())
+
+                                        val garageLat = locationViewModel.location.value?.latitude
+                                        val garageLong = locationViewModel.location.value?.longitude
+
+                                        if (garageLat != null && garageLong != null) {
+                                            val range = getRangeWithin3km(garageLat, garageLong)
+                                            if ((range.first.latitude < customerLat!!) && (range.second.latitude > garageLat) && (range.first.longitude < garageLong) && (range.second.longitude > garageLong)) {
+                                                Log.d(
+                                                    "location resound ",
+                                                    "GarageDashboard: garage eka 3 km athule hutto "
+                                                )
+                                            } else {
+                                                Log.d(
+                                                    "location resound ",
+                                                    "GarageDashboard: garage eka 3 km athule neweyi hutto  hutto "
+                                                )
+                                            }
+                                        }
+
+                                        if (garageLong != null && garageLat != null) {
+
+                                        }
+
+                                        ServiceRequest(
+                                            navController,
+                                            serviceRequest,
+                                            Modifier.align(Alignment.CenterHorizontally),
+                                            viewModel
+                                        )
+                                    } else {
+                                        title = "Garage not verified"
+                                        message = "Unverified garage detected. Please verify."
+                                        buttonOneName = "Ok"
+                                        buttonTwoName = "null"
+                                        showMessageDialog = true
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
+
                         }
                     }
                 }
@@ -354,7 +428,24 @@ fun GarageDashboard(
     }
 }
 
-suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
+fun getRangeWithin3km(lat: Double, lon: Double): Pair<LatLng, LatLng> {
+    val earthRadius = 6371 // Earth's radius in kilometers
+
+    val latRadians = Math.toRadians(lat)
+    val lonRadians = Math.toRadians(lon)
+
+    val deltaLat = 3.0 / earthRadius
+    val deltaLon = 3.0 / (earthRadius * cos(latRadians))
+
+    val minLat = lat - Math.toDegrees(deltaLat)
+    val maxLat = lat + Math.toDegrees(deltaLat)
+    val minLon = lon - Math.toDegrees(deltaLon)
+    val maxLon = lon + Math.toDegrees(deltaLon)
+
+    return Pair(LatLng(minLat, minLon), LatLng(maxLat, maxLon))
+}
+
+suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject? {
     var response: ResponseObject? = null
 
     try {
@@ -365,7 +456,7 @@ suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
                 response = ResponseObject(400, "response is null", null)
             }
         }
-    }catch (e: SocketTimeoutException) {
+    } catch (e: SocketTimeoutException) {
         response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
     } catch (e: Exception) {
         response = ResponseObject(404, "Exception error.", e.localizedMessage)
@@ -373,7 +464,7 @@ suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject?{
     return response
 }
 
-suspend fun loadGarageDetails(viewModel: MainViewModel,searchId:String): ResponseObject? {
+suspend fun loadGarageDetails(viewModel: MainViewModel, searchId: String): ResponseObject? {
     var response: ResponseObject? = null
 
     try {
@@ -395,7 +486,12 @@ suspend fun loadGarageDetails(viewModel: MainViewModel,searchId:String): Respons
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestModel, modifier: Modifier,viewModel: MainViewModel) {
+fun ServiceRequest(
+    navController: NavController,
+    serviceRequest: ServicesRequestModel,
+    modifier: Modifier,
+    viewModel: MainViewModel,
+) {
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -409,7 +505,7 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
     var showAlert by remember { mutableStateOf(false) }
     var techniciansList = emptyList<String>()
 
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth(0.9f)
@@ -418,7 +514,6 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
         colors = CardDefaults.cardColors(containerColor = Color.White),
 
         ) {
-
 
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -489,7 +584,9 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                     .padding(8.dp, 0.dp)
             )
             Text(
-                text = if (serviceRequest.getDescription().isEmpty()) "No Description" else serviceRequest.getDescription(),
+                text = if (serviceRequest.getDescription()
+                        .isEmpty()
+                ) "No Description" else serviceRequest.getDescription(),
                 color = Color.Black,
                 modifier = Modifier.weight(1f),
                 maxLines = 3
@@ -662,7 +759,7 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 IconButton(onClick = {
-                                    techniciansList= emptyList()
+                                    techniciansList = emptyList()
                                     showDialog = false
                                 }) {
                                     Icon(
@@ -688,7 +785,7 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                             // Dropdown load
 
 
-                            val option= CommonDropdown(
+                            val option = CommonDropdown(
                                 optionList = techniciansList,
                                 defaultSelection = "Technician ",
                                 Modifier
@@ -705,18 +802,26 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                                 btnName = "Assign",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
-                                    val serviceProviderId="1"
-                                    Log.d("TAG test assign button is work", "ServiceRequest: work assign button")
+                                    val serviceProviderId = "1"
+                                    Log.d(
+                                        "TAG test assign button is work",
+                                        "ServiceRequest: work assign button"
+                                    )
                                     coroutineScope.launch {
-                                        val responseObject= assignTechnicianForService(viewModel,serviceRequest.getServiceRequestId(),serviceProviderId,option.toString())
+                                        val responseObject = assignTechnicianForService(
+                                            viewModel,
+                                            serviceRequest.getServiceRequestId(),
+                                            serviceProviderId,
+                                            option.toString()
+                                        )
 
-                                        if (responseObject!=null) {
-                                            if(responseObject.status==200){
-                                                title="Success"
-                                                message= responseObject.message.toString()
-                                                buttonOneName="null"
-                                                buttonTwoName="null"
-                                                showAlert=true
+                                        if (responseObject != null) {
+                                            if (responseObject.status == 200) {
+                                                title = "Success"
+                                                message = responseObject.message.toString()
+                                                buttonOneName = "null"
+                                                buttonTwoName = "null"
+                                                showAlert = true
 
                                             } else if (responseObject.status == 400) {
                                                 title = responseObject.status.toString()
@@ -751,7 +856,7 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
                                                 buttonTwoName = "null"
                                                 showAlert = true
                                             }
-                                        }else{
+                                        } else {
                                             title = "401"
                                             message = "Cannot call the sever"
                                             buttonOneName = "Ok"
@@ -798,17 +903,21 @@ fun ServiceRequest(navController:NavController,serviceRequest: ServicesRequestMo
 }
 
 
-
 suspend fun assignTechnicianForService(
     viewModel: MainViewModel,
     serviceRequestId: Int,
     serviceProviderId: String,
-    technicianId: String
-):ResponseObject? {
+    technicianId: String,
+): ResponseObject? {
     var response: ResponseObject? = null
 
     try {
-        viewModel.assignTechnicianForService("assignTechnician",serviceRequestId,serviceProviderId,technicianId) { responseObject ->
+        viewModel.assignTechnicianForService(
+            "assignTechnician",
+            serviceRequestId,
+            serviceProviderId,
+            technicianId
+        ) { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {
@@ -825,7 +934,10 @@ suspend fun assignTechnicianForService(
     return response
 }
 
-suspend fun loadTechniciansGroupByIssue(viewModel: MainViewModel,issueCategory:String):ResponseObject? {
+suspend fun loadTechniciansGroupByIssue(
+    viewModel: MainViewModel,
+    issueCategory: String,
+): ResponseObject? {
     var response: ResponseObject? = null
 
     try {

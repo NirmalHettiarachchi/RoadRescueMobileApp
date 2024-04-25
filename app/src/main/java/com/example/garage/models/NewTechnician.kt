@@ -15,7 +15,7 @@ data class NewTechnician(
     val techStatus: Int,
 )
 
-data class UpdateTechnician(
+data class UpdateTechnicianByGarage(
     @SerializedName("techId")
     val techId: String,
     @SerializedName("techFirstName")
@@ -66,4 +66,21 @@ data class NewUser(
     @SerializedName("longitude")
     val longitude: String
 )
+
+data class UpdateTechnicianByTechnician(
+    @SerializedName("techId")
+    val techId: String,
+    @SerializedName("techFirstName")
+    val techFirstName: String,
+    @SerializedName("techLastName")
+    val techLastName: String,
+    @SerializedName("imageRef")
+    val techImageRef:String,
+    @SerializedName("techExpertiseAreas")
+    val techExpertiseAreas: List<String>,
+    @SerializedName("techEmail")
+    val techEmail:String
+)
+
+
 

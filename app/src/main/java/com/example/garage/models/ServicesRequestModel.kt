@@ -7,7 +7,8 @@ class ServicesRequestModel(
     private var _issue: String,
     private var _description: String,
     private var _serviceFee: Double,
-    private var _indicatorLightStatus: String
+    private var _indicatorLightStatus: String,
+    private var _customerLocation: String
 
     ) {
 
@@ -29,6 +30,10 @@ class ServicesRequestModel(
 
     fun getTime(): String {
         return this._time
+    }
+
+    fun getCustomerLocation(): String {
+        return this._customerLocation
     }
 
     fun setTime(time: String) {
