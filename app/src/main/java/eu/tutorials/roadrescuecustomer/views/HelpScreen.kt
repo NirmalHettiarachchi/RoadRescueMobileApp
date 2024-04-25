@@ -130,7 +130,7 @@ fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewM
         } else {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Support tickets",
+                text = "Your complaints",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )

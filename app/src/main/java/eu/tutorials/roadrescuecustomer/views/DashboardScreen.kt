@@ -865,8 +865,6 @@ fun RequestServiceScreen(
 
     showLoadingLocationWindow = locationViewModel.location.value == null
 
-    notificationViewModel.initNotificationChannel(context)
-
     val loading = remember {
         mutableStateOf(false)
     }
@@ -1040,6 +1038,7 @@ fun RequestServiceScreen(
                             approxCost = serviceRequestViewModel.issue.value.approximatedCost
                         ), object : ServiceRequestRepository.RequestCallback {
                             override fun success(message: String) {
+                                notificationViewModel.initNotificationChannel(context)
                                 notificationViewModel.sendNotification(context, "Service Request", "Service requested successfully")
                                 Toast.makeText(
                                     context,
