@@ -211,6 +211,7 @@ fun DashboardScreen(
                     )
                 } else {
                     if (request?.status?.toInt() == 2) {
+                        notificationViewModel.sendNotification(context, "Service Request", "Your service request is accepted")
                         LaunchedEffect(key1 = true) {
                             while (true) {
                                 currentStateViewModel.fetchLatestRequest(
@@ -232,6 +233,7 @@ fun DashboardScreen(
                             navController = navController
                         )
                     } else if (request?.status?.toInt() == 3) {
+                        notificationViewModel.sendNotification(context, "Service Request", "Service provided successfully. Please make the payment")
                         ServiceProvidedDashboard(
                             request = request,
                             serviceRequestViewModel = serviceRequestViewModel,
