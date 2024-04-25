@@ -20,22 +20,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,12 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
-import kotlinx.coroutines.launch
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -129,7 +121,7 @@ fun ProfileBox(profileViewModel: ProfileViewModel, serviceRequestViewModel: Serv
     val loading by profileViewModel.loading.collectAsState()
     CircularProgressBar(isDisplayed = loading)
 
-    val customerId = eu.tutorials.roadrescuecustomer.AppPreferences(LocalContext.current)
+    val customerId = eu.tutorials.roadrescuecustomer.util.AppPreferences(LocalContext.current)
         .getStringPreference("CUSTOMER_ID", "")
     LaunchedEffect(key1 = customerId) {
         serviceRequestViewModel.fetchRequestCount(customerId)

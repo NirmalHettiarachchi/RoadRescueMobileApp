@@ -1,6 +1,5 @@
 package eu.tutorials.roadrescuecustomer.views
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,10 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import eu.tutorials.roadrescuecustomer.models.LocationUtils
-import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
-import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
-import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.TipViewModel
 import kotlin.random.Random
 

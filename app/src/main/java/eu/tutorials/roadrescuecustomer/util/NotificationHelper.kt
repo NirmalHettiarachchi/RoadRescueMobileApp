@@ -10,7 +10,7 @@ import androidx.core.app.NotificationManagerCompat
 import eu.tutorials.roadrescuecustomer.R
 
 object NotificationHelper {
-    const val CHANNEL_ID = "channel_id"
+    private const val CHANNEL_ID = "channel_id"
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

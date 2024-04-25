@@ -30,7 +30,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -39,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import com.stripe.android.paymentsheet.rememberPaymentSheet
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
@@ -78,7 +75,6 @@ import java.util.Date
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 @Composable
 fun DashboardScreen(
@@ -129,7 +125,7 @@ fun DashboardScreen(
 
         val formatterUTC: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
         formatterUTC.timeZone = TimeZone.getTimeZone("UTC") // UTC timezone
-        val d = Date(System.currentTimeMillis())
+//        val d = Date(System.currentTimeMillis())
         val ddd = Date()
 
         //get time in milliseconds
@@ -139,7 +135,7 @@ fun DashboardScreen(
 
         val minutes = seconds / 60
         val hours = minutes / 60
-        val days = hours / 24
+//        val days = hours / 24
 
         Log.d(
             "TAG",
@@ -153,17 +149,17 @@ fun DashboardScreen(
 
         val date1 = System.currentTimeMillis()
         Thread.sleep(1000)
-        val date2 = System.currentTimeMillis()
+//        val date2 = System.currentTimeMillis()
 
         val duration = abs(ddd.time - dd.time)
-        val days1 = TimeUnit.MILLISECONDS.toDays(duration)
-        val hours1 = TimeUnit.MILLISECONDS.toHours(duration)
+//        val days1 = TimeUnit.MILLISECONDS.toDays(duration)
+//        val hours1 = TimeUnit.MILLISECONDS.toHours(duration)
         val minutes1 = TimeUnit.MILLISECONDS.toMinutes(duration)
 
         Log.d("TAG", "DashboardScreen: Duration Minutes....... $minutes1")
         waitingTime = (3 - minutes1) * 60 * 1000
 
-        val seconds1 = TimeUnit.MILLISECONDS.toSeconds(duration)
+//        val seconds1 = TimeUnit.MILLISECONDS.toSeconds(duration)
 
         if(isChangeAutomatic){
             currentStateViewModel.setCurrentState(

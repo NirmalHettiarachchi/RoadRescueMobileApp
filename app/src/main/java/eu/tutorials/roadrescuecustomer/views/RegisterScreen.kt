@@ -28,7 +28,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -54,8 +53,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
-import com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
-import com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.models.Customer
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
