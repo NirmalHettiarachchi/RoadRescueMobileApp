@@ -67,6 +67,7 @@ import eu.tutorials.roadrescuecustomer.models.ServiceRequestRepository
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.NotificationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -86,6 +87,7 @@ fun DashboardScreen(
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
     navigationViewModel: NavigationViewModel,
+    notificationViewModel: NotificationViewModel,
     context: Context,
     navController: NavHostController
 ) {
@@ -204,6 +206,7 @@ fun DashboardScreen(
                         serviceRequestViewModel = serviceRequestViewModel,
                         locationUtils = locationUtils,
                         locationViewModel = locationViewModel,
+                        notificationViewModel = notificationViewModel,
                         context = context
                     )
                 } else {
@@ -852,6 +855,7 @@ fun RequestServiceScreen(
     serviceRequestViewModel: ServiceRequestViewModel,
     locationUtils: LocationUtils,
     locationViewModel: LocationViewModel,
+    notificationViewModel: NotificationViewModel,
     context: Context
 ) {
     var description by remember { mutableStateOf("") }
@@ -862,6 +866,8 @@ fun RequestServiceScreen(
     var showIssueDetailsWindow by remember { mutableStateOf(false) }
 
     showLoadingLocationWindow = locationViewModel.location.value == null
+
+    notificationViewModel.initNotificationChannel(context)
 
     val loading = remember {
         mutableStateOf(false)
@@ -1036,6 +1042,7 @@ fun RequestServiceScreen(
                             approxCost = serviceRequestViewModel.issue.value.approximatedCost
                         ), object : ServiceRequestRepository.RequestCallback {
                             override fun success(message: String) {
+                                notificationViewModel.sendNotification(context, "Service Request", "Service requested successfully")
                                 Toast.makeText(
                                     context,
                                     "Service requested successfully",

@@ -26,6 +26,7 @@ import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LocationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.LoginViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.NavigationViewModel
+import eu.tutorials.roadrescuecustomer.viewmodels.NotificationViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.ServiceRequestViewModel
 import eu.tutorials.roadrescuecustomer.viewmodels.RegisterViewModel
@@ -45,6 +46,7 @@ fun App(
     customerSupportTicketViewModel: CustomerSupportTicketViewModel,
     navigationViewModel: NavigationViewModel,
     tipViewModel: TipViewModel,
+    notificationViewModel: NotificationViewModel,
     context: MainActivity
 ) {
     val navController = rememberNavController()
@@ -133,6 +135,7 @@ fun App(
                         locationUtils = locationUtils,
                         locationViewModel = locationViewModel,
                         navigationViewModel = navigationViewModel,
+                        notificationViewModel = notificationViewModel,
                         context = context,
                         navController = navController
                     )
