@@ -1,6 +1,7 @@
 package eu.tutorials.roadrescuecustomer.models
 
 import android.content.Context
+import eu.tutorials.roadrescuecustomer.AppConfig
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.sql.Connection
@@ -25,12 +26,10 @@ class SingUpRepository() {
         context: Context,
         user: Customer, callback: AddUserCallback
     ) {
-        val DATABASE_NAME = "road_rescue"
         val TABLE_NAME = "customer"
-        val url =
-            "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
         Thread {
             try {
                 // Load the JDBC driver

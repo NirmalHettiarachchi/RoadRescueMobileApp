@@ -2,6 +2,7 @@ package eu.tutorials.roadrescuecustomer.models
 
 import android.content.Context
 import android.widget.Toast
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -27,12 +28,10 @@ class ProfileRepository() {
     fun getProfile() = _profile
 
     fun updateProfile(phoneNumber: String, name: String, email: String, context: Context) {
-        val DATABASE_NAME = "road_rescue"
         val TABLE_NAME = "customer"
-        val url =
-            "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
 
         Thread {
             try {
