@@ -84,7 +84,7 @@ fun PhoneIconButton(context: Context) {
     IconButton(
         onClick = {
             val intent = Intent(Intent.ACTION_DIAL)
-            intent.data = Uri.parse("tel:+94768879830")
+            intent.data = Uri.parse("tel:+94761816604")
             context.startActivity(intent)
         }
     ) {
@@ -122,7 +122,7 @@ fun HelpRequestedList(customerSupportTicketViewModel: CustomerSupportTicketViewM
         if(customerSupportTicketViewModel.tickets.isEmpty()) {
             Spacer(modifier = Modifier.height(128.dp))
             Text(
-                text = "There are no support tickets to show!",
+                text = "There are no complaints to show!",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = textStyle2
             )
@@ -355,7 +355,7 @@ fun CustomerSupportTicketMoreInfoWindow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Support Ticket ID ", style = textStyle4,
+                        text = "Complaint ID ", style = textStyle4,
                         modifier = Modifier
                             .weight(1f)
                             .padding(8.dp, 0.dp)
