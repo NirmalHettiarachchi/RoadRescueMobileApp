@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -22,9 +23,9 @@ class CustomerSupportTicketViewModel : ViewModel() {
             loading.value = true
             withContext(Dispatchers.IO) {
                 // Database credentials and URL
-                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
-                val databaseUser = "admin"
-                val databasePassword = "admin123"
+                val databaseUrl = AppConfig.DATABASE_URL
+                val databaseUser = AppConfig.DATABASE_USERNAME
+                val databasePassword = AppConfig.DATABASE_PASSWORD
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")
@@ -66,9 +67,9 @@ class CustomerSupportTicketViewModel : ViewModel() {
             loading.value = true
             withContext(Dispatchers.IO) {
                 // Database credentials and URL
-                val databaseUrl = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
-                val databaseUser = "admin"
-                val databasePassword = "admin123"
+                val databaseUrl = AppConfig.DATABASE_URL
+                val databaseUser = AppConfig.DATABASE_USERNAME
+                val databasePassword = AppConfig.DATABASE_PASSWORD
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")

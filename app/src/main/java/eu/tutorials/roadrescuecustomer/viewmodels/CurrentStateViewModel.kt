@@ -1,30 +1,22 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
-import android.content.ContentValues
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.models.CurrentStateRepository
-import eu.tutorials.roadrescuecustomer.models.Issues
 import eu.tutorials.roadrescuecustomer.models.ServiceRequest
 import eu.tutorials.roadrescuecustomer.models.TechnicianLocation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 
 class CurrentStateViewModel : ViewModel() {
     private val _repository: CurrentStateRepository = CurrentStateRepository()
@@ -79,11 +71,9 @@ class CurrentStateViewModel : ViewModel() {
     private fun fetchLatestRequestFromDatabase(customerId: String): List<ServiceRequest> {
         val latestRequests = mutableListOf<ServiceRequest>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -173,11 +163,9 @@ class CurrentStateViewModel : ViewModel() {
     private fun fetchLatestRequestTechLocation(serviceRequestId: String): List<TechnicianLocation> {
         val techLocationLatestRequests = mutableListOf<TechnicianLocation>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =

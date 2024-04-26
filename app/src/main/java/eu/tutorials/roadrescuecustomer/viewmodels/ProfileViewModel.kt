@@ -1,18 +1,12 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
-import android.content.ContentValues
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.models.ProfileRepository
-import eu.tutorials.roadrescuecustomer.util.AppPreferences
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,11 +42,9 @@ class ProfileViewModel : ViewModel() {
 
     fun changePhoneNumberFromDatabase(newPhoneNumber: String, customerId: String) {
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->

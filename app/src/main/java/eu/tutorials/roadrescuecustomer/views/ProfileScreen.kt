@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
 import eu.tutorials.roadrescuecustomer.R
 import eu.tutorials.roadrescuecustomer.viewmodels.ProfileViewModel
@@ -81,11 +82,9 @@ fun ProfileScreen(
 @Throws(SQLException::class)
 fun utilFun() {
     Thread {
-        val DATABASE_NAME = "road_rescue"
-        val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
-                DATABASE_NAME
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
 
         val records = StringBuilder()
         try {

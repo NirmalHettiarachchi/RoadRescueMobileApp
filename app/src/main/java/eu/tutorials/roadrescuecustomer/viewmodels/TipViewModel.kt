@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.models.Tip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,10 +34,9 @@ class TipViewModel : ViewModel() {
 
     private fun fetchTipsFromDatabase(tipId: String): List<Tip> {
         val tips = mutableListOf<Tip>()
-        val DATABASE_NAME = "road_rescue"
-        val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
 
         try {
             Class.forName("com.mysql.jdbc.Driver")

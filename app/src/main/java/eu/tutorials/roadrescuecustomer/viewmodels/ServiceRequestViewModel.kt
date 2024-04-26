@@ -14,14 +14,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.stripe.android.PaymentConfiguration
-import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
-import com.stripe.android.paymentsheet.PaymentSheetResultCallback
-import eu.tutorials.roadrescuecustomer.data.api.ApiInterface
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.data.api.ApiUtilities
 import eu.tutorials.roadrescuecustomer.data.model.PaymentResponse
-import eu.tutorials.roadrescuecustomer.models.CustomerSupportTicket
 import eu.tutorials.roadrescuecustomer.models.FuelType
 import eu.tutorials.roadrescuecustomer.models.Issues
 import eu.tutorials.roadrescuecustomer.models.ServiceRequest
@@ -30,9 +26,7 @@ import eu.tutorials.roadrescuecustomer.models.VehicleMake
 import eu.tutorials.roadrescuecustomer.models.VehicleModel
 import eu.tutorials.roadrescuecustomer.models.VehicleType
 import eu.tutorials.roadrescuecustomer.util.AppPreferences
-import eu.tutorials.roadrescuecustomer.views.getActivity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,12 +36,6 @@ import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
-import kotlin.math.log
 
 class ServiceRequestViewModel : ViewModel() {
     private val _repository: ServiceRequestRepository = ServiceRequestRepository()
@@ -282,10 +270,9 @@ class ServiceRequestViewModel : ViewModel() {
             loading.value = true
             withContext(Dispatchers.IO) {
                 // Database credentials and URL
-                val databaseUrl =
-                    "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
-                val databaseUser = "admin"
-                val databasePassword = "admin123"
+                val databaseUrl = AppConfig.DATABASE_URL
+                val databaseUser = AppConfig.DATABASE_USERNAME
+                val databasePassword = AppConfig.DATABASE_PASSWORD
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")
@@ -353,10 +340,9 @@ class ServiceRequestViewModel : ViewModel() {
             loading.value = true
 
             withContext(Dispatchers.IO) {
-                val databaseUrl =
-                    "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/road_rescue"
-                val databaseUser = "admin"
-                val databasePassword = "admin123"
+                val databaseUrl = AppConfig.DATABASE_URL
+                val databaseUser = AppConfig.DATABASE_USERNAME
+                val databasePassword = AppConfig.DATABASE_PASSWORD
 
                 try {
                     Class.forName("com.mysql.jdbc.Driver")
@@ -464,12 +450,10 @@ class ServiceRequestViewModel : ViewModel() {
 
     private fun deleteRequestFromDatabase(context: Context, requestId: Int): DeleteResult {
         try {
-            val DATABASE_NAME = "road_rescue"
             val TABLE_NAME = "service_request"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
@@ -509,12 +493,9 @@ class ServiceRequestViewModel : ViewModel() {
     @SuppressLint("SuspiciousIndentation")
     private fun rateOrSkipDatabase(context: Context, rate: Int, requestId: Int): DeleteResult {
         try {
-            val DATABASE_NAME = "road_rescue"
-            val TABLE_NAME = "service_request"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
@@ -554,12 +535,9 @@ class ServiceRequestViewModel : ViewModel() {
 
     private fun paymentDoneDatabase(requestId: Int, paidByCard: Boolean): DeleteResult {
         try {
-            val DATABASE_NAME = "road_rescue"
-            val TABLE_NAME = "service_request"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             DriverManager.getConnection(url, username, databasePassword).use { connection ->
@@ -592,11 +570,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun getIssuesFromDatabase(): List<Issues> {
         val issueList = mutableListOf<Issues>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -621,11 +597,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun checkRequestStatus(requestId : Int): Int {
         var status  = 0
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -648,11 +622,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun getVehicleTypesFromDatabase(): List<VehicleType> {
         val vehicleTypeList = mutableListOf<VehicleType>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url =
-                "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" + DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -675,11 +647,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun getFuelTypesFromDatabase(): List<FuelType> {
         val fuelTypeList = mutableListOf<FuelType>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
-                    DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -702,11 +672,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun getVehicleMakesFromDatabase(): List<VehicleMake> {
         val vehicleMakeList = mutableListOf<VehicleMake>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
-                    DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =
@@ -729,11 +697,9 @@ class ServiceRequestViewModel : ViewModel() {
     private fun getVehicleModelsFromDatabase(): List<VehicleModel> {
         val vehicleModelList = mutableListOf<VehicleModel>()
         try {
-            val DATABASE_NAME = "road_rescue"
-            val url = "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/" +
-                    DATABASE_NAME
-            val username = "admin"
-            val databasePassword = "admin123"
+            val url = AppConfig.DATABASE_URL
+            val username = AppConfig.DATABASE_USERNAME
+            val databasePassword = AppConfig.DATABASE_PASSWORD
 
             Class.forName("com.mysql.jdbc.Driver")
             val connection: Connection =

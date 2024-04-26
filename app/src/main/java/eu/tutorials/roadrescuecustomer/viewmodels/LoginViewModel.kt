@@ -1,6 +1,7 @@
 package eu.tutorials.roadrescuecustomer.viewmodels
 
 import androidx.lifecycle.ViewModel
+import eu.tutorials.roadrescuecustomer.AppConfig
 import eu.tutorials.roadrescuecustomer.models.Customer
 import java.sql.Connection
 import java.sql.DriverManager
@@ -23,12 +24,10 @@ class LoginViewModel : ViewModel() {
     }
 
     fun getUserDetails(customer: Customer, callback: UserRetrievalCallback) {
-        val DATABASE_NAME = "road_rescue"
         val TABLE_NAME = "customer"
-        val url =
-            "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
 
         Thread {
             var connection: Connection? = null
@@ -68,12 +67,10 @@ class LoginViewModel : ViewModel() {
     }
 
     fun checkPhoneNumberExists(customer: Customer, callback: PhoneNumberCheckCallback) {
-        val DATABASE_NAME = "road_rescue"
         val TABLE_NAME = "customer"
-        val url =
-            "jdbc:mysql://database-1.cxaiwakqecm4.eu-north-1.rds.amazonaws.com:3306/$DATABASE_NAME"
-        val username = "admin"
-        val databasePassword = "admin123"
+        val url = AppConfig.DATABASE_URL
+        val username = AppConfig.DATABASE_USERNAME
+        val databasePassword = AppConfig.DATABASE_PASSWORD
 
         Thread {
             try {
