@@ -1,15 +1,20 @@
 package eu.tutorials.roadrescuecustomer.views
 
 import CustomerSupportTicketViewModel
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import eu.tutorials.roadrescuecustomer.ui.theme.RoadRescueCustomerTheme
 import eu.tutorials.roadrescuecustomer.viewmodels.CurrentStateViewModel
@@ -26,6 +31,13 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
         setContent {
             val currentStateViewModel: CurrentStateViewModel = viewModel()
             val serviceRequestViewModel: ServiceRequestViewModel = viewModel()
@@ -58,6 +70,14 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) {
+        } else {
+            Toast.makeText(this, "Location permission is required to use this app.", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
 }
