@@ -86,9 +86,15 @@ fun SidebarContent(
                 navController.navigate(Screen.HelpScreen.route)
             })
 
+            SidebarButton(buttonName="Earning",verticalPadding=8, onClick = {
+                navController.navigate(Screen.Earning.route)
+            })
+
             SidebarButton(buttonName="Settings",verticalPadding=8, onClick = {
                 navController.navigate(Screen.SettingsScreen.route)
             })
+
+
 
         }
 

@@ -32,12 +32,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.garage.viewModels.GarageSessionViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
-    navController: NavController
+    navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel
 )
 {
 
@@ -80,7 +81,7 @@ fun SettingsScreen(
                         style = textStyle4,
                         fontSize = 32.sp
                     )
-            SettingsBox(navController)
+            SettingsBox(navController, loginShearedViewModel = loginShearedViewModel)
                 }
             }
         }
@@ -91,7 +92,8 @@ fun SettingsScreen(
 
 @Composable
 fun SettingsBox(
-    navController: NavController
+    navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
     var showChangePhoneNumWindow by remember { mutableStateOf(false) }
@@ -119,7 +121,7 @@ fun SettingsBox(
     }
 
     if(showChangePhoneNumWindow) {
-        ChangePhoneNumWindow (navController = navController){
+        ChangePhoneNumWindow (navController = navController,loginShearedViewModel){
             showChangePhoneNumWindow = false
         }
     }

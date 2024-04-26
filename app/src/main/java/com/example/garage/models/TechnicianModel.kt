@@ -1,6 +1,7 @@
 package com.example.garage.models
 
 class TechnicianModel(
+    private var _techId:String,
     private var _techFName: String,
     private var _techLName: String,
     private var _techContactNumber: String,
@@ -9,6 +10,14 @@ class TechnicianModel(
     private var _techExpatiateList: List<String>
 ) {
 
+
+    fun getTechId():String{
+        return _techId
+    }
+
+    fun setTechId(id:String){
+        this._techId=id
+    }
 
     fun getTechFName(): String {
         return _techFName

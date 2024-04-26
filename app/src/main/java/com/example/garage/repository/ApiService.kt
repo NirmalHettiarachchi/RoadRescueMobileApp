@@ -5,6 +5,7 @@ import com.example.garage.models.NewTechnician
 import com.example.garage.models.NewUser
 import com.example.garage.models.UpdateGarage
 import com.example.garage.models.UpdateTechnicianByGarage
+import com.example.garage.models.UpdateTechnicianByTechnician
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -32,6 +33,8 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @GET("login")
     fun login(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
+    @PUT("garage")
+    fun changePhoneNumber(@Query("garageId")garageId:String,@Query("newContactNumber")newPhoneNumber:String,@Query("option")option:String):Call<ResponseBody>
     @POST("login")
     fun locationUpdate(@Query("latitude")latitude:Double,@Query("longitude")longitude:Double,@Query("option")option:String,@Query("id")id:String): Call<ResponseBody>
 
@@ -46,6 +49,8 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("garage")
     fun postSupportTicket(@Body issueTicket: NewSupportTicket): Call<ResponseBody>
+
+    
 
     @Headers("Content-Type: application/json")
     @PUT("garage")
@@ -64,7 +69,11 @@ interface ApiService {
     fun deleteTechnician(@Query("delId") delId: String):Call<ResponseBody>
     @Headers("Content-Type: application/json")
     @PUT("technician")
-    fun updateTechnician(@Body technician: UpdateTechnicianByGarage):Call<ResponseBody>
+    fun updateTechnician(@Query("option") option: String, @Body technician: UpdateTechnicianByGarage):Call<ResponseBody>
+
+    @Headers("Content-Type: application/json")
+    @PUT("technician")
+    fun updateTechnicianByTechnicianApp(@Query("option")option:String,@Body technician: UpdateTechnicianByTechnician):Call<ResponseBody>
 
 
     @Headers("Content-Type: application/json")

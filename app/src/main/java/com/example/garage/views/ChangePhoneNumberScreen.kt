@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,26 +24,36 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthProvider
+import com.example.garage.models.ResponseObject
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
+import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 @Composable
-fun ChangePhoneNumWindow(navController: NavController,onDismiss: () -> Unit) {
+fun ChangePhoneNumWindow(
+    navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel,
+    onDismiss: () -> Unit) {
+
+    val showDialog = remember { mutableStateOf(false) }
+    var title by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    var buttonOneName by remember { mutableStateOf("") }
+    var buttonTwoName by remember { mutableStateOf("") }
 
     var newPhoneNumber by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val viewModel:MainViewModel= viewModel()
+    val containScope = rememberCoroutineScope()
+    var processingBarStatus = remember { mutableStateOf(false) }
+    var generatedOTP = "0"
 
-    var loading by remember { mutableStateOf(false) }
-    /*CircularProgressBar(isDisplayed = loading)*/
-
-    var mAuth: FirebaseAuth? = null
-    mAuth = FirebaseAuth.getInstance()
-    var otpid by remember {
-        mutableStateOf("")
-    }
-
+    CircularProcessingBar(isShow = processingBarStatus.value)
     AlertDialog(
         onDismissRequest = { onDismiss() },
         tonalElevation = 16.dp,
@@ -80,89 +91,79 @@ fun ChangePhoneNumWindow(navController: NavController,onDismiss: () -> Unit) {
                 AuthFieldBtn(
                     onClickButton = {
 
-                        /*if (newPhoneNumber.isNotEmpty() && newPhoneNumber.trim().length == 12 && newPhoneNumber.trim().startsWith("+94")) {
-                            loading = true
-                            loginViewModel.checkPhoneNumberExists(
-                                Customer(
-                                    null,
-                                    null, null,
-                                    phoneNumber = newPhoneNumber
-                                ), object :
-                                    LoginViewModel.PhoneNumberCheckCallback {
-                                    override fun onResult(exists: Boolean) {
-                                        if (!exists) {
-                                            PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                                                newPhoneNumber.replace(" ", ""),  // Phone number to verify
-                                                60,  // Timeout duration
-                                                TimeUnit.SECONDS,  // Unit of timeout
-                                                //mainActivity,  // Activity (for callback binding)
-                                                object :
-                                                    PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                                                    override fun onCodeSent(
-                                                        s: String,
-                                                        forceResendingToken: PhoneAuthProvider.ForceResendingToken
-                                                    ) {
-                                                        loading = false
-                                                        otpid = s
-                                                        Log.d("TAG", "onCodeSent: OTP Received $s")
-                                                        Toast.makeText(
-                                                            context,
-                                                            "OTP sent",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                            .show()
-                                                    }
+                        containScope.launch {
 
-                                                    override fun onVerificationCompleted(
-                                                        phoneAuthCredential: PhoneAuthCredential
-                                                    ) {
-                                                        loading = false
-                                                        mAuth?.signInWithCredential(phoneAuthCredential)
-                                                            ?.addOnCompleteListener(
-                                                               // mainActivity
-                                                            ) { task ->
-                                                                if (task.isSuccessful) {
-                                                                    //todo
-                                                                } else {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "Error",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                }
-                                                            }
-                                                    }
+                            if (newPhoneNumber.length==12 && newPhoneNumber.isNotEmpty()){
+                                val response=sentOtp(viewModel,newPhoneNumber)
 
-                                                    override fun onVerificationFailed(e: FirebaseException) {
-                                                        loading = false
-                                                        Toast.makeText(
-                                                            context,
-                                                            e.message,
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
+                                if (response != null) {
+                                    if (response.status == 200) {
+                                        processingBarStatus.value=false
+                                        generatedOTP=response.data.toString()
+                                        Toast.makeText(
+                                            context,
+                                            response.data.toString(),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
 
-
-                                                    }
-                                                })
-                                        } else {
-                                            loading = false
-                                            MainScope().launch {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Phone number already exists",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                        }
+                                    } else if (response.status == 400) {
+                                        processingBarStatus.value=false
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (response.status == 404) {
+                                        processingBarStatus.value=false
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (response.status == 500) {
+                                        processingBarStatus.value=false
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (response.status == 508) {
+                                        processingBarStatus.value=false
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        processingBarStatus.value=false
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
-                                })
-                        } else {
-                            Toast.makeText(context, "Enter a valid phone number", Toast.LENGTH_SHORT).show()
-                        }*/
+                                } else {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        "Cannot call the sever",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    "Phone number wrong",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        }
+
                     }
                 )
 
-              //  otp = AuthField("Enter the OTP", "", false)
+                otp = AuthField("Enter the OTP", "", false)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -172,48 +173,137 @@ fun ChangePhoneNumWindow(navController: NavController,onDismiss: () -> Unit) {
                         .align(Alignment.CenterHorizontally)
                         .padding(10.dp)
                 ) {
-                    if (otp.isNotEmpty()) {
-                        loading = true
-                        val credential =
-                            otpid.let { PhoneAuthProvider.getCredential(it, otp) }
-                        if (credential != null) {
-                            mAuth?.signInWithCredential(credential)
-                                ?.addOnCompleteListener(
-                                  //  mainActivity
-                                ) { task ->
-                                  /*  val customerId = AppPreferences(context).getStringPreference(
-                                        "CUSTOMER_ID",
-                                        ""
-                                    )*/
-                                    if (task.isSuccessful) {
-                                        //profileViewModel.changePhoneNumber(newPhoneNumber, customerId)
-                                        navController.navigate("loginscreen") {
-                                            popUpTo("loginscreen") { inclusive = true }
-                                        }
-                                      //  AppPreferences(context).clearAllPreferences()
-                                        /*currentStateViewModel.setCurrentState(
-                                            isServiceRequested = false,
-                                            isReqServiceWindowOpened = false
-                                        )*/
-//                                        serviceRequestViewModel.clearData()
-                                        Toast.makeText(context, "Phone number changed successfully", Toast.LENGTH_SHORT).show()
-                                        loading = false
-                                    } else {
-                                        loading = false
-                                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                                    }
+
+                    containScope.launch {
+                        if (otp==generatedOTP) {
+                            Log.d("id", "ChangePhoneNumWindow: ${loginShearedViewModel.loginId}")
+                           val response = loginShearedViewModel.loginId?.let { savePhoneNumber(it,newPhoneNumber,viewModel) }
+
+                            if (response != null) {
+                                if (response.status == 200) {
+                                    processingBarStatus.value=false
+                                    title = "Updated successfully"
+                                    message = response.message.toString()
+                                    buttonOneName = "null"
+                                    buttonTwoName = "null"
+                                    processingBarStatus.value=false
+                                    showDialog.value = true
+
+                                } else if (response.status == 204){
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }else if (response.status == 400) {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else if (response.status == 404) {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else if (response.status == 500) {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else if (response.status == 508) {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    processingBarStatus.value=false
+                                    Toast.makeText(
+                                        context,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+                            } else {
+                                processingBarStatus.value=false
+                                Toast.makeText(
+                                    context,
+                                    "Cannot call the sever",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }else{
-                            loading = false
-                            Log.d("TAG", "LoginBox: Credential Null")
+                            Toast.makeText(
+                                context,
+                                "Incorrect OTP",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Enter OTP", Toast.LENGTH_SHORT).show()
                     }
+
+
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
+            if (showDialog.value) {
+                sweetAlertDialog(
+                    title = title,
+                    message = message,
+                    buttonOneName = buttonOneName,
+                    buttonTwoName = buttonTwoName,
+                    onConfirm = {
+                        showDialog.value = false
+                        navController.navigate(Screen.SettingsScreen.route)
+                    }
+                )
+            }
         }
     )
+}
+
+suspend fun savePhoneNumber(loginId: String, newPhoneNumber: String, viewModel: MainViewModel):ResponseObject? {
+    var response: ResponseObject? = null
+    try {
+        viewModel.chanePhoneNumber(loginId,newPhoneNumber, "changePhoneNumber") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    Log.d("TAG null", "savePhoneNumber: 9")
+    return response
+}
+
+suspend fun sentOtp(viewModel: MainViewModel, newPhoneNumber: String):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.checkPhoneNumberIsExists(newPhoneNumber, "sentOtp") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
+
 }

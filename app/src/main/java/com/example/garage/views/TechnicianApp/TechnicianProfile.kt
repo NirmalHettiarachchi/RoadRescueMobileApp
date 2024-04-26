@@ -1,5 +1,6 @@
 package com.example.garage.views.TechnicianApp
 
+import android.content.ContentValues.TAG
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -7,6 +8,8 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -64,9 +67,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.R
 import com.example.garage.models.ResponseObject
+import com.example.garage.models.TechnicianModel
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.TechShearedViewModel
+import com.example.garage.views.CircularProcessingBar
 import com.example.garage.views.CommonButton
 import com.example.garage.views.CommonDropdown
 import com.example.garage.views.CommonTextField
@@ -95,7 +101,7 @@ fun TechnicianProfile(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val showDialogSelectPic = remember { mutableStateOf(false) }
-
+    var processingBarStatus = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -170,6 +176,9 @@ fun TechnicianProfile(
                     TechnicianFooter(navController, "navStatus")
                 }
             ) {
+
+                CircularProcessingBar(isShow = processingBarStatus.value)
+
                 Column(
                     modifier = defaultBackground.padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -340,131 +349,217 @@ fun TechnicianProfile(
                                     .width(150.dp)
                                     .height(48.dp), onClickButton = {
 
-                                    bitmap.value.let {tempBitmap ->
-                                        val saveLocation= saveImage(context,tempBitmap,loginShearedViewModel.loginId)
-                                        if (saveLocation!=null) {
+                                    processingBarStatus.value=true
+
+                                    bitmap.value.let { tempBitmap ->
+                                        val saveLocation = saveImage(
+                                            context,
+                                            tempBitmap,
+                                            loginShearedViewModel.loginId
+                                        )
+
+                                        if (saveLocation != null) {
                                             coroutineScope.launch {
 
-/*
 
 
+                                                val trimmedName = techName.trim()
+                                                val parts = trimmedName.split(Regex("\\s+"))
+                                                val firstName = parts[0]
+                                                val lastName = parts.drop(1).joinToString(" ")
 
-                                                loginShearedViewModel.loginId?.let { it1 ->
-                                                    editProfileTechnician(
+                                                val technician =
+                                                    techData?.techExpatiateList?.let { it1 ->
+                                                        loginShearedViewModel.loginId?.let { it2 ->
+                                                            TechnicianModel(
+                                                                it2,
+                                                                firstName,
+                                                                lastName,
+                                                                techcontactnumber,
+                                                                techEmail,
+                                                                saveLocation,
+                                                                it1
+                                                            )
+                                                        }
+                                                    }
+
+                                                if (technician != null) {
+                                                    val response=editProfileTechnician(
                                                         viewModel,
-                                                        it1
+                                                        technician
                                                     )
+
+                                                    if (response != null) {
+                                                        if (response.status == 200) {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Updated",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                            navController.navigate(Screen.TechnicianDashboard.route)
+
+                                                        } else if (response.status == 400) {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                response.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                        } else if (response.status == 404) {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                response.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                        } else if (response.status == 500) {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                response.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (response.status == 508) {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                response.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else {
+                                                            processingBarStatus.value=false
+                                                            Toast.makeText(
+                                                                context,
+                                                                response.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    } else {
+                                                        processingBarStatus.value=false
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Cannot call the sever",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+
                                                 }
-
-                                                val part = techName.split(" ")
-
-                                                val technician=TechnicianModel(
-                                                    part[0],part[1],techcontactnumber,techEmail,te
-                                                )
-*/
-
                                             }
                                         }
-
                                     }
-
-
-
 
                                 })
 
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
 
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(26.dp))
-                    Footer(navController, navyStatus)
                 }
+
+                Spacer(modifier = Modifier.height(26.dp))
+                Footer(navController, navyStatus)
             }
         }
+    }
 
-        // image loader
+    // image loader
 
-        if (showDialogSelectPic.value) {
-            Dialog(
-                onDismissRequest = { showDialogSelectPic.value = false },
-                content = {
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.SpaceEvenly,
+    if (showDialogSelectPic.value) {
+        Dialog(
+            onDismissRequest = { showDialogSelectPic.value = false },
+            content = {
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF253555))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                         modifier = Modifier
-                            .width(300.dp)
-                            .height(80.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF253555))
+                            .fillMaxWidth()
+                            .weight(1f)
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
+                        Image(
+                            painter = painterResource(id = R.drawable.baseline_camera_alt_24),
+                            contentDescription = null,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_camera_alt_24),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
-                                    .clickable {
-                                        launcher.launch()
-                                        showDialogSelectPic.value = false
-                                    }
-                            )
-                            Text(
-                                text = "Camera",
-                                style = textStyle4
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(0.2f))
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_image_24),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
-                                    .clickable {
-                                        launcherImage.launch("image/*")
-                                        showDialogSelectPic.value = false
-                                    }
-                            )
-                            Text(
-                                text = "Gallery",
-                                style = textStyle4
-                            )
-                        }
-
+                                .size(50.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color.White)
+                                .clickable {
+                                    launcher.launch()
+                                    showDialogSelectPic.value = false
+                                }
+                        )
+                        Text(
+                            text = "Camera",
+                            style = textStyle4
+                        )
                     }
-                }
-            )
+                    Spacer(modifier = Modifier.weight(0.2f))
 
-        }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.baseline_image_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color.White)
+                                .clickable {
+                                    launcherImage.launch("image/*")
+                                    showDialogSelectPic.value = false
+                                }
+                        )
+                        Text(
+                            text = "Gallery",
+                            style = textStyle4
+                        )
+                    }
+
+                }
+            }
+        )
 
     }
+
 }
 
-/*suspend fun editProfileTechnician(viewModel: MainViewModel, techId: String) {
+
+suspend fun editProfileTechnician(
+    viewModel: MainViewModel,
+    technician: TechnicianModel,
+): ResponseObject? {
     var response: ResponseObject? = null
 
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechId()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getImgRef()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechFName()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechLName()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechContactNumber()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechEmail()}")
+    Log.d(TAG, "editProfileTechnician: ${technician.getTechExpatiateList()}")
+
     try {
-        viewModel.updateTechnicianByTechnicianApp(techId, "getTechnician") { responseObject ->
+        viewModel.updateTechnicianByTechnicianApp(technician) { responseObject ->
             if (responseObject != null) {
                 response = responseObject
             } else {
@@ -477,7 +572,7 @@ fun TechnicianProfile(
         response = ResponseObject(404, "Exception error.", e.localizedMessage)
     }
     return response
-}*/
+}
 
 suspend fun loadTechnicianData(viewModel: MainViewModel, techId: String): ResponseObject? {
     var response: ResponseObject? = null

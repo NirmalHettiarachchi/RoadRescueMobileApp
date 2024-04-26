@@ -23,7 +23,7 @@ import com.example.garage.viewModels.TechShearedViewModel
 import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.Activities
 import com.example.garage.views.AddTechnician
-import com.example.garage.views.ChangePhoneNumWindow
+import com.example.garage.views.EarningsScreen
 import com.example.garage.views.EditTechnician
 import com.example.garage.views.GarageDashboard
 import com.example.garage.views.GarageProfile
@@ -32,6 +32,7 @@ import com.example.garage.views.HelpBox
 import com.example.garage.views.LoginScreen
 import com.example.garage.views.RegisterScreen
 import com.example.garage.views.SettingsScreen
+import com.example.garage.views.TechnicianApp.TechnicianActivities
 import com.example.garage.views.TechnicianApp.TechnicianCompleteJob
 import com.example.garage.views.TechnicianApp.TechnicianDashboard
 import com.example.garage.views.TechnicianApp.TechnicianProfile
@@ -65,7 +66,7 @@ fun SetupNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route,
+        startDestination = Screen.TechnicianActivities.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -145,12 +146,10 @@ fun SetupNavGraph(
         }
 
         composable(route=Screen.SettingsScreen.route) {
-            SettingsScreen(navController)
+            SettingsScreen(navController,loginShearedViewModel)
         }
 
-        composable(route=Screen.ChangePhoneNumberScreen.route){
-            ChangePhoneNumWindow(navController = navController, onDismiss = {})
-        }
+
 
         composable(route=Screen.HelpScreen.route){
             HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel)
@@ -170,7 +169,17 @@ fun SetupNavGraph(
             )
         }
 
+        composable(
+            route=Screen.TechnicianActivities.route
+        ){
+            TechnicianActivities(navController = navController,loginShearedViewModel)
+        }
 
+        composable(
+            route=Screen.Earning.route
+        ){
+            EarningsScreen(navController)
+        }
 
     }
 }

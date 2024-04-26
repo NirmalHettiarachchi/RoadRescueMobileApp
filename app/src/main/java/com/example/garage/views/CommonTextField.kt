@@ -49,7 +49,7 @@ fun CommonTextField(
     keyboardType: KeyboardType
 ):String{
     var textFieldValue by remember { mutableStateOf(value) }
-
+    var clickMoreInformation by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -100,7 +100,10 @@ fun CommonTextField(
                 },
                 suffix = {
                     if (prefixStatus) {
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(onClick = {
+                            clickMoreInformation=true
+
+                        }) {
                             Icon(
                                 imageVector = Icons.Rounded.Info,
                                 contentDescription = "Change ContactNumber",
@@ -114,7 +117,15 @@ fun CommonTextField(
                 )
             )
         }
+        if (clickMoreInformation){
+            MoreInfoWindow(
+                message = "Change phone number in settings?"
+            ){
+                clickMoreInformation = false
+            }
+        }
     }
 
     return textFieldValue
 }
+

@@ -76,8 +76,6 @@ data class UpdateTechnicianByTechnician(
     val techLastName: String,
     @SerializedName("imageRef")
     val techImageRef:String,
-    @SerializedName("techExpertiseAreas")
-    val techExpertiseAreas: List<String>,
     @SerializedName("techEmail")
     val techEmail:String
 )

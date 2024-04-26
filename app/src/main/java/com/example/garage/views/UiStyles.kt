@@ -124,8 +124,11 @@ val deleteIconStyles=Modifier
 fun changeStatusType(technician: GarageTechnician): String {
     return if (technician.getTechStatus()==1){
         "Available"
+    }else if (technician.getTechStatus()==2){
+        "Assign for job"
     }else{
         "Not Available"
+
     }
 }
 

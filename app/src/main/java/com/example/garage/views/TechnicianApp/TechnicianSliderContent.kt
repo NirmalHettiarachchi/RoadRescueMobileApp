@@ -73,7 +73,7 @@ fun TechnicianSliderContent(
             })
 
             SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {
-                //navController.navigate(Screen.Activities.route)
+                navController.navigate(Screen.TechnicianActivities.route)
             })
 
             SidebarButton(buttonName="Help",verticalPadding=8, onClick = {

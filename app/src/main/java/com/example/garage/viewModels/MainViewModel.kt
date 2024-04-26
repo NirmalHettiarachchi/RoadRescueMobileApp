@@ -12,6 +12,7 @@ import com.example.garage.models.NewTechnician
 import com.example.garage.models.NewUser
 import com.example.garage.models.RegisterModel
 import com.example.garage.models.ResponseObject
+import com.example.garage.models.TechnicianModel
 import com.example.garage.models.UpdateGarage
 import com.example.garage.repository.garageService
 import kotlinx.coroutines.CompletableDeferred
@@ -27,7 +28,7 @@ class MainViewModel : ViewModel() {
     suspend fun  registerUser(
         registerModel: RegisterModel,
         option:String,
-        onResponseReceived: (ResponseObject?) -> Unit,
+        onResponseReceived: (ResponseObject?) -> Unit
     ) {
         Log.d(ContentValues.TAG, "SignUpBox: 4")
         val deferred = CompletableDeferred<ResponseObject>()
@@ -76,6 +77,52 @@ class MainViewModel : ViewModel() {
         }
         deferred.await()
 
+    }
+
+
+    suspend fun chanePhoneNumber(
+        garageId: String,
+        newPhoneNumber: String,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+        try {
+
+            val call = garageService.changePhoneNumber(garageId,newPhoneNumber,option)
+
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        responseBody?.let {
+                            val jsonString = it.string() // Convert response body to JSON string
+                            val jsonObject = JSONObject(jsonString)
+                            val status = jsonObject.optString("status").toInt()
+                            val message = jsonObject.optString("message")
+                            val data = jsonObject.optString("data")
+
+                            val responseObject = ResponseObject(status, message, data)
+
+                            onResponseReceived(responseObject)
+                            deferred.complete(responseObject)
+                        }
+
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    deferred.completeExceptionally(t)
+                }
+
+            })
+
+        } catch (e: Exception) {
+            deferred.completeExceptionally(e)
+        }catch (e:JSONException){
+            deferred.completeExceptionally(e)
+        }
+        deferred.await()
     }
 
     suspend fun  updateLocation(
@@ -421,7 +468,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try{
                 val call = garageService.updateTechnician(
-                    com.example.garage.models.UpdateTechnicianByGarage(
+                    "garage",com.example.garage.models.UpdateTechnicianByGarage(
                         technician.getTechId(),
                         technician.getTechFirstName(),
                         technician.getTechLastName(),
@@ -466,20 +513,20 @@ class MainViewModel : ViewModel() {
 
 
     suspend fun updateTechnicianByTechnicianApp(
-        technician: GarageTechnician,
+        technician: TechnicianModel,
         onResponseReceived: (ResponseObject?) -> Unit
     ){
         val deferred = CompletableDeferred<ResponseObject>()
 
         viewModelScope.launch {
             try{
-                val call = garageService.updateTechnician(
-                    com.example.garage.models.UpdateTechnicianByGarage(
+                val call = garageService.updateTechnicianByTechnicianApp(
+                    "technician",com.example.garage.models.UpdateTechnicianByTechnician(
                         technician.getTechId(),
-                        technician.getTechFirstName(),
-                        technician.getTechLastName(),
-                        technician.getTechImageRef(),
-                        technician.getTechExpertiseAreas()
+                        technician.getTechFName(),
+                        technician.getTechLName(),
+                        technician.getImgRef(),
+                        technician.getTechEmail()
                     )
                 )
 
@@ -958,6 +1005,58 @@ class MainViewModel : ViewModel() {
             }
         }
         deferred.await()
+    }
+
+   suspend fun loadTechActivities(
+        techId: String,
+        option: String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ) {
+
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.getTechnician(techId,option)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            Log.d("TAG response", "onResponse: ${response}")
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                Log.d("status", "onResponse: $status")
+                                Log.d("message", "onResponse: $message")
+                                Log.d("data", "onResponse: $data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+
     }
 
 

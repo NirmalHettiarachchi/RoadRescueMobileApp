@@ -286,7 +286,9 @@ fun TechniciansList(
 
                                 if (techStatus.equals("Available")) {
                                     techDetails.setTechStatus(1)
-                                } else {
+                                } else if(techStatus.equals("Assign for Job")){
+                                    techDetails.setTechStatus(2)
+                                }else{
                                     techDetails.setTechStatus(0)
                                 }
 
