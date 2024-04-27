@@ -84,7 +84,7 @@ class CustomerSupportTicketViewModel : ViewModel() {
                         preparedStatement.executeUpdate()
                     }
                     MainScope().launch {
-                        Toast.makeText(context, "Support ticket created successfully", Toast.LENGTH_SHORT)
+                        Toast.makeText(context, "Complaint submitted successfully", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } catch (e: Exception) {

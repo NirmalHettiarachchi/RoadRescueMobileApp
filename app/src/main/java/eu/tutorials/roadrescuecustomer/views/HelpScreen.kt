@@ -230,7 +230,7 @@ fun RequestHelpWindow(
 
                 val issueList = listOf("Login Issue", "Payment Issue", "Technical Glitch", "Feedback", "Other")
 
-                issue = dropDownCommon("Issue", issueList)
+                issue = dropDownCommon("Issue (required)", issueList)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
