@@ -1,5 +1,6 @@
 package com.example.garage.repository
 
+import com.example.garage.models.AddBankDetails
 import com.example.garage.models.NewSupportTicket
 import com.example.garage.models.NewTechnician
 import com.example.garage.models.NewUser
@@ -21,8 +22,8 @@ import retrofit2.http.Query
 
 
 
-private val ipV4Address="192.168.28.117"
-private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/roadRescueBackend/")
+private val ipV4Address="192.168.163.117"
+private val retrofit = Retrofit.Builder().baseUrl("http://${ipV4Address}:8082/backend/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
@@ -79,6 +80,7 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @GET("service")
     fun getServiceRequests(@Query("searchId") searchId: String,@Query("option") option:String): Call<ResponseBody>
+
     @PUT("service")
     fun updateServiceRequest(
         @Query("option") option:String,
@@ -93,4 +95,8 @@ interface ApiService {
         @Query("serviceId")serviceId:String,
         @Query("amount")amount:String
     ): Call<ResponseBody>
+    @POST("bankDetail")
+    fun addBankDetails(@Body cardDetails: AddBankDetails):Call<ResponseBody>
+    @PUT("statusServlet")
+    fun changeStatus(@Query("option")option:String,@Query("status")status:String,@Query("id")id:String):Call<ResponseBody>
 }

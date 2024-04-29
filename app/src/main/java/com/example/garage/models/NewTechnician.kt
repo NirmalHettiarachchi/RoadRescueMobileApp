@@ -80,5 +80,18 @@ data class UpdateTechnicianByTechnician(
     val techEmail:String
 )
 
+data class AddBankDetails(
+    @SerializedName("bank")
+    val bank: String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("branch")
+    val branch: String,
+    @SerializedName("accountNumber")
+    val accountNumber: String,
+    @SerializedName("garageId")
+    val garageId: String,
+    )
+
 
 

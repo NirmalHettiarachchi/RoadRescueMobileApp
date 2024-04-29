@@ -25,6 +25,9 @@ sealed class Screen(val route :String) {
     object SettingsScreen:Screen(route = "Setting_Screen")
     object HelpScreen:Screen(route = "Help")
     object Earning:Screen(route = "Earning")
+    object ChangeTechnicianPhoneNumber:Screen(route = "ChangeTechnicianPhoneNumber")
+    object TechHelpScreen:Screen(route = "TechHelpScreen")
+    object TechnicianTrackLocation:Screen(route = "TechnicianTrackLocation")
 
 
 

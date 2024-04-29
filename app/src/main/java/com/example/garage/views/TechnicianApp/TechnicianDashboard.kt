@@ -246,7 +246,7 @@ fun TechnicianDashboard(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    TechnicianSliderContent(navController) {
+                    TechnicianSliderContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -477,6 +477,22 @@ fun ServiceRequest(
 
 
         if (button) {
+
+            val details= TechnicianDashboardServiceCommonDetails(
+                techId,
+                technicianService.getServiceId(),
+                technicianService.getTime(),
+                technicianService.getDescription(),
+                technicianService.getIssueCategory(),
+                technicianService.getCustomerName(),
+                technicianService.getCustomerContact(),
+                technicianService.getVehicleModel(),
+                customerLocation
+            )
+            technicianShearedViewModel.techCommonDetails(details)
+
+
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -485,21 +501,8 @@ fun ServiceRequest(
 
                 CommonButton(
                     btnName = "Show Details",
-                    modifier = Modifier.align(Alignment.CenterVertically).width(90.dp),
+                    modifier = Modifier.align(Alignment.CenterVertically).width(170.dp),
                     onClickButton = {
-
-                        val details= TechnicianDashboardServiceCommonDetails(
-                            techId,
-                            technicianService.getServiceId(),
-                            technicianService.getTime(),
-                            technicianService.getDescription(),
-                            technicianService.getIssueCategory(),
-                            technicianService.getCustomerName(),
-                            technicianService.getCustomerContact(),
-                            technicianService.getVehicleModel(),
-                            customerLocation
-                        )
-                        technicianShearedViewModel.techCommonDetails(details)
                         navController.navigate(route = Screen.TechnicianCompleteJob.route)
                     }
                 )

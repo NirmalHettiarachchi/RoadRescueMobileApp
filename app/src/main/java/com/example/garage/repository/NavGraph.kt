@@ -32,10 +32,13 @@ import com.example.garage.views.HelpBox
 import com.example.garage.views.LoginScreen
 import com.example.garage.views.RegisterScreen
 import com.example.garage.views.SettingsScreen
+import com.example.garage.views.TechnicianApp.SettingsTechnicianScreen
+import com.example.garage.views.TechnicianApp.TechHelpScreen
 import com.example.garage.views.TechnicianApp.TechnicianActivities
 import com.example.garage.views.TechnicianApp.TechnicianCompleteJob
 import com.example.garage.views.TechnicianApp.TechnicianDashboard
 import com.example.garage.views.TechnicianApp.TechnicianProfile
+import com.example.garage.views.TechnicianApp.TechnicianTrackLocationScreen
 import com.example.garage.views.TechniciansList
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -60,13 +63,14 @@ fun SetupNavGraph(
     val locationViewModel:LocationViewModel= viewModel()
     val notificationViewModel: NotificationViewModel = viewModel()
     val techShearedViewModel:TechShearedViewModel = viewModel()
+    val technicianShearedViewModel:TechnicianShearedViewModel= viewModel()
     val locationUtils=LocationUtils(context)
 
 
 
     NavHost(
         navController = navController,
-        startDestination = Screen.TechnicianActivities.route,
+        startDestination = Screen.Login.route,
         enterTransition = {
             fadeIn(animationSpec = tween(700))+slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left, tween(700)
@@ -102,19 +106,19 @@ fun SetupNavGraph(
         composable(
             route=Screen.Activities.route
         ){
-            Activities(navController, "activities")
+            Activities(navController,loginShearedViewModel, "activities")
         }
 
         composable(
             route=Screen.EditTechnician.route,
         ){
-            EditTechnician(navController = navController,navyStatus = "editTechnician",sharedViewModel = sharedViewModel)
+            EditTechnician(navController = navController,navyStatus = "editTechnician",sharedViewModel = sharedViewModel,loginShearedViewModel)
         }
 
         composable(
             route=Screen.AddTechnician.route
         ){
-            AddTechnician(navController = navController, navyStatus = "addTechnician")
+            AddTechnician(navController = navController, navyStatus = "addTechnician",loginShearedViewModel)
         }
 
         composable(
@@ -123,14 +127,15 @@ fun SetupNavGraph(
             GarageProfile(
                 navController = navController,
                 navyStatus = "dasdewa",
-                garageSharedViewModel = garageSharedViewModel
+                garageSharedViewModel = garageSharedViewModel,
+                loginShearedViewModel
             )
         }
 
         composable(
             route=Screen.GarageProfileEdit.route
         ){
-            GarageProfileEdit(navController = navController,"garageProfileEdit",garageSharedViewModel = garageSharedViewModel)
+            GarageProfileEdit(navController = navController,"garageProfileEdit",garageSharedViewModel = garageSharedViewModel,loginShearedViewModel)
         }
 
         composable(
@@ -152,7 +157,7 @@ fun SetupNavGraph(
 
 
         composable(route=Screen.HelpScreen.route){
-            HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel)
+            HelpBox(navController = navController, garageSharedViewModel = garageSharedViewModel,loginShearedViewModel)
         }
 
         composable(
@@ -165,7 +170,7 @@ fun SetupNavGraph(
             route=Screen.TechnicianCompleteJob.route
         ){
             TechnicianCompleteJob(navController = navController, navStatus = "technicianCompleteJob", locationUtils = locationUtils, locationViewModel = locationViewModel, context = context,
-                technicianShearedViewModel = technicianDashboardServiceCommonDetails
+                technicianShearedViewModel = technicianDashboardServiceCommonDetails,loginShearedViewModel
             )
         }
 
@@ -178,8 +183,28 @@ fun SetupNavGraph(
         composable(
             route=Screen.Earning.route
         ){
-            EarningsScreen(navController)
+            EarningsScreen(navController,loginShearedViewModel)
         }
+
+        composable(
+            route=Screen.ChangeTechnicianPhoneNumber.route
+        ){
+            SettingsTechnicianScreen(navController,loginShearedViewModel)
+        }
+
+        composable(
+            route=Screen.TechHelpScreen.route
+        ){
+            TechHelpScreen(navController = navController, loginShearedViewModel =loginShearedViewModel)
+        }
+
+
+        composable(
+            route=Screen.TechnicianTrackLocation.route
+        ){
+            TechnicianTrackLocationScreen(navController,loginShearedViewModel,locationViewModel,technicianShearedViewModel)
+        }
+
 
     }
 }

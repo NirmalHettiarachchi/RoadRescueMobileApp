@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.garage.models.AddBankDetails
+import com.example.garage.models.BankDetail
 import com.example.garage.models.Garage
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.IssueSupportTicket
@@ -25,6 +27,10 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainViewModel : ViewModel() {
+    suspend fun  CancleRequest(serviceRequestId: Int) {
+
+    }
+
     suspend fun  registerUser(
         registerModel: RegisterModel,
         option:String,
@@ -1033,6 +1039,110 @@ class MainViewModel : ViewModel() {
                                 Log.d("status", "onResponse: $status")
                                 Log.d("message", "onResponse: $message")
                                 Log.d("data", "onResponse: $data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+
+    }
+
+    suspend fun addBankDetails(
+        garageId:String,
+        bankDetail: BankDetail,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ){
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.addBankDetails(
+                    AddBankDetails(
+                        bankDetail.getBank(),
+                        bankDetail.getName(),
+                        bankDetail.getBranch(),
+                        bankDetail.getAccountNumber(),
+                        garageId
+                    )
+                )
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            Log.d("TAG", "onResponse: $response")
+                            Log.d("TAG", "onResponse: ${response.body().toString()}")
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
+
+                                val responseObject = ResponseObject(status, message, data)
+
+                                onResponseReceived(responseObject)
+                                deferred.complete(responseObject)
+                            }
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        deferred.completeExceptionally(t)
+                    }
+
+                })
+
+            } catch (e: Exception) {
+                deferred.completeExceptionally(e)
+            }catch (e:JSONException){
+                deferred.completeExceptionally(e)
+            }
+        }
+        deferred.await()
+    }
+
+    suspend fun changeStatus(
+        id: String,
+        status: String,
+        option:String,
+        onResponseReceived: (ResponseObject?) -> Unit
+    ) {
+        val deferred = CompletableDeferred<ResponseObject>()
+
+        viewModelScope.launch {
+            try {
+                val call = garageService.changeStatus(option,status,id)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                        if (response.isSuccessful) {
+                            Log.d("TAG", "onResponse: $response")
+                            Log.d("TAG", "onResponse: ${response.body().toString()}")
+                            val responseBody = response.body()
+                            responseBody?.let {
+                                val jsonString = it.string() // Convert response body to JSON string
+                                val jsonObject = JSONObject(jsonString)
+                                val status = jsonObject.optString("status").toInt()
+                                val message = jsonObject.optString("message")
+                                val data = jsonObject.optString("data")
 
                                 val responseObject = ResponseObject(status, message, data)
 

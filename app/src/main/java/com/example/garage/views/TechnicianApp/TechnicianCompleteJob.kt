@@ -51,6 +51,7 @@ import com.example.garage.models.ResponseObject
 import com.example.garage.models.TechnicianDashboard
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.LocationViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.TechnicianShearedViewModel
 import com.example.garage.views.CircularProcessingBar
@@ -71,6 +72,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.SocketTimeoutException
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -83,6 +85,7 @@ fun TechnicianCompleteJob(
     locationViewModel: LocationViewModel,
     context: Context,
     technicianShearedViewModel: TechnicianShearedViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
     var viewModel: MainViewModel = viewModel()
@@ -118,7 +121,7 @@ fun TechnicianCompleteJob(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    TechnicianSliderContent(navController) {
+                    TechnicianSliderContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -439,91 +442,100 @@ fun TechnicianCompleteJob(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
+
                             CommonButton(
                                 btnName = "Check if paid by card.",
                                 modifier = Modifier.width(230.dp)
                             ) {
                                 processingBarStatus.value = true
                                 coroutineScope.launch {
-                                    while (true){
-                                        val response = service?.serviceId?.let { it1 ->
-                                            checkForCustomerPaid(
-                                                viewModel,
-                                                it1, "checkPayment"
-                                            )
-                                        }
-
-                                        if (response != null) {
-                                            if (response.status == 200) {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                                navController.navigate(Screen.TechnicianDashboard.route)
-                                            } else if (response.status == 204) {
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
-
-                                            } else if (response.status == 400) {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                                Log.d("TAG-paka ai wada natte ", "TechnicianCompleteJob: ")
-                                            } else if (response.status == 404) {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
-                                            } else if (response.status == 500) {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
-                                            } else if (response.status == 508) {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
-                                            } else {
-                                                processingBarStatus.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    response.message,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
+                                    val result = withTimeoutOrNull(20000) {  // 20000 milliseconds = 20 seconds
+                                        while (true) {
+                                            val response = service?.serviceId?.let { serviceId ->
+                                                checkForCustomerPaid(viewModel, serviceId, "checkPayment")
                                             }
-                                        } else {
-                                            processingBarStatus.value = false
-                                            Toast.makeText(
-                                                context,
-                                                "Cannot call the sever",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
 
+                                            if (response != null) {
+
+                                                if (response.status == 200) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    navController.navigate(Screen.TechnicianDashboard.route)
+                                                } else if (response.status == 204) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+
+                                                } else if (response.status == 400) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    Log.d("TAG-paka ai wada natte ", "TechnicianCompleteJob: ")
+                                                } else if (response.status == 404) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else if (response.status == 500) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else if (response.status == 508) {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else {
+                                                    processingBarStatus.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        response.message,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+                                                break  // Stop the loop if a response is received
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Cannot call the server",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                break  // Stop the loop on failure to receive a response
+                                            }
+                                            delay(10000)  // Wait for 10 seconds before checking again
                                         }
-                                        delay(1000 * 10)
-
                                     }
-                                    
+                                    if (result == null) {
+                                        // This block runs only if the timeout was reached without breaking the loop
+                                        processingBarStatus.value = false
+                                        Toast.makeText(
+                                            context,
+                                            "Checking for payment timed out",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))

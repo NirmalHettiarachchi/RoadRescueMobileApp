@@ -45,6 +45,7 @@ import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.models.GarageTechnician
 import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -52,7 +53,7 @@ import java.net.SocketTimeoutException
 
 @Composable
 fun AddTechnician(
-    navController: NavController, navyStatus:String
+    navController: NavController, navyStatus:String,loginShearedViewModel: LoginShearedViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -130,7 +131,7 @@ fun AddTechnician(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }

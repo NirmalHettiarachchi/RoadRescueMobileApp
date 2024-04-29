@@ -45,14 +45,13 @@ import com.example.garage.R
 import com.example.garage.models.CustomerSupportTicket
 import com.example.garage.models.IssueSupportTicket
 import com.example.garage.models.ResponseObject
+import com.example.garage.repository.Screen
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.views.CommonDropdown
 import com.example.garage.views.CommonTextField
 import com.example.garage.views.CustomerSupport
-import com.example.garage.views.Footer
 import com.example.garage.views.Header
-import com.example.garage.views.SidebarContent
 import com.example.garage.views.cardModifier
 import com.example.garage.views.defaultBackground
 import com.example.garage.views.loadCustomerSupports
@@ -142,7 +141,7 @@ fun TechHelpScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    TechnicianSliderContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -158,7 +157,7 @@ fun TechHelpScreen(
                 }
             },
             bottomBar = {
-                Footer(navController, "")
+                TechnicianFooter(navController, "")
             }
         ) {
             Column(
@@ -256,6 +255,9 @@ fun TechHelpScreen(
                                                     response.message,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
+
+                                                navController.navigate(Screen.TechnicianDashboard.route)
+
                                             } else if (response.status == 400) {
                                                 Toast.makeText(
                                                     context,

@@ -71,6 +71,7 @@ import com.example.garage.R
 import com.example.garage.repository.Screen
 import com.example.garage.viewModels.GarageProfileViewModel
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -80,7 +81,8 @@ import org.json.JSONArray
 fun GarageProfile(
     navController: NavController,
     navyStatus: String,
-    garageSharedViewModel: GarageSharedViewModel
+    garageSharedViewModel: GarageSharedViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
     var garageData = garageSharedViewModel.garage
@@ -196,7 +198,7 @@ fun GarageProfile(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }

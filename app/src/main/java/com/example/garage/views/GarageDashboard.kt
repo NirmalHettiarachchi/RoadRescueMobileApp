@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -16,12 +17,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -63,16 +66,18 @@ import com.example.garage.viewModels.LocationViewModel
 import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.NotificationViewModel
-import com.example.garage.views.TechnicianApp.extractCustomerLatitude
-import com.example.garage.views.TechnicianApp.extractCustomerLongitude
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.SocketTimeoutException
+import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -165,8 +170,12 @@ fun GarageDashboard(
 
             if (serviceResponse != null) {
                 if (serviceResponse.status == 200) {
+
                     requestServices = serviceResponse.data!!.toString()
+                    Log.d("service check 00", serviceResponse.data.toString())
+
                     if (requestServices.length > preServicesLength) {
+
                         preServicesLength = requestServices.length
                         requestServices = ""
                         requestServices = serviceResponse.data!!.toString()
@@ -212,7 +221,7 @@ fun GarageDashboard(
                 buttonTwoName = "null"
                 showMessageDialog = true
             }
-            delay(1000 * 5)
+            delay(1000 * 10)
         }
 
 
@@ -275,7 +284,7 @@ fun GarageDashboard(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -329,6 +338,7 @@ fun GarageDashboard(
                     // customer request load karanna one
                     if (showServiceRequests) {
                         if (requestServices.isNotEmpty()) {
+                            Log.d("service check", requestServices)
                             val jsonArray = JSONArray(requestServices)
                             if (jsonArray.length() > preServicesLength) {
 
@@ -343,10 +353,16 @@ fun GarageDashboard(
                                     val indicatorLightStatus =
                                         jsonObject.getString("indicatorLightStatus")
                                     val serviceRequestId = jsonObject.getInt("serviceRequestId")
-                                    val garageVerification = jsonObject.getString("verification")
                                     val serviceLocation = jsonObject.getString("serviceLocation")
+                                    //  val garageVerification = jsonObject.getString("verification")
 
                                     // methananwens karanna wi balanna weyi
+
+
+                                    val garageLat = locationViewModel.location.value?.latitude
+                                    val garageLong = locationViewModel.location.value?.longitude
+
+
                                     var serviceRequest = ServicesRequestModel(
                                         serviceRequestId,
                                         customerContactNumber,
@@ -358,48 +374,26 @@ fun GarageDashboard(
                                         ""
                                     )
 
-                                    if (garageVerification == "Yes") {
+                                    ServiceRequest(
+                                        navController,
+                                        serviceRequest,
+                                        Modifier.align(Alignment.CenterHorizontally),
+                                        viewModel,
+                                        loginShearedViewModel
+                                    )
 
-                                        val customerLat =
-                                            extractCustomerLatitude(serviceLocation.toString())
-                                        val customerLong =
-                                            extractCustomerLongitude(serviceLocation.toString())
 
-                                        val garageLat = locationViewModel.location.value?.latitude
-                                        val garageLong = locationViewModel.location.value?.longitude
+                                    /*if (garageVerification == "Yes") {
 
-                                        if (garageLat != null && garageLong != null) {
-                                            val range = getRangeWithin3km(garageLat, garageLong)
-                                            if ((range.first.latitude < customerLat!!) && (range.second.latitude > garageLat) && (range.first.longitude < garageLong) && (range.second.longitude > garageLong)) {
-                                                Log.d(
-                                                    "location resound ",
-                                                    "GarageDashboard: garage eka 3 km athule hutto "
-                                                )
-                                            } else {
-                                                Log.d(
-                                                    "location resound ",
-                                                    "GarageDashboard: garage eka 3 km athule neweyi hutto  hutto "
-                                                )
-                                            }
-                                        }
 
-                                        if (garageLong != null && garageLat != null) {
 
-                                        }
-
-                                        ServiceRequest(
-                                            navController,
-                                            serviceRequest,
-                                            Modifier.align(Alignment.CenterHorizontally),
-                                            viewModel
-                                        )
                                     } else {
                                         title = "Garage not verified"
                                         message = "Unverified garage detected. Please verify."
                                         buttonOneName = "Ok"
                                         buttonTwoName = "null"
                                         showMessageDialog = true
-                                    }
+                                    }*/
 
                                     Spacer(modifier = Modifier.height(16.dp))
                                 }
@@ -428,21 +422,25 @@ fun GarageDashboard(
     }
 }
 
-fun getRangeWithin3km(lat: Double, lon: Double): Pair<LatLng, LatLng> {
-    val earthRadius = 6371 // Earth's radius in kilometers
+fun getBoundingBox(
+    lat: Double,
+    lon: Double,
+    radiusKm: Double = 3.0,
+): Pair<Pair<Double, Double>, Pair<Double, Double>> {
+    val earthRadiusKm = 6371.0 // Radius of the Earth in kilometers
+    val radPerDeg = PI / 180 // Radians per degree
+    val distFraction =
+        radiusKm / earthRadiusKm // Fraction of the Earth's radius covered by the radiusKm
 
-    val latRadians = Math.toRadians(lat)
-    val lonRadians = Math.toRadians(lon)
+    // Calculate latitude bounds
+    val minLat = lat - distFraction * 180 / PI
+    val maxLat = lat + distFraction * 180 / PI
 
-    val deltaLat = 3.0 / earthRadius
-    val deltaLon = 3.0 / (earthRadius * cos(latRadians))
+    // Calculate longitude bounds. Cosine factor adjusts for convergence of longitude lines at higher latitudes.
+    val minLon = lon - distFraction * 180 / PI / cos(lat * radPerDeg)
+    val maxLon = lon + distFraction * 180 / PI / cos(lat * radPerDeg)
 
-    val minLat = lat - Math.toDegrees(deltaLat)
-    val maxLat = lat + Math.toDegrees(deltaLat)
-    val minLon = lon - Math.toDegrees(deltaLon)
-    val maxLon = lon + Math.toDegrees(deltaLon)
-
-    return Pair(LatLng(minLat, minLon), LatLng(maxLat, maxLon))
+    return Pair(Pair(minLat, maxLat), Pair(minLon, maxLon))
 }
 
 suspend fun fetchServiceRequests(viewModel: MainViewModel): ResponseObject? {
@@ -483,6 +481,26 @@ suspend fun loadGarageDetails(viewModel: MainViewModel, searchId: String): Respo
     return response
 }
 
+fun isWithinRadius(
+    centerLat: Double,
+    centerLon: Double,
+    pointLat: Double,
+    pointLon: Double,
+    radiusKm: Double = 3.0,
+): Boolean {
+    val earthRadiusKm = 6371.0 // Earth's radius in kilometers
+
+    val dLat = (pointLat - centerLat) * PI / 180
+    val dLon = (pointLon - centerLon) * PI / 180
+    val a = sin(dLat / 2).pow(2) +
+            cos(centerLat * PI / 180) * cos(pointLat * PI / 180) *
+            sin(dLon / 2).pow(2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    val distance = earthRadiusKm * c
+
+    return distance <= radiusKm
+}
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -491,6 +509,7 @@ fun ServiceRequest(
     serviceRequest: ServicesRequestModel,
     modifier: Modifier,
     viewModel: MainViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
     val context = LocalContext.current
@@ -503,6 +522,7 @@ fun ServiceRequest(
     var showMessageDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showAlert by remember { mutableStateOf(false) }
+    var cancleDialog by remember { mutableStateOf(false) }
     var techniciansList = emptyList<String>()
 
 
@@ -634,6 +654,16 @@ fun ServiceRequest(
                     tint = Color.Black
                 )
             }
+            
+            CommonButton(
+                btnName = "Cancel",
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+
+                cancleDialog=true
+
+            }
+            
 
             CommonButton(
                 btnName = "Accept",
@@ -681,9 +711,12 @@ fun ServiceRequest(
                     if (technicianResponse != null) {
                         if (technicianResponse.status == 200) {
 
+
                             val filterTechnicians = technicianResponse.data!!.toString()
 
                             val jsonArray = JSONArray(filterTechnicians)
+
+                            Log.d("filter techniciand list pre", filterTechnicians)
 
                             for (i in 0 until jsonArray.length()) {
                                 val jsonObject = jsonArray.getJSONObject(i)
@@ -693,6 +726,8 @@ fun ServiceRequest(
 
                                 techniciansList += "$techId-$techFName $techLName"
                             }
+
+                            Log.d("filter techniciand list after", techniciansList.toString())
 
                         } else if (technicianResponse.status == 400) {
                             title = technicianResponse.status.toString()
@@ -784,10 +819,11 @@ fun ServiceRequest(
 
                             // Dropdown load
 
+                            Log.d("filter techniciand list", "$techniciansList")
 
                             val option = CommonDropdown(
                                 optionList = techniciansList,
-                                defaultSelection = "Technician ",
+                                defaultSelection = "Technician",
                                 Modifier
                             )
 
@@ -796,24 +832,30 @@ fun ServiceRequest(
 
                             // accept button load
 
-                            Log.d("dropDownValue", "$option")
 
                             CommonButton(
                                 btnName = "Assign",
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                                 onClickButton = {
+
+                                    Log.d("dropDownValue", "$option")
+
                                     val serviceProviderId = "1"
                                     Log.d(
                                         "TAG test assign button is work",
                                         "ServiceRequest: work assign button"
                                     )
                                     coroutineScope.launch {
-                                        val responseObject = assignTechnicianForService(
-                                            viewModel,
-                                            serviceRequest.getServiceRequestId(),
-                                            serviceProviderId,
-                                            option.toString()
-                                        )
+
+
+                                        val responseObject = loginShearedViewModel.loginId?.let {
+                                            assignTechnicianForService(
+                                                viewModel,
+                                                serviceRequest.getServiceRequestId(),
+                                                it,
+                                                option.toString()
+                                            )
+                                        }
 
                                         if (responseObject != null) {
                                             if (responseObject.status == 200) {
@@ -865,6 +907,7 @@ fun ServiceRequest(
                                         }
                                     }
 
+
                                 }
                             )
 
@@ -875,6 +918,130 @@ fun ServiceRequest(
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
+
+    if (cancleDialog){
+        Dialog(
+            onDismissRequest = { },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .fillMaxHeight(0.25f)
+                        .background(
+                            Color(0xFFACB3C0),
+                            shape = RoundedCornerShape(20.dp)
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "delete icon",
+                            modifier = deleteIconStyles.size(64.dp),
+                            tint = Color(0xB5D32222),
+
+                            )
+                    }
+
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Do you really want to cancel this request ? ",
+                            style = textStyleDefault
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        CommonButton(
+                            btnName = "Cancel",
+                            modifier = Modifier,
+                            onClickButton = { cancleDialog = false })
+
+                        CommonButton(btnName = "Yes", modifier = Modifier, onClickButton = {
+                            // handle technician delete operation
+
+                            cancleDialog = false
+
+                            coroutineScope.launch {
+
+                                val response=candleServiceRequest(viewModel,serviceRequest.getServiceRequestId())
+
+                                if (response != null) {
+                                    if (response.status == 200) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (response.status == 400) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else if (response.status == 404) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else if (response.status == 500) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (response.status == 508) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Can not call server",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                            }
+                        })
+
+                    }
+
+
+                }
+            }
+        )
+    }
+
 
     if (showMessageDialog) {
         sweetAlertDialog(
@@ -900,6 +1067,27 @@ fun ServiceRequest(
             }
         )
     }
+}
+
+suspend fun candleServiceRequest(viewModel: MainViewModel, serviceRequestId: Int):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.changeStatus(serviceRequestId.toString(),"6","candle") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+    } catch (e: SocketTimeoutException) {
+        // handle
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+
+    return response
 }
 
 

@@ -149,7 +149,7 @@ fun TechniciansList(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }

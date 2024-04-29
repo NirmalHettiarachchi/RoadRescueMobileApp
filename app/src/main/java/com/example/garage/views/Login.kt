@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +87,8 @@ fun LoginScreen(
             TrackLocation(
                 locationUtils = locationUtils,
                 locationViewModel = locationViewModel,
-                context = context
+                context = context,
+
             )
 
             Column(
@@ -96,12 +97,19 @@ fun LoginScreen(
             ) {
                 Column {
 
-                    Text(
-                        text = stringResource(R.string.log_in_to_road_rescue),
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = textStyle1,
-                        fontSize = 32.sp
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(1f).align(Alignment.CenterHorizontally),
+                        contentAlignment = Alignment.Center,
+
+                    ){
+                        Text(
+                            text = "log_in_to_road_rescue",
+                            modifier = Modifier,
+                            style = textStyle1,
+                            fontSize = 26.sp
+                        )
+                    }
+
 
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -271,8 +279,11 @@ fun LoginBox(
 
                             if (currentLocation!=null){
                                 if (part[0]=="sp"){
+                                    loginShearedViewModel.specificLoginId(part[1])
+                                    processingBarStatus.value=false
+                                    navController.navigate(Screen.GarageDashboard.route)
 
-                                    val response=updateLocation(
+                                    /*val response=updateLocation(
                                         viewModel,
                                         locationViewModel.location.value!!.latitude,
                                         locationViewModel.location.value!!.longitude,
@@ -335,7 +346,7 @@ fun LoginBox(
                                             "Cannot call the sever",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    }
+                                    }*/
 
                                 }else if (part[0]=="mp"){
 

@@ -71,6 +71,7 @@ import com.example.garage.R
 import com.example.garage.models.CheckBoxDetailsModel
 import com.example.garage.models.GarageTechnician
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import com.example.garage.viewModels.SharedViewModel
 import kotlinx.coroutines.launch
@@ -85,7 +86,8 @@ import java.net.SocketTimeoutException
 fun EditTechnician(
     navController: NavController,
     navyStatus:String,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ){
 
     val technicianDetails= sharedViewModel.technician
@@ -202,7 +204,7 @@ fun EditTechnician(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }

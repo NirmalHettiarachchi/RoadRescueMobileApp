@@ -1,5 +1,6 @@
 package com.example.garage.views
 
+
 import android.Manifest
 import android.content.Context
 import android.widget.Toast
@@ -54,7 +55,7 @@ fun TrackLocation(
     }
 
     if (locationUtils.hasLocationPermission(context)) {
-            locationUtils.requestLocationUpdates(locationViewModel)
+        locationUtils.requestLocationUpdates(locationViewModel)
     } else {
         // Launch the permission request only if not already granted
         SideEffect {

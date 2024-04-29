@@ -1,4 +1,4 @@
-package com.example.garage.views
+package com.example.garage.views.TechnicianApp
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -33,10 +33,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.garage.viewModels.LoginShearedViewModel
+import com.example.garage.views.Header
+import com.example.garage.views.cardModifier
+import com.example.garage.views.defaultBackground
+import com.example.garage.views.textStyle4
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(
+fun SettingsTechnicianScreen(
     navController: NavController,
     loginShearedViewModel: LoginShearedViewModel
 )
@@ -50,7 +54,7 @@ fun SettingsScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController,loginShearedViewModel) {
+                    TechnicianSliderContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -66,7 +70,7 @@ fun SettingsScreen(
                 }
             },
             bottomBar = {
-                Footer(navController, "")
+                TechnicianFooter(navController, "")
             }
         ) {
             Column(
@@ -121,7 +125,7 @@ fun SettingsBox(
     }
 
     if(showChangePhoneNumWindow) {
-        ChangePhoneNumWindow (navController = navController,loginShearedViewModel){
+        ChangeTechnicianPhoneNumWindow (navController = navController,loginShearedViewModel){
             showChangePhoneNumWindow = false
         }
     }

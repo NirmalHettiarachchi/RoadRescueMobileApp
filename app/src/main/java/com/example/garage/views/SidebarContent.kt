@@ -1,5 +1,7 @@
 package com.example.garage.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,21 +22,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.garage.models.ResponseObject
 import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
+import com.example.garage.viewModels.MainViewModel
+import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 
 
 @Composable
 
 fun SidebarContent(
     navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel,
     menuClicked:()->Unit
 ){
+    var viewModel:MainViewModel= viewModel()
+    val containScope= rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
 
@@ -75,7 +89,16 @@ fun SidebarContent(
             var garageOpenClosedStatus by remember { mutableStateOf("Closed") }
 
             SidebarButton(buttonName=garageOpenClosedStatus,verticalPadding=8, onClick = {
-                garageOpenClosedStatus=chaneState(garageOpenClosedStatus)
+                containScope.launch {
+
+                    garageOpenClosedStatus= loginShearedViewModel.loginId?.let {
+                        openChangeState(viewModel,garageOpenClosedStatus,
+                            it,context
+                        )
+                    }.toString()
+                }
+
+
             })
 
             SidebarButton(buttonName="Activities",verticalPadding=8, onClick = {
@@ -106,16 +129,122 @@ fun SidebarContent(
 
 }
 
-fun chaneState(garageOpenClosedStatus: String):String {
+
+
+suspend fun openChangeState(viewModel: MainViewModel, garageOpenClosedStatus: String,garageId:String,context: Context):String {
     var stastus=""
     if (garageOpenClosedStatus == "Closed") {
-        stastus="Open"
+
+
+        val response=changeGarageStatus(viewModel,"open",garageId)
+
+        if (response != null) {
+            if (response.status == 200) {
+
+                stastus="Open"
+
+            } else if (response.status == 400) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 404) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 500) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (response.status == 508) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            Toast.makeText(
+                context,
+                "Can not call server",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
     }else{
-        stastus="Closed"
+
+        val response=changeGarageStatus(viewModel,"close",garageId)
+
+        if (response != null) {
+            if (response.status == 200) {
+
+                stastus="Closed"
+
+            } else if (response.status == 400) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 404) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else if (response.status == 500) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (response.status == 508) {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            Toast.makeText(
+                context,
+                "Can not call server",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
     }
     return stastus
 }
 
+suspend fun changeGarageStatus(viewModel: MainViewModel, status: String,garageId: String):ResponseObject?{
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.changeStatus(garageId,status,"garage") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
+}
 
 @Composable
 

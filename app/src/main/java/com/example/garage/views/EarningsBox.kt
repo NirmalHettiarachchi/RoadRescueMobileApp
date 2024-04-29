@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,15 +46,24 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.garage.R
+import com.example.garage.models.BankDetail
+import com.example.garage.models.ResponseObject
+import com.example.garage.repository.Screen
+import com.example.garage.viewModels.LoginShearedViewModel
+import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.net.SocketTimeoutException
 
 
 @Composable
 fun EarningsScreen(
     navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel,
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -66,7 +76,7 @@ fun EarningsScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
@@ -103,7 +113,7 @@ fun EarningsScreen(
                             style = textStyle1,
                             fontSize = 32.sp
                         )
-                        EarningsBox()
+                        EarningsBox(navController,loginShearedViewModel)
                     }
                     Spacer(modifier = Modifier.height(32.dp))
                 }
@@ -115,20 +125,83 @@ fun EarningsScreen(
 }
 
 @Composable
-fun EarningsBox() {
+fun EarningsBox(
+    navController: NavController,
+    loginShearedViewModel: LoginShearedViewModel
+) {
 
     var dayEarningsWindow by remember { mutableStateOf(false) }
     var dayCardEarningsWindow by remember { mutableStateOf(false) }
     var monthlyEarningWindow by remember { mutableStateOf(false) }
     var bankDetailsWindow by remember { mutableStateOf(false) }
     var addedBankDetailsWindow by remember { mutableStateOf(false) }
+    val viewModel: MainViewModel = viewModel()
+    val garageId = loginShearedViewModel.loginId
+    val context= LocalContext.current
+
+    var dalyAmount by remember { mutableStateOf("") }
+    var dalyCardAmount by remember { mutableStateOf("") }
+    var monthlyAmount by remember { mutableStateOf("") }
+    var accountNumber by remember { mutableStateOf("###-######-###") }
+
+
+    LaunchedEffect(Unit) {
+        if (garageId != null) {
+            val response = loadEarnings(viewModel, garageId)
+            if (response!=null){
+                if (response.status == 200) {
+
+                    val jsonObject = JSONObject(response.data.toString())
+
+                    dalyAmount   = jsonObject.getString("dalyEarning")
+                    monthlyAmount  = jsonObject.getString("monthlyEarning")
+                    dalyCardAmount  = jsonObject.getString("dalyEarningCard")
+                    accountNumber = jsonObject.getString("accountNumber")
+
+
+                } else if (response.status == 400) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else if (response.status == 404) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else if (response.status == 500) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (response.status == 508) {
+                    Toast.makeText(
+                        context,
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }else{
+                Toast.makeText(
+                    context,
+                    "Cannot connect the server",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     Card(
         modifier = cardModifier,
         border = BorderStroke(width = 2.dp, Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFB6C7E3))// Apply shadow to the outer Box
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFD3EFFF))// Apply shadow to the outer Box
     ) {
         Column(
             modifier = Modifier
@@ -139,30 +212,34 @@ fun EarningsBox() {
 
             AccountFieldButton(
                 labelName = "Today's earnings",
-                value = "LKR12000.00",
+                value = dalyAmount,
                 onClickButton = { dayEarningsWindow = true }
             )
             AccountFieldButton(
                 labelName = "Today's earnings (card)",
-                value =  "LKR6800.00",
+                value = dalyCardAmount,
                 onClickButton = { dayCardEarningsWindow = true }
             )
 
             AccountFieldButton(
                 labelName = "30-day earnings",
-                value =  "LKR47500.00",
+                value = monthlyAmount,
                 onClickButton = { monthlyEarningWindow = true }
             )
 
             AccountFieldButton(
                 labelName = "Bank details",
-                value =  "821234829103",
+                value = accountNumber,
                 onClickButton = { addedBankDetailsWindow = true }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            CommonButton(btnName = "Add Bank Details", modifier = Modifier.align(Alignment.CenterHorizontally).width(190.dp)) {
+            CommonButton(
+                btnName = "Add Bank Details", modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .width(190.dp)
+            ) {
                 bankDetailsWindow = true
             }
 
@@ -185,17 +262,39 @@ fun EarningsBox() {
         }
     }
 
-    if(bankDetailsWindow) {
-        BankDetailsWindow {
-            bankDetailsWindow = false
+    if (bankDetailsWindow) {
+        if (garageId != null) {
+            BankDetailsWindow(navController,viewModel,garageId) {
+                bankDetailsWindow = false
+            }
         }
     }
 
-    if(addedBankDetailsWindow) {
+    if (addedBankDetailsWindow) {
         MoreInfoWindow(message = "This field will remain empty if you have not added your bank details.") {
             addedBankDetailsWindow = false
         }
     }
+}
+
+suspend fun loadEarnings(viewModel: MainViewModel, garageId: String): ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.getGarageDetails(garageId, "getEarningDetails") { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,12 +351,18 @@ fun AccountFieldButton(labelName: String, value: String, onClickButton: () -> Un
 }
 
 @Composable
-fun BankDetailsWindow(onDismiss: () -> Unit)
-{
+fun BankDetailsWindow(
+    navController: NavController,
+    viewModel: MainViewModel,
+    garageId: String,
+    onDismiss: () -> Unit
+) {
     var accountNumber by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var bank by remember { mutableStateOf("") }
     var branch by remember { mutableStateOf("") }
+
+    val containScope= rememberCoroutineScope()
 
     var context = LocalContext.current
 
@@ -274,11 +379,11 @@ fun BankDetailsWindow(onDismiss: () -> Unit)
             .verticalScroll(rememberScrollState()),
         containerColor = Color(0xFFDCE4EC),
         confirmButton = {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     text = "Add your bank details",
@@ -286,12 +391,17 @@ fun BankDetailsWindow(onDismiss: () -> Unit)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                accountNumber = AccountDetailsField(labelName = "Account number (required)", value = "")
+                accountNumber =
+                    AccountDetailsField(labelName = "Account number (required)", value = "")
                 name = AccountDetailsField(labelName = "Name (required)", value = "")
 
-                val bankList = listOf("BOC", "Commercial Bank", "DFCC", "HNB", "NDB", "NSB", "Sampath Bank")
+                val bankList =
+                    listOf("BOC", "Commercial Bank", "DFCC", "HNB", "NDB", "NSB", "Sampath Bank")
 
-                bank = CommonDropdown(bankList,"Bank",Modifier ).toString()
+                bank = CommonDropdown(bankList, "Bank",
+                    Modifier
+                        .width(230.dp)
+                        .height(50.dp)).toString()
 
                 branch = AccountDetailsField(labelName = "Branch (required)", value = "")
 
@@ -299,14 +409,90 @@ fun BankDetailsWindow(onDismiss: () -> Unit)
 
 
                 Spacer(modifier = Modifier.height(16.dp))
-                CommonButton(btnName = "Add", modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                CommonButton(
+                    btnName = "Add",
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
                     if (bank.isNotEmpty() && name != "" && branch != "" && accountNumber != "") {
+                        if (accountNumber.toLong()> 10){
+
+                            val bankDetail=BankDetail(
+                                bank,name,branch,accountNumber
+                            )
+
+                            containScope.launch {
+                               val response = addBankDetails(viewModel,bankDetail,garageId)
+                                if (response!=null){
+                                    if (response.status == 200) {
+
+                                        Toast.makeText(
+                                            context,
+                                            "Successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        navController.navigate(Screen.Earning.route)
+
+
+                                    } else if (response.status == 204) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else if (response.status == 400) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    }else if (response.status == 404) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else if (response.status == 500) {
+//                                        Toast.makeText(
+//                                            context,
+//                                            response.message,
+//                                            Toast.LENGTH_SHORT
+//                                        ).show()
+                                    } else if (response.status == 508) {
+                                        Toast.makeText(
+                                            context,
+                                            response.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }else{
+                                    Toast.makeText(
+                                        context,
+                                        "Cannot connect the server",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                            }
+                        }else{
+                            Toast.makeText(
+                                context,
+                                "Account number is invalided",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         //todo
                         onDismiss()
                     } else {
                         MainScope().launch {
-                            Toast.makeText(context, "Fill all the required details", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(
+                                context,
+                                "Fill all the required details",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -316,9 +502,29 @@ fun BankDetailsWindow(onDismiss: () -> Unit)
     )
 }
 
+suspend fun addBankDetails(viewModel: MainViewModel, bankDetail: BankDetail,garageId:String):ResponseObject? {
+    var response: ResponseObject? = null
+
+    try {
+        viewModel.addBankDetails(garageId,bankDetail) { responseObject ->
+            if (responseObject != null) {
+                response = responseObject
+            } else {
+                response = ResponseObject(400, "response is null", null)
+            }
+        }
+
+    } catch (e: SocketTimeoutException) {
+        response = ResponseObject(508, "Request time out.\n Please try again.", e.localizedMessage)
+    } catch (e: Exception) {
+        response = ResponseObject(404, "Exception error.", e.localizedMessage)
+    }
+    return response
+}
+
 @Composable
 fun AccountDetailsField(labelName: String, value: String?): String {
-    var fieldValue by remember { mutableStateOf(TextFieldValue(value ?: "" )) }
+    var fieldValue by remember { mutableStateOf(TextFieldValue(value ?: "")) }
 
     Box(
         modifier = Modifier

@@ -56,6 +56,7 @@ import com.example.garage.models.CustomerSupportTicket
 import com.example.garage.models.IssueSupportTicket
 import com.example.garage.models.ResponseObject
 import com.example.garage.viewModels.GarageSharedViewModel
+import com.example.garage.viewModels.LoginShearedViewModel
 import com.example.garage.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -64,7 +65,8 @@ import java.net.SocketTimeoutException
 @Composable
 fun HelpBox(
     navController: NavController,
-    garageSharedViewModel: GarageSharedViewModel
+    garageSharedViewModel: GarageSharedViewModel,
+    loginShearedViewModel: LoginShearedViewModel
 ) {
 
     val garageData = garageSharedViewModel.garage
@@ -144,7 +146,7 @@ fun HelpBox(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    SidebarContent(navController) {
+                    SidebarContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }

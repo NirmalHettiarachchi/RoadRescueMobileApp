@@ -125,7 +125,7 @@ fun TechnicianActivities(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    TechnicianSliderContent(navController) {
+                    TechnicianSliderContent(navController,loginShearedViewModel) {
                         scope.launch {
                             drawerState.close()
                         }
